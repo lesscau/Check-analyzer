@@ -1,0 +1,6 @@
+{% block content %}
+{
+   "username": {{form.username}},
+   "password": {{form.password}}
+}
+{% endblock%}
