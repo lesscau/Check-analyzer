@@ -24,9 +24,9 @@ def randomPhrase(nounList, adjList, count=1):
                 # Only single number
                 elif ("Sgtm" in i.tag) == True:
                     number = "sing"
-                # Randomize noun number
+                # Get string with number of noun
                 else:
-                    number = random.choice(("sing", "plur"))
+                    number = str(i.tag.number)
 
                 # Change only gender on adj
                 if number == "sing" or number == "fixd":
@@ -37,8 +37,6 @@ def randomPhrase(nounList, adjList, count=1):
                 # Change only number on noun and adj
                 else:
                     inflectVal = {number}
-                    # Change number of noun
-                    randNoun = i.inflect(inflectVal).word
                     break
 
         # Inflect adj
