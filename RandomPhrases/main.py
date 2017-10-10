@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import pymorphy2
 import random
 import os
