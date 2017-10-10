@@ -5,4 +5,8 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 CSRF_ENABLED = True
-SECRET_KEY = 'fhsjfhdlaksdjhrkjhjhsdlfkjd'
+SECRET_KEY = 'you-can-never-win'
+
+OPENID_PROVIDERS = [
+    { 'name': 'Google', 'url': 'https://www.google.com/accounts/o8/id' },
+    { 'name': 'Yahoo', 'url': 'https://me.yahoo.com' }]
