@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Сколько с меня?</string>
-    <string name="btn_text">Ввести покупки вручную</string>
-    <string name="login">Login</string>
+    <string name="btn_enterlist">Ввести покупки вручную</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_qr">Сканировать чек</string>
     <string name="next">Продолжить</string>
     <string name="count">0 шт</string>
     <string name="price">0.00 р</string>
