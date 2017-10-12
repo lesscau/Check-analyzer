@@ -5,7 +5,8 @@ class User(db.Model):
     username = db.Column(db.String(64), index = True, unique = True)
     phone = db.Column(db.String(12), index = True, unique = True)
     fts_key = db.Column(db.Integer, default = 0)
-    tables = db.relationship('Table', backref = 'cur_table')
+    # Queries not work with this line (???)
+    # tables = db.relationship('Table', backref = 'cur_table')
 
     def __repr__(self):
         return '<User %r>' % (self.username)
