@@ -7,7 +7,6 @@ class User(db.Model):
     fts_key = db.Column(db.Integer, default = 0)
     tables = db.relationship('Table', backref = 'cur_table')
 
-
     def __repr__(self):
         return '<User %r>' % (self.username)
 
