@@ -26,7 +26,7 @@ class Table(db.Model):
 
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    table_id = db.Column(db.Integer, ForeignKey(Table.table_id), nullable = False)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.table_id), nullable = False)
     product_name = db.Column(db.String(120), unique = True)
     count = db.Column(db.Integer)
     price = db.Column(db.Float)
@@ -36,18 +36,18 @@ class Products(db.Model):
 
 
 class UserTable(db.Model):
-    user_id = db.Column(db.Integer, ForeignKey(User.id), nullable = False, index = True)
-    table_id = db.Column(db.Integer, ForeignKey(Table.id), nullable = False, unique = True, index = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable = False, index = True)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable = False, unique = True, index = True)
     price = db.Column(db.Float)
 
 class UserTableArchive(db.Model):
-    user_id = db.Column(db.Integer, ForeignKey(User.id), nullable = False, index = True)
-    table_id = db.Column(db.Integer, ForeignKey(Table.id), nullable = False, index = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable = False, index = True)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable = False, index = True)
     price = db.Column(db.Float)
 
 class UserProduct(db.Model):
-    user_id = db.Column(db.Integer, ForeignKey(User.id), nullable = False, index = True)
-    product_id = db.Column(db.Integer, ForeignKey(Product.id), nullable = False, index = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable = False, index = True)
+    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable = False, index = True)
     table_id = db.Column(db.Integer, index = True)
     count = db.Column(db.Float)
     price = db.Column(db.Float)
