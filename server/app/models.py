@@ -1,7 +1,5 @@
 from app import db
 
-
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
@@ -22,8 +20,6 @@ class Table(db.Model):
     def __repr__(self):
         return '<Table %r>' % (self.table_key)
 
-
-
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable = False)
@@ -33,7 +29,6 @@ class Products(db.Model):
 
     def __repr__(self):
         return '<Product %r>' % (self.product_name)
-
 
 class UserTable(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -54,9 +49,3 @@ class UserProduct(db.Model):
     table_id = db.Column(db.Integer, index = True)
     count = db.Column(db.Float)
     price = db.Column(db.Float)
-
-
-
-
-
-
