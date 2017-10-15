@@ -6,63 +6,64 @@
     android:layout_height="match_parent"
     tools:context="com.trpo6.receiptanalyzer.MainActivity">
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:text="login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:text="@string/btn_login" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="368dp"
+        android:layout_height="551dp"
+        android:orientation="vertical"
+        android:paddingTop="100dp"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp"
+        android:baselineAligned="false">
 
-    <Button
-        android:id="@+id/input_button"
-        android:layout_width="0dp"
-        android:layout_height="49dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:onClick="addItemsWindow"
-        android:text="@string/btn_enterlist"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="368dp"
+            android:layout_height="49dp"
+            android:background="@color/colorPrimary"
+            android:elevation="0dp"
+            android:text="НАЙТИ СТОЛ"
+            android:layout_marginBottom="20dp"
+            android:textColor="@android:color/white" />
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.078"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="368dp"
+            android:layout_height="49dp"
+            android:background="@color/colorPrimary"
+            android:layout_marginBottom="20dp"
+            android:onClick="scanQRcode"
+            android:text="@string/btn_qr"
+            android:textColor="@android:color/white" />
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="0dp"
-        android:layout_height="49dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:onClick="scanQRcode"
-        android:text="@string/btn_qr"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_button" />
+        <Button
+            android:id="@+id/input_button"
+            android:layout_width="368dp"
+            android:layout_height="49dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/colorPrimary"
+            android:onClick="addItemsWindow"
+            android:text="@string/btn_enterlist"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/button7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@color/colorPrimary"
+            android:text="ИСТОРИЯ"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="368dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@color/colorPrimary"
+            android:text="LOG OUT"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>
