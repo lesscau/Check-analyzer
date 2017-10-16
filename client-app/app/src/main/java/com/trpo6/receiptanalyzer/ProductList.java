@@ -12,7 +12,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 public class ProductList extends AppCompatActivity {
 
-    // private static final String TAG = "MyApp";   // для отладки
+     private static final String TAG = "MyApp";
 
     ProductAdapter adapter;
     ArrayList<Product> products = new ArrayList();
@@ -39,20 +39,30 @@ public class ProductList extends AppCompatActivity {
 
     // Обработчик кнопки добавления продукта
     public void add(View view){
-        //Log.i(TAG,"go in add");   // отладка
+        Log.i(TAG,"go to add");
+        // Получение названия
         EditText productEditText = (EditText) findViewById(R.id.addProduct);
         String product = productEditText.getText().toString();
+        if(product.isEmpty() && products.contains(product)) return;
+
+        // Получение общего количества
         EditText countEditText = (EditText) findViewById(R.id.addCount);
-        int count = Integer.parseInt(countEditText.getText().toString());
+        String strCount = countEditText.getText().toString();
+        if (strCount.equals("")) return;
+        int count = Integer.parseInt(strCount);
+
+        // Получение цены
         EditText priceEditText = (EditText) findViewById(R.id.addPrice);
-        float price = Float.parseFloat(priceEditText.getText().toString());
-        if(!product.isEmpty() && !products.contains(product)){
-            products.add(new Product(product,count,price));
-            productEditText.setText("");
-            countEditText.setText("");
-            priceEditText.setText("");
-            adapter.notifyDataSetChanged();
-        }
+        String strPrice = priceEditText.getText().toString();
+        if (strPrice.equals("")) return;
+        float price = Float.parseFloat(strPrice);
+
+        // Добавление продукта в список
+        products.add(new Product(product,count,price));
+        productEditText.setText("");
+        countEditText.setText("");
+        priceEditText.setText("");
+        adapter.notifyDataSetChanged();
     }
 
     // Обработчик кнопки удаления продукта
