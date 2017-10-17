@@ -20,8 +20,12 @@ class FtsRequest:
         data = {"name": name, "email" : email, "phone": phone}
 
         response = post(url, headers = self.headers, json = data)
-        print(response.status_code)
-        return response.text
+
+        if response.ok:
+            return json.loads(json.dumps({"ftsRequestSuccess": True}))
+        else:
+            JSON = {"ftsRequestSuccess": False, "responseCode": response.status_code, "error": response.text}
+            return json.loads(json.dumps(JSON))
 
     def restorePassword(self, phone):
         url = "{}/v1/mobile/users/restore".format(self.baseUrl)
@@ -29,27 +33,30 @@ class FtsRequest:
         data = {"phone": phone}
 
         response = post(url, headers = self.headers, json = data)
-        print(response.status_code)
-        return response.text
+
+        if response.ok:
+            return json.loads(json.dumps({"ftsRequestSuccess": True}))
+        else:
+            JSON = {"ftsRequestSuccess": False, "responseCode": response.status_code, "error": response.text}
+            return json.loads(json.dumps(JSON))
 
     def checkAuthData(self, loginPhone, smsPass):
-        """
-        If ok 200 + json (email, name)
-        fail 403 + the user was not found or the specified password was not correct
-        """
         url = "{}/v1/mobile/users/login".format(self.baseUrl)
         auth = (loginPhone, smsPass)
 
         response = get(url, headers = self.headers, auth = auth)
-        print("{} {}".format(response.status_code, response.text))
-        return response.text
+        return response.ok
 
     def getReceipt(self, fn, fd, fp, loginPhone, smsPass):
         url = "{}/v1/inns/*/kkts/*/fss/{}/tickets/{}?fiscalSign={}&sendToEmail=no".format(self.baseUrl, fn, fd, fp)
         auth = (loginPhone, smsPass)
 
         response = get(url, headers = self.headers, auth = auth)
-        try:
-            return json.loads(response.text)['document']['receipt']
-        except ValueError:
-            raise ValueError('Non-JSON response: "{}"'.format(response.text))
+
+        if response.ok:
+            JSON = json.loads(response.text)['document']['receipt']
+            JSON["ftsRequestSuccess"] = True
+            return JSON
+        else:
+            JSON = {"ftsRequestSuccess": False, "responseCode": response.status_code, "error": response.text}
+            return json.loads(json.dumps(JSON))
