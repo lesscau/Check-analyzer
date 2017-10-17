@@ -32,8 +32,8 @@ class Products(db.Model):
 
 class UserTable(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable = False, index = True)
-    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable = False, unique = True, index = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable = False, unique = True, index = True)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable = False, index = True)
     price = db.Column(db.Float)
 
 class UserTableArchive(db.Model):
