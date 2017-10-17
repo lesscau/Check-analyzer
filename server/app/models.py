@@ -3,10 +3,10 @@ from app import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
+    password = db.Column(db.String(24))
     phone = db.Column(db.String(12), index = True, unique = True)
     fts_key = db.Column(db.Integer, default = 0)
-    # Queries not work with this line (???)
-    # tables = db.relationship('Table', backref = 'cur_table')
+    
 
     def __repr__(self):
         return '<User %r>' % (self.username)
