@@ -1,8 +1,6 @@
 from requests import get, post
 import json, uuid
 
-# TODO: handle possible errors
-# TODO: remove prints
 # TODO: write docstrings
 class FtsRequest:
     baseUrl = "https://proverkacheka.nalog.ru:9999"
