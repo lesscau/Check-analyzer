@@ -6,7 +6,8 @@ class User(db.Model):
     password = db.Column(db.String(24))
     phone = db.Column(db.String(12), index = True, unique = True)
     fts_key = db.Column(db.Integer, default = 0)
-    
+
+    current_table = db.relationship('Table', secondary = 'user_table')
 
     def __repr__(self):
         return '<User %r>' % (self.username)
@@ -16,6 +17,8 @@ class Table(db.Model):
     table_key = db.Column(db.String(120), index = True, unique = True)
     table_info = db.Column(db.Integer, default = "")
     table_date = db.Column(db.DateTime)
+
+    users = db.relationship('User', secondary = 'user_table')
 
     def __repr__(self):
         return '<Table %r>' % (self.table_key)
@@ -35,6 +38,9 @@ class UserTable(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable = False, unique = True, index = True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable = False, index = True)
     price = db.Column(db.Float)
+
+    user = db.relationship('User', backref = db.backref('user_tables', cascade="all, delete-orphan" ))
+    table = db.relationship('Table', backref = db.backref('user_tables', cascade="all, delete-orphan" ))
 
 class UserTableArchive(db.Model):
     id = db.Column(db.Integer, primary_key = True)
