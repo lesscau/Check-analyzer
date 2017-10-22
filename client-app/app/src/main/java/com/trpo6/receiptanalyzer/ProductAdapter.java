@@ -1,85 +1,131 @@
 package com.trpo6.receiptanalyzer;
 
-import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Добавление элементов списка продуктов
  */
 
-public class ProductAdapter extends ArrayAdapter<Product> {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder>  {
     private LayoutInflater inflater;
     private int layout;
-    private ArrayList<Product> productList;
-
-    ProductAdapter(Context context, int resource, ArrayList<Product> products) {
-        super(context, resource, products);
+    private List<Product> productList;
+    private static final String TAG = "ProductAdapter";
+    public ProductAdapter(List<Product> products) {
+        //super(context, resource, products);
         this.productList = products;
-        this.layout = resource;
-        this.inflater = LayoutInflater.from(context);
     }
 
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        return new ViewHolder(v);
+    }
 
-        final ViewHolder viewHolder;
-        if(convertView==null){
-            convertView = inflater.inflate(this.layout, parent, false);
-            viewHolder = new ViewHolder(convertView);
-            convertView.setTag(viewHolder);
-        }
-        else{
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+    @Override
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
         final Product product = productList.get(position);
-
         viewHolder.nameView.setText(product.getName());
         viewHolder.countView.setText(formatValue(product.getSelectedCount()));
         viewHolder.priceView.setText(Float.toString(product.getPrice()));
+        viewHolder.incButtonListener.setProduct(product);
+        viewHolder.decButtonListener.setProduct(product);
+        viewHolder.deleteButtonListener.setProduct(product);
+    }
 
-        // Обработчик кнопки - увеличить выбранное количество продукта
-        viewHolder.removeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int count = product.getSelectedCount()-1;
-                if(count<0) count=0;
-                product.setSelectedCount(count);
-                viewHolder.countView.setText(formatValue(count));
-            }
-        });
+    @Override
+    public int getItemCount() {
+        return productList.size();
+    }
 
-        // Обработчик кнопки - уменьшить выбранное количество продукта
-        viewHolder.addButton.setOnClickListener(new View.OnClickListener() {
+    // Обработчик кнопки - увеличить/уменьшить выбранное количество продукта
+    private void incDecCount(Product product, int delta){
+        int count = product.getSelectedCount()+delta;
+        if(count<0) count=0;
+        product.setSelectedCount(count);
+        notifyItemChanged(productList.indexOf(product));
+    }
 
-            @Override
-            public void onClick(View v) {
-                int count = product.getSelectedCount()+1;
-                product.setSelectedCount(count);
-                viewHolder.countView.setText(formatValue(count));
-            }
-        });
-        return convertView;
+    // Обработчик кнопки удаления продукта
+    private void delProduct(Product product){
+        int pos = productList.indexOf(product);
+        productList.remove(product);
+        notifyItemRemoved(pos);
     }
 
     private String formatValue(int count){
         return String.valueOf(count) ;
     }
-    private class ViewHolder {
-        final Button addButton, removeButton;
+
+
+    class ViewHolder extends RecyclerView.ViewHolder{
+        final Button incButton, decButton, delButton;
         final TextView nameView, countView, priceView;
-        ViewHolder(View view){
-            addButton = (Button) view.findViewById(R.id.addButton);
-            removeButton = (Button) view.findViewById(R.id.removeButton);
+        final IncButtonListener incButtonListener;
+        final DecButtonListener decButtonListener;
+        final DeleteButtonListener deleteButtonListener;
+
+        public ViewHolder(View view){
+            super(view);
+            incButton = (Button) view.findViewById(R.id.incButton);
+            decButton = (Button) view.findViewById(R.id.decButton);
+            delButton = (Button) view.findViewById(R.id.delButton);
             nameView = (TextView) view.findViewById(R.id.nameView);
             countView = (TextView) view.findViewById(R.id.countView);
             priceView = (TextView) view.findViewById(R.id.priceView);
+            incButtonListener = new IncButtonListener();
+            decButtonListener = new DecButtonListener();
+            deleteButtonListener = new DeleteButtonListener();
+            incButton.setOnClickListener(incButtonListener);
+            decButton.setOnClickListener(decButtonListener);
+            delButton.setOnClickListener(deleteButtonListener);
+        }
+    }
+
+    private class IncButtonListener implements View.OnClickListener {
+        private Product product;
+
+        @Override
+        public void onClick(View view) {
+            incDecCount(product,1);
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
+        }
+    }
+
+    private class DecButtonListener implements View.OnClickListener {
+        private Product product;
+
+        @Override
+        public void onClick(View view) {
+            incDecCount(product,-1);
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
+        }
+    }
+
+    private class DeleteButtonListener implements View.OnClickListener {
+        private Product product;
+
+        @Override
+        public void onClick(View view) {
+            delProduct(product);
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
         }
     }
 }
