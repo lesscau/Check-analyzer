@@ -1,4 +1,4 @@
-from passlib.apps import custom_app_context as pwd_context
+from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 
 class User(db.Model):
@@ -11,10 +11,10 @@ class User(db.Model):
     current_table = db.relationship('Table', secondary = 'user_table')
 
     def hash_password(self, password):
-        self.password = pwd_context.encrypt(password)
+        self.password = generate_password_hash(password)
 
     def verify_password(self, password):
-        return pwd_context.verify(password, self.password)
+        return check_password_hash(self.password, password)
 
     def __repr__(self):
         return '<User %r>' % (self.username)
