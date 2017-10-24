@@ -30,7 +30,7 @@ user_fields = {
 }
 
 class UserList(Resource):
-    method_decorators = {'get': [verify_password]}
+    method_decorators = {'get': [auth.login_required]}
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
