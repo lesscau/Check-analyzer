@@ -31,6 +31,7 @@ class UserList(Resource):
 
     def get(self):
         users = User.query.all()
+        self.abortIfUsersDoesntExist(users)
         return { 'users': marshal(users, users_fields) }
 
     def post(self):
@@ -45,7 +46,13 @@ class UserList(Resource):
         db.session.commit()
         return { 'user': marshal(user, user_fields) }, 201
 
-    def abortIfUserAlreadyExist(self, username, phone):
+    @staticmethod
+    def abortIfUsersDoesntExist(users):
+        if len(users) == 0:
+            abort(404, message="Users don't exist in database")
+
+    @staticmethod
+    def abortIfUserAlreadyExist(username, phone):
         users = db.session.query(User).filter(
             (User.username == username) | (User.phone == phone)).all()
         if len(users) != 0:
@@ -76,11 +83,13 @@ class Users(Resource):
         db.session.commit()
         return { 'user': marshal(user, user_fields) }
 
-    def abortIfUserDoesntExist(self, user, id):
+    @staticmethod
+    def abortIfUserDoesntExist(user, id):
         if user is None:
             abort(404, message="User id {} doesn't exist".format(id))
 
-    def abortIfUserAlreadyExist(self, username="", phone=""):
+    @staticmethod
+    def abortIfUserAlreadyExist(username="", phone=""):
         users = db.session.query(User).filter(
             (User.username == username) | (User.phone == phone)).all()
         print(users)
