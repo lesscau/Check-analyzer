@@ -69,6 +69,7 @@ class Users(Resource):
         args = self.reqparse.parse_args()
         user = User.query.get(id)
         self.abortIfUserDoesntExist(user, id)
+        self.abortIfUserAlreadyExist(args['username'], args['phone'])
         for key, value in args.items():
             if value is not None:
                 setattr(user, key, value)
@@ -78,6 +79,13 @@ class Users(Resource):
     def abortIfUserDoesntExist(self, user, id):
         if user is None:
             abort(404, message="User id {} doesn't exist".format(id))
+
+    def abortIfUserAlreadyExist(self, username="", phone=""):
+        users = db.session.query(User).filter(
+            (User.username == username) | (User.phone == phone)).all()
+        print(users)
+        if len(users) != 0:
+            abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class UserInfo(Resource):
     def get(self):
