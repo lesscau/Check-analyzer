@@ -3,7 +3,7 @@ from app import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
-    password = db.Column(db.String(24))
+    password = db.Column(db.String(128))
     phone = db.Column(db.String(12), index = True, unique = True)
     fts_key = db.Column(db.Integer, default = 0)
 
