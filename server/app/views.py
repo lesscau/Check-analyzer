@@ -90,7 +90,7 @@ class Users(Resource):
 
 	def get(self, id):
 		user = models.User.query.get(id)
-		abortIfUserDoesntExist(user, id)
+		self.abortIfUserDoesntExist(user, id)
 		return { 'user': marshal(user, user_fields) }
 
 	def put(self, id):
