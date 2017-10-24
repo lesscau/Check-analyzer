@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, request, jsonify
-from flask_restful import Resource, reqparse, fields, marshal
+from flask_restful import Resource, reqparse, fields, marshal, abort
 import json
 
 from app import app, api, db, models
@@ -63,6 +63,7 @@ class UserList(Resource):
 
 	def post(self):
 		args = self.reqparse.parse_args()
+		self.abortIfUserAlreadyExist(args['username'], args['phone'])
 		user = models.User(
 			username = args['username'],
 			password = args['password'],
@@ -70,7 +71,13 @@ class UserList(Resource):
 			fts_key = args['fts_key'])
 		db.session.add(user)
 		db.session.commit()
-		return { 'user': marshal(user, user_fields) }
+		return { 'user': marshal(user, user_fields) }, 201
+
+	def abortIfUserAlreadyExist(self, username, phone):
+		users = db.session.query(models.User).filter(
+			(models.User.username == username) | (models.User.phone == phone)).all()
+		if len(users) != 0:
+			abort(409, message="Username {} and/or phone {} already exist".format(username, phone))
 
 class Users(Resource):
 	def __init__(self):
@@ -83,17 +90,23 @@ class Users(Resource):
 
 	def get(self, id):
 		user = models.User.query.get(id)
+		abortIfUserDoesntExist(user, id)
 		return { 'user': marshal(user, user_fields) }
 
 	def put(self, id):
 		args = self.reqparse.parse_args()
 		user = models.User.query.get(id)
+		self.abortIfUserDoesntExist(user, id)
 		for key, value in args.items():
 			if value is not None:
 				setattr(user, key, value)
 		print(user.fts_key)
 		db.session.commit()
 		return { 'user': marshal(user, user_fields) }
+
+	def abortIfUserDoesntExist(self, user, id):
+		if user is None:
+			abort(404, message="User id {} doesn't exist".format(id))
 
 class UserInfo(Resource):
 	def get(self):
