@@ -1,7 +1,20 @@
+# from flask import g
 from flask_restful import Resource, reqparse, fields, marshal, abort
-from app import api, db
+from app import api, db, auth
 from app.models import User
 from app.views import APIv1
+
+@auth.verify_password
+def verify_password(username, password):
+    user = User.query.filter_by(username = username).first()
+    if not user:
+        return False
+    # g.user = user
+    return user.verify_password(password)
+
+@auth.error_handler
+def unauthorized():
+    abort(401, message="Unauthorized access")
 
 users_fields = {
     'id': fields.Integer,
@@ -17,6 +30,8 @@ user_fields = {
 }
 
 class UserList(Resource):
+    method_decorators = {'get': [verify_password]}
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('username', type = str, required = True,
@@ -39,9 +54,9 @@ class UserList(Resource):
         self.abortIfUserAlreadyExist(args['username'], args['phone'])
         user = User(
             username = args['username'],
-            password = args['password'],
             phone = args['phone'],
             fts_key = args['fts_key'])
+        user.hash_password(args['password'])
         db.session.add(user)
         db.session.commit()
         return { 'user': marshal(user, user_fields) }, 201
@@ -59,6 +74,8 @@ class UserList(Resource):
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class Users(Resource):
+    method_decorators = [auth.login_required]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('username', type = str, location = 'json')
@@ -79,6 +96,9 @@ class Users(Resource):
         self.abortIfUserAlreadyExist(args['username'], args['phone'])
         for key, value in args.items():
             if value is not None:
+                if key == "password":
+                    user.hash_password(value)
+                    continue
                 setattr(user, key, value)
         db.session.commit()
         return { 'user': marshal(user, user_fields) }
@@ -97,11 +117,40 @@ class Users(Resource):
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class UserInfo(Resource):
+    method_decorators = [auth.login_required]
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('username', type = str, location = 'json')
+        self.reqparse.add_argument('password', type = str, location = 'json')
+        self.reqparse.add_argument('phone', type = str, location = 'json')
+        self.reqparse.add_argument('fts_key', type = int, location = 'json')
+        super(UserInfo, self).__init__()
+
     def get(self):
-        pass
+        user = User.query.filter_by(username = auth.username()).first()
+        return { 'user': marshal(user, user_fields) }
 
     def put(self):
-        pass
+        args = self.reqparse.parse_args()
+        user = User.query.filter_by(username = auth.username()).first()
+        self.abortIfUserAlreadyExist(args['username'], args['phone'])
+        for key, value in args.items():
+            if value is not None:
+                if key == "password":
+                    user.hash_password(value)
+                    continue
+                setattr(user, key, value)
+        db.session.commit()
+        return { 'user': marshal(user, user_fields) }
+
+    @staticmethod
+    def abortIfUserAlreadyExist(username="", phone=""):
+        users = db.session.query(User).filter(
+            (User.username == username) | (User.phone == phone)).all()
+        print(users)
+        if len(users) != 0:
+            abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 api.add_resource(UserList, APIv1 + '/users', endpoint = 'users')
 api.add_resource(Users, APIv1 + '/users/<int:id>', endpoint = 'user')

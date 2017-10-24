@@ -1,3 +1,4 @@
+from passlib.apps import custom_app_context as pwd_context
 from app import db
 
 class User(db.Model):
@@ -8,6 +9,12 @@ class User(db.Model):
     fts_key = db.Column(db.Integer, default = 0)
 
     current_table = db.relationship('Table', secondary = 'user_table')
+
+    def hash_password(self, password):
+        self.password = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password)
 
     def __repr__(self):
         return '<User %r>' % (self.username)
