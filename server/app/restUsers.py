@@ -1,29 +1,9 @@
 from flask import g
 from flask_restful import Resource, reqparse, fields, marshal, abort
-from app import api, db, basic_auth, token_auth, multi_auth
+from app import api, db
 from app.models import User
 from app.views import APIv1
-
-@basic_auth.verify_password
-def verify_password(username, password):
-    user = User.query.filter_by(username = username).first()
-    if not user or not user.verify_password(password):
-        return False
-    g.user = user
-    return True
-
-@token_auth.error_handler
-@basic_auth.error_handler
-def unauthorized():
-    abort(401, message="Unauthorized access")
-
-@token_auth.verify_token
-def verify_token(token):
-    user = User.verify_auth_token(token)
-    if not user:
-        return False
-    g.user = user
-    return True
+from app.restAuth import Auth
 
 users_fields = {
     'id': fields.Integer,
@@ -39,7 +19,7 @@ user_fields = {
 }
 
 class UserList(Resource):
-    method_decorators = {'get': [multi_auth.login_required]}
+    method_decorators = {'get': [Auth.multi_auth.login_required]}
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -83,7 +63,7 @@ class UserList(Resource):
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class Users(Resource):
-    method_decorators = [multi_auth.login_required]
+    method_decorators = [Auth.multi_auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -121,12 +101,11 @@ class Users(Resource):
     def abortIfUserAlreadyExist(username="", phone=""):
         users = db.session.query(User).filter(
             (User.username == username) | (User.phone == phone)).all()
-        print(users)
         if len(users) != 0:
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class UserInfo(Resource):
-    method_decorators = [multi_auth.login_required]
+    method_decorators = [Auth.multi_auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -138,7 +117,6 @@ class UserInfo(Resource):
 
     def get(self):
         user = User.query.filter_by(username = g.user.username).first()
-        print(g.user.username)
         return { 'user': marshal(user, user_fields) }
 
     def put(self):
@@ -158,20 +136,9 @@ class UserInfo(Resource):
     def abortIfUserAlreadyExist(username="", phone=""):
         users = db.session.query(User).filter(
             (User.username == username) | (User.phone == phone)).all()
-        print(users)
         if len(users) != 0:
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 api.add_resource(UserList, APIv1 + '/users', endpoint = 'users')
 api.add_resource(Users, APIv1 + '/users/<int:id>', endpoint = 'user')
 api.add_resource(UserInfo, APIv1 + '/users/me', endpoint = 'userme')
-
-class Token(Resource):
-    method_decorators = [basic_auth.login_required]
-
-    def get(self):
-        user = User.query.filter_by(username = g.user.username).first()
-        token = user.generate_auth_token()
-        return { 'token': token.decode('ascii') }
-
-api.add_resource(Token, APIv1 + '/token', endpoint = 'token')
