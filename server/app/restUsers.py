@@ -1,20 +1,29 @@
-# from flask import g
+from flask import g
 from flask_restful import Resource, reqparse, fields, marshal, abort
-from app import api, db, auth
+from app import api, db, basic_auth, token_auth, multi_auth
 from app.models import User
 from app.views import APIv1
 
-@auth.verify_password
+@basic_auth.verify_password
 def verify_password(username, password):
     user = User.query.filter_by(username = username).first()
-    if not user:
+    if not user or not user.verify_password(password):
         return False
-    # g.user = user
-    return user.verify_password(password)
+    g.user = user
+    return True
 
-@auth.error_handler
+@token_auth.error_handler
+@basic_auth.error_handler
 def unauthorized():
     abort(401, message="Unauthorized access")
+
+@token_auth.verify_token
+def verify_token(token):
+    user = User.verify_auth_token(token)
+    if not user:
+        return False
+    g.user = user
+    return True
 
 users_fields = {
     'id': fields.Integer,
@@ -30,7 +39,7 @@ user_fields = {
 }
 
 class UserList(Resource):
-    method_decorators = {'get': [auth.login_required]}
+    method_decorators = {'get': [multi_auth.login_required]}
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -74,7 +83,7 @@ class UserList(Resource):
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class Users(Resource):
-    method_decorators = [auth.login_required]
+    method_decorators = [multi_auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -117,7 +126,7 @@ class Users(Resource):
             abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class UserInfo(Resource):
-    method_decorators = [auth.login_required]
+    method_decorators = [multi_auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -128,12 +137,13 @@ class UserInfo(Resource):
         super(UserInfo, self).__init__()
 
     def get(self):
-        user = User.query.filter_by(username = auth.username()).first()
+        user = User.query.filter_by(username = g.user.username).first()
+        print(g.user.username)
         return { 'user': marshal(user, user_fields) }
 
     def put(self):
         args = self.reqparse.parse_args()
-        user = User.query.filter_by(username = auth.username()).first()
+        user = User.query.filter_by(username = g.user.username).first()
         self.abortIfUserAlreadyExist(args['username'], args['phone'])
         for key, value in args.items():
             if value is not None:
@@ -155,3 +165,13 @@ class UserInfo(Resource):
 api.add_resource(UserList, APIv1 + '/users', endpoint = 'users')
 api.add_resource(Users, APIv1 + '/users/<int:id>', endpoint = 'user')
 api.add_resource(UserInfo, APIv1 + '/users/me', endpoint = 'userme')
+
+class Token(Resource):
+    method_decorators = [basic_auth.login_required]
+
+    def get(self):
+        user = User.query.filter_by(username = g.user.username).first()
+        token = user.generate_auth_token()
+        return { 'token': token.decode('ascii') }
+
+api.add_resource(Token, APIv1 + '/token', endpoint = 'token')
