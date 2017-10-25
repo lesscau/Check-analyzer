@@ -1,18 +1,14 @@
-import os
 from flask import Flask
 from flask_restful import Api
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 from flask_migrate import Migrate
 from config import basedir
+import os
 
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
-
-lm = LoginManager()
-lm.init_app(app)
 
 api = Api(app)
 basic_auth = HTTPBasicAuth()

@@ -4,15 +4,9 @@ import json
 
 from app import app
 from app.models import User
-from .forms import LoginForm
 from .FtsRequest import FtsRequest
 
 APIv1 = "/api/v1.0"
-
-@app.route(APIv1 + '/login')
-def login():
-    form = LoginForm()
-    return render_template('login.json', form = form)
 
 # Password from json not used because it doesn't exist in current User model
 @app.route(APIv1 + '/receipt')
