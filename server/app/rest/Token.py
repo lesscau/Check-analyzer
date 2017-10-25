@@ -3,7 +3,7 @@ from flask_restful import Resource
 from app import api
 from app.models import User
 from app.views import APIv1
-from app.restAuth import Auth
+from app.rest.Auth import Auth
 
 class Token(Resource):
     method_decorators = [Auth.basic_auth.login_required]

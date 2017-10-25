@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse, fields, marshal, abort
 from app import api, db
 from app.models import User
 from app.views import APIv1
-from app.restAuth import Auth
+from app.rest.Auth import Auth
 
 users_fields = {
     'id': fields.Integer,

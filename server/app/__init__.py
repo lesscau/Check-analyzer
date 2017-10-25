@@ -13,4 +13,4 @@ api = Api(app)
 
 migrate = Migrate(app, db)
 
-from app import views, models, FtsRequest, restUsers, restAuth, restToken
+from app import rest, views, models, FtsRequest
