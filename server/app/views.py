@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from flask import request, jsonify
 import json
-
 from app import app
 from app.models import User
 from .FtsRequest import FtsRequest
 
+# REST API v1 URL pattern
 APIv1 = "/api/v1.0"
 
+# TODO: Rewrite as REST
 # Password from json not used because it doesn't exist in current User model
 @app.route(APIv1 + '/receipt')
 def getReceipt():
