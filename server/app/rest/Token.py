@@ -8,8 +8,10 @@ from app.rest.Auth import Auth
 class Token(Resource):
     """
     Obtaining bearer token for authorized user
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
     """
-    # Login via basic auth required decorator
     method_decorators = [Auth.basic_auth.login_required]
 
     def get(self):

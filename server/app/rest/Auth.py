@@ -7,11 +7,11 @@ class Auth():
     """
     Authorization via basic auth or bearer token. Call methods as decorators.
 
-    :ivar    basic_auth: Authorization via basic auth
+    :var     basic_auth: Authorization via basic auth
     :vartype basic_auth: flask_httpauth.HTTPBasicAuth
-    :ivar    token_auth: Authorization via bearer token
+    :var     token_auth: Authorization via bearer token
     :vartype token_auth: flask_httpauth.HTTPTokenAuth
-    :ivar    multi_auth: Authorization via basic auth or bearer token
+    :var     multi_auth: Authorization via basic auth or bearer token
     :vartype multi_auth: flask_httpauth.MultiAuth
     """
     basic_auth = HTTPBasicAuth()
