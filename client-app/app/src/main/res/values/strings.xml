@@ -21,4 +21,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="string_internet_connection_not_available">Can not connect to the Internet</string>
+
 </resources>
