@@ -1,17 +1,17 @@
-package com.trpo6.receiptanalyzer;
+package com.trpo6.receiptanalyzer.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.FloatProperty;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
+
+import com.trpo6.receiptanalyzer.model.Item;
+import com.trpo6.receiptanalyzer.adapter.ProductAdapter;
+import com.trpo6.receiptanalyzer.R;
 
 import java.util.ArrayList;
 public class ProductListActivity extends AppCompatActivity {
@@ -19,7 +19,7 @@ public class ProductListActivity extends AppCompatActivity {
     private static final String TAG = "MyApp";
 
     ProductAdapter adapter;
-    ArrayList<Product> products = new ArrayList();
+    ArrayList<Item> items = new ArrayList();
 
     RecyclerView productList;
 
@@ -29,16 +29,16 @@ public class ProductListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_list);
 
         // данные будут браться с сервера
-        if (products.size() == 0) {
-            products.add(new Product("Картофель", 10, 5));
-            products.add(new Product("Чай", 10, 5));
-            products.add(new Product("Яйца", 10, 5));
-            products.add(new Product("Молоко", 10, 5));
-            products.add(new Product("Макароны", 10, 5));
+        if (items.size() == 0) {
+            items.add(new Item("Картофель", 2, 10));
+            items.add(new Item("Чай", 5, 60));
+            items.add(new Item("Яйца", 4, 50));
+            items.add(new Item("Молоко", 3, 45));
+            items.add(new Item("Макароны", 10, 30));
         }
 
         productList = (RecyclerView) findViewById(R.id.productList);
-        adapter = new ProductAdapter(products);
+        adapter = new ProductAdapter(items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
 
@@ -54,7 +54,7 @@ public class ProductListActivity extends AppCompatActivity {
         // Получение названия
         EditText productEditText = (EditText) findViewById(R.id.addProduct);
         String product = productEditText.getText().toString();
-        if(product.isEmpty() && products.contains(product)) return;
+        if(product.isEmpty() && items.contains(product)) return;
 
         // Получение общего количества
         EditText countEditText = (EditText) findViewById(R.id.addCount);
@@ -69,10 +69,10 @@ public class ProductListActivity extends AppCompatActivity {
         float price = Float.parseFloat(strPrice);
 
         // Добавление продукта в список
-        products.add(new Product(product,count,price));
+        items.add(new Item(product,count,price));
         productEditText.setText("");
         countEditText.setText("");
         priceEditText.setText("");
-        adapter.notifyItemInserted(products.size()-1);
+        adapter.notifyItemInserted(items.size()-1);
     }
 }

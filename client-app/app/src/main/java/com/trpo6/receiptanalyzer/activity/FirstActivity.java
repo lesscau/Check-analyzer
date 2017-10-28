@@ -1,9 +1,12 @@
-package com.trpo6.receiptanalyzer;
+package com.trpo6.receiptanalyzer.activity;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+
+import com.trpo6.receiptanalyzer.activity.LoginActivity;
+import com.trpo6.receiptanalyzer.R;
 
 public class FirstActivity extends AppCompatActivity {
 

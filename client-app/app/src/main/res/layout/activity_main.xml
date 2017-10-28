@@ -8,7 +8,7 @@
     android:paddingTop="100dp">
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/findTableButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -28,7 +28,7 @@
         android:textColor="@android:color/white" />
 
     <Button
-        android:id="@+id/input_button"
+        android:id="@+id/inputButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -38,7 +38,7 @@
         android:textColor="@android:color/white" />
 
     <Button
-        android:id="@+id/button7"
+        android:id="@+id/historyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -47,7 +47,7 @@
         android:textColor="@android:color/white" />
 
     <Button
-        android:id="@+id/button6"
+        android:id="@+id/logoutButt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"

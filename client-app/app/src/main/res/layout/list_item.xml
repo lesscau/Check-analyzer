@@ -3,34 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="80dp"
     android:orientation="vertical"
     android:padding="0dp"
     android:weightSum="1">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/countView"
-            android:layout_width="30dp"
-            android:layout_height="39dp"
-            android:layout_marginLeft="8dp"
-            android:gravity="center_vertical|center_horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toRightOf="@+id/nameView"
-            app:layout_constraintRight_toLeftOf="@+id/textView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            android:layout_marginStart="8dp" />
+        android:layout_height="match_parent">
 
         <Button
             android:id="@+id/delButton"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:background="@drawable/del"
@@ -43,69 +30,47 @@
             android:id="@+id/nameView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1.31"
             android:gravity="center_vertical"
             android:textAlignment="center"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/delButton"
-            app:layout_constraintRight_toRightOf="@+id/countView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <Button
-            android:id="@+id/decButton"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_weight="1"
-            android:background="@drawable/minus"
-            android:textAlignment="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/incButton"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <Button
-            android:id="@+id/incButton"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_weight="1"
-            android:background="@drawable/plus"
-            android:fontFamily="monospace"
-            android:textAlignment="center"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="23dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
-            android:text="x"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/priceView"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintHorizontal_bias="0.0" />
 
         <TextView
             android:id="@+id/priceView"
             android:layout_width="50dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:gravity="center_vertical|center_horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/incButton"
+            app:layout_constraintRight_toLeftOf="@+id/numberPicker"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
+
+        <NumberPicker
+            android:id="@+id/numberPicker"
+            android:layout_width="40dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:theme="@style/AppTheme.Picker"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.507" />
 
     </android.support.constraint.ConstraintLayout>
 
