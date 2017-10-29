@@ -55,7 +55,7 @@ class UserList(Resource):
         # Parsing request JSON fields
         args = self.reqparse.parse_args()
         # Error checking
-        self.abortIfUserAlreadyExist(args['username'], args['phone'])
+        self.abortIfUserAlreadyExist(args['username'])
         # Create user and add to database
         user = User(
             username = args['username'],
@@ -68,19 +68,16 @@ class UserList(Resource):
         return { 'user': marshal(user, user_fields) }, 201
 
     @staticmethod
-    def abortIfUserAlreadyExist(username, phone):
+    def abortIfUserAlreadyExist(username = None):
         """
-        Return error JSON in 409 response if user or phone already exists in database
+        Return error JSON in 409 response if username already exists in database
 
         :param username: User login
         :type  username: str
-        :param phone: User phone number
-        :type  phone: str
         """
-        users = db.session.query(User).filter(
-            (User.username == username) | (User.phone == phone)).all()
-        if len(users) != 0:
-            abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
+        user = User.query.filter_by(username = username).first()
+        if user is not None:
+            abort(409, message="Username '{}' already exist".format(username))
 
 class Users(Resource):
     """
@@ -172,7 +169,7 @@ class UserInfo(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username = g.user.username).first()
         # Error checking
-        self.abortIfUserAlreadyExist(args['username'], args['phone'])
+        self.abortIfUserAlreadyExist(args['username'])
         # Modify user info according to JSON fields
         for key, value in args.items():
             if value is not None:
@@ -185,19 +182,16 @@ class UserInfo(Resource):
         return { 'user': marshal(user, user_fields) }
 
     @staticmethod
-    def abortIfUserAlreadyExist(username="", phone=""):
+    def abortIfUserAlreadyExist(username = None):
         """
-        Return error JSON in 409 response if user or phone already exists in database
+        Return error JSON in 409 response if username already exists in database
 
         :param username: User login
         :type  username: str
-        :param phone: User phone number
-        :type  phone: str
         """
-        users = db.session.query(User).filter(
-            (User.username == username) | (User.phone == phone)).all()
-        if len(users) != 0:
-            abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
+        user = User.query.filter_by(username = username).first()
+        if user is not None:
+            abort(409, message="Username '{}' already exist".format(username))
 
 # Add classes to REST API
 api.add_resource(UserList, APIv1 + '/users', endpoint = 'users')
