@@ -17,11 +17,9 @@ public class RegActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg);
     }
-    /**Действия, совершаемые после нажатия на кнопку*/
+    /**Переход к общему меню*/
     public void menuOpen(View view) {
-        /**Объект Intent для вызова новой Activity*/
         Intent intent = new Intent(this, MainActivity.class);
-        /**Запуск activity*/
         startActivity(intent);
     }
 }

@@ -19,7 +19,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Главное меню
+ */
 public class MainActivity extends AppCompatActivity {
+    /**Запуск главного меню*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
