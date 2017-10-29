@@ -10,9 +10,13 @@ import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+/**
+ * QR сканер
+ */
 public class QRscanner extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     private ZXingScannerView mScannerView;
 
+    /**Запуск окна сканера*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,25 +24,27 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
         setContentView(mScannerView);
     }
 
+    /**Регистрация себя, как обработчика результатов сканирования и запуск камеры*/
     @Override
     public void onResume() {
         super.onResume();
-        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();          // Start camera on resume
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
     }
-
+    /**Остановка камеры при паузе*/
     @Override
     public void onPause() {
         super.onPause();
-        mScannerView.stopCamera();   // Stop camera on pause
+        mScannerView.stopCamera();
     }
-
+    /**Обработка результатов сканирования*/
     @Override
     public void handleResult(Result rawResult) {
         // Do something with the result here
+        /**Печать результатов сканирования*/
         Log.e("handler", rawResult.getText()); // Prints scan results
         Log.e("handler", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode)
-        // show the scanner result into dialog box.
+        /** Отображение результатов сканирования в диалоговом окне*/
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Scan Result");
         builder.setMessage(rawResult.getText());
