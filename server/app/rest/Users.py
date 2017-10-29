@@ -5,13 +5,6 @@ from app.models import User
 from app.views import APIv1
 from app.rest.Auth import Auth
 
-# Response JSON template for /users requests
-users_fields = {
-    'id': fields.Integer,
-    'username': fields.String,
-    'url': fields.Url('user')
-}
-
 # Response JSON template for /users/{id} or /users/me requests
 user_fields = {
     'id': fields.Integer,
