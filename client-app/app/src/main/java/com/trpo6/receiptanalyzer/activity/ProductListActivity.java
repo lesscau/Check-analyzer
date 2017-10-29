@@ -47,7 +47,7 @@ public class ProductListActivity extends AppCompatActivity {
         adapter = new ProductAdapter(items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
-        
+
         productList.setAdapter(adapter);
         productList.setLayoutManager(layoutManager);
         productList.setItemAnimator(itemAnimator);
