@@ -4,6 +4,7 @@ from app import api, db
 from app.models import User
 from app.views import APIv1
 from app.rest.Auth import Auth
+from app.FtsRequest import FtsRequest
 
 # Response JSON template for /users/{id} or /users/me requests
 user_fields = {
@@ -49,6 +50,7 @@ class UserList(Resource):
         args = self.reqparse.parse_args()
         # Error checking
         self.abortIfUserAlreadyExist(args['username'])
+        self.abortIfFtsUserDoesntExist(args['phone'], args['fts_key'])
         # Create user and add to database
         user = User(
             username = args['username'],
@@ -71,6 +73,20 @@ class UserList(Resource):
         user = User.query.filter_by(username = username).first()
         if user is not None:
             abort(409, message="Username '{}' already exist".format(username))
+
+    @staticmethod
+    def abortIfFtsUserDoesntExist(phone, fts_key):
+        """
+        Return error JSON in 409 response if user doesn't exists in Federal Tax Service
+
+        :param username: User phone number
+        :type  username: str
+        :param username: SMS key
+        :type  username: int
+        """
+        fts = FtsRequest()
+        if fts.checkAuthData(phone, fts_key) is False:
+            abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
 
 class Users(Resource):
     """

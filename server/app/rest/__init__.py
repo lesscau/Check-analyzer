@@ -1,1 +1,1 @@
-from app.rest import Auth, Token, Users
+from app.rest import Auth, Token, Users, Fts
