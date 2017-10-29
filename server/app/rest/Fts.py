@@ -30,6 +30,9 @@ class FtsSignUp(Resource):
         :return: JSON with "check" field True if user exists, False otherwise
         :rtype:  dict/json
         """
+        # Check if authorization is Basic Auth
+        if request.authorization is None:
+            abort(400, message="The resource requires the Basic authentication")
         # Get phone and SMS key from Basic Auth header
         phone = request.authorization.username
         fts_key = request.authorization.password
