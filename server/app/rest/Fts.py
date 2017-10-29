@@ -1,3 +1,4 @@
+from flask import request
 from flask_restful import Resource, reqparse, abort
 from app import api
 from app.views import APIv1
@@ -20,6 +21,24 @@ class FtsSignUp(Resource):
         self.reqparse.add_argument('phone', type = str, required = True,
             help = 'No phone provided', location = 'json')
         super(FtsSignUp, self).__init__()
+
+    def get(self):
+        """
+        Check if user exists in Federal Tax Service
+        Phone and SMS key send as Basic Auth header
+
+        :return: JSON with "check" field True if user exists, False otherwise
+        :rtype:  dict/json
+        """
+        # Get phone and SMS key from Basic Auth header
+        phone = request.authorization.username
+        fts_key = request.authorization.password
+        # Send check auth request
+        fts = FtsRequest()
+        auth = fts.checkAuthData(phone, fts_key)
+        # Return JSON
+        result = { 'check': auth }
+        return (result, 200) if auth else (result, 404)
 
     def post(self):
         """
