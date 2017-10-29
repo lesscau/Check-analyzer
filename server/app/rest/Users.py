@@ -45,17 +45,6 @@ class UserList(Resource):
             help = 'No ftskey provided', location = 'json')
         super(UserList, self).__init__()
 
-    def get(self):
-        """
-        Get all users partial info
-
-        :return: List of users with some data
-        :rtype:  dict/json
-        """
-        users = User.query.all()
-        # Return JSON using template
-        return { 'users': marshal(users, users_fields) }
-
     def post(self):
         """
         Create new user in database
@@ -126,30 +115,6 @@ class Users(Resource):
         # Return JSON using template
         return { 'user': marshal(user, user_fields) }
 
-    def put(self, id):
-        """
-        Modify existing user in database
-
-        :return: Modified user with some data
-        :rtype:  dict/json
-        """
-        # Parsing request JSON fields
-        args = self.reqparse.parse_args()
-        user = User.query.get(id)
-        # Error checking
-        self.abortIfUserDoesntExist(user, id)
-        self.abortIfUserAlreadyExist(args['username'], args['phone'])
-        # Modify user info according to JSON fields
-        for key, value in args.items():
-            if value is not None:
-                if key == "password":
-                    user.hash_password(value)
-                    continue
-                setattr(user, key, value)
-        db.session.commit()
-        # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
-
     @staticmethod
     def abortIfUserDoesntExist(user, id):
         """
@@ -162,21 +127,6 @@ class Users(Resource):
         """
         if user is None:
             abort(404, message="User id {} doesn't exist".format(id))
-
-    @staticmethod
-    def abortIfUserAlreadyExist(username="", phone=""):
-        """
-        Return error JSON in 409 response if user or phone already exists in database
-
-        :param username: User login
-        :type  username: str
-        :param phone: User phone number
-        :type  phone: str
-        """
-        users = db.session.query(User).filter(
-            (User.username == username) | (User.phone == phone)).all()
-        if len(users) != 0:
-            abort(409, message="Username '{}' and/or phone {} already exist".format(username, phone))
 
 class UserInfo(Resource):
     """
