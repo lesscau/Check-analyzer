@@ -6,7 +6,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
     password = db.Column(db.String(128))
-    phone = db.Column(db.String(12), index = True, unique = True)
+    phone = db.Column(db.String(12))
     fts_key = db.Column(db.Integer, default = 0)
 
     current_table = db.relationship('Table', secondary = 'user_table')
