@@ -21,11 +21,11 @@ import java.util.ArrayList;
 public class ProductListActivity extends AppCompatActivity {
     /**Тег*/
     private static final String TAG = "MyApp";
-    /**Что за продукт адаптер? я хз*/
+    /**Адаптер списка продуктов*/
     ProductAdapter adapter;
     /**Список продуктов*/
     ArrayList<Item> items = new ArrayList();
-    /**View списка продуктов*/
+    /**View для работы со списком продуктов*/
     RecyclerView productList;
 
     /**Запуск окна продуктов*/
