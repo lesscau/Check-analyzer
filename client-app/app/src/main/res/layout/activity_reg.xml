@@ -42,7 +42,7 @@
             android:textColor="@android:color/black" />
 
         <EditText
-            android:id="@+id/fts-keyTextEdit"
+            android:id="@+id/fts_keyTextEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
