@@ -23,7 +23,7 @@
         app:layout_constraintHorizontal_bias="0.5">
 
         <EditText
-            android:id="@+id/editText7"
+            android:id="@+id/usernameTextEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -32,7 +32,27 @@
             android:textColor="@android:color/black" />
 
         <EditText
-            android:id="@+id/editText4"
+            android:id="@+id/phoneTextEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Phone"
+            android:inputType="phone"
+            android:singleLine="true"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/fts_keyTextEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Fts-key"
+            android:inputType="numberPassword"
+            android:singleLine="true"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/passwordTextEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -41,28 +61,8 @@
             android:singleLine="true"
             android:textColor="@android:color/black" />
 
-        <EditText
-            android:id="@+id/editText5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Confirm"
-            android:inputType="textPassword"
-            android:singleLine="true"
-            android:textColor="@android:color/black" />
-
-        <EditText
-            android:id="@+id/editText6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Phone number"
-            android:inputType="phone"
-            android:singleLine="true"
-            android:textColor="@android:color/black" />
-
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/signupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"

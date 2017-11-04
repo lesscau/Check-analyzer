@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Item {
     /** наименование продукта */
-    @SerializedName("name")
+    @SerializedName("username")
     @Expose
     private String name;
 
