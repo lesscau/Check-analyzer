@@ -10,12 +10,12 @@ import com.google.gson.annotations.SerializedName;
 public class User {
 
     /** логин */
-    @SerializedName("username")
+    @SerializedName("loginPhone")
     @Expose
     private String name;
 
     /** пароль */
-    @SerializedName("password")
+    @SerializedName("smsPass")
     @Expose
     private String pass;
 
