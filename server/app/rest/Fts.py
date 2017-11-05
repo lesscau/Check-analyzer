@@ -72,27 +72,37 @@ class FtsReceiptRequest(Resource):
 
     :var     method_decorators: Decorators applied to methods
     :vartype method_decorators: list
+    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
+    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    def get(self, fn, fd, fp):
+    def __init__(self):
+        # Define request query parameters
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('fn', type = int, required = True,
+            help = 'No fn provided', location = 'args')
+        self.reqparse.add_argument('fd', type = int, required = True,
+            help = 'No fd provided', location = 'args')
+        self.reqparse.add_argument('fp', type = int, required = True,
+            help = 'No fp provided', location = 'args')
+        super(FtsReceiptRequest, self).__init__()
+
+    def get(self):
         """
         Get receipt with given ФН, ФД and ФП numbers
+        ФН, ФД and ФП numbers getting from fn, fd and fp query parameters
 
-        :param fn: ФН number from receipt
-        :type  fn: int
-        :param fd: ФД number from receipt
-        :type  fd: int
-        :param fp: ФП number from receipt
-        :type  fp: int
         :return: Products from receipt with name, quantity and price of 1 piece of product
         :rtype:  dict/json
         """
+        # Parsing request JSON fields
+        args = self.reqparse.parse_args()
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username = g.user.username).first()
         # Send request of receipt JSON
         fts = FtsRequest()
-        request = fts.getReceipt(fn, fd, fp, user.phone, user.fts_key)
+        request = fts.getReceipt(args['fn'], args['fd'], args['fp'], user.phone, user.fts_key)
         # Send error JSON if bad request
         if request['ftsRequestSuccess'] is False:
             abort(request['responseCode'], message = request['error'])
@@ -105,4 +115,4 @@ class FtsReceiptRequest(Resource):
 
 # Add classes to REST API
 api.add_resource(FtsSignUp, APIv1 + '/fts/users', endpoint = 'fts_users')
-api.add_resource(FtsReceiptRequest, APIv1 + '/fts/receipts/fns/<int:fn>/fds/<int:fd>/fps/<int:fp>', endpoint = 'fts_receipts')
+api.add_resource(FtsReceiptRequest, APIv1 + '/fts/receipts', endpoint = 'fts_receipts')
