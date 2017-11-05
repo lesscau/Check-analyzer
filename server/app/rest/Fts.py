@@ -90,19 +90,16 @@ class FtsReceiptRequest(Resource):
         """
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username = g.user.username).first()
-        # Phone and key for authentication in FTS
-        login = user.phone
-        password = user.fts_key
         # Send request of receipt JSON
         fts = FtsRequest()
-        request = fts.getReceipt(fn, fd, fp, login, password)
+        request = fts.getReceipt(fn, fd, fp, user.phone, user.fts_key)
         # Send error JSON if bad request
         if request['ftsRequestSuccess'] is False:
             abort(request['responseCode'], message = request['error'])
         # Extract products info from JSON
         result = {}
         result['items'] = [ { 'name': item['name'], 'quantity': item['quantity'], 'price': item['price'] }
-            for item in request['items']]
+            for item in request['items'] ]
         # Return extracted part of JSON
         return result, 200
 
