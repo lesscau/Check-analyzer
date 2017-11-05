@@ -1,8 +1,10 @@
-from flask import request
+from flask import g, request
 from flask_restful import Resource, reqparse, abort
 from app import api
 from app.views import APIv1
+from app.models import User
 from app.FtsRequest import FtsRequest
+from app.rest.Auth import Auth
 
 class FtsSignUp(Resource):
     """
@@ -64,5 +66,53 @@ class FtsSignUp(Resource):
         # Return JSON
         return { 'message': 'SMS with password was sent to {}'.format(args['phone'])}, 200
 
+class FtsReceiptRequest(Resource):
+    """
+    Operations with FTS receipts
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
+    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
+    :vartype reqparse: flask_restful.reqparse.RequestParser
+    """
+    method_decorators = [Auth.multi_auth.login_required]
+
+    def __init__(self):
+        # Define request query parameters
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('fn', type = int, required = True,
+            help = 'No fn provided', location = 'args')
+        self.reqparse.add_argument('fd', type = int, required = True,
+            help = 'No fd provided', location = 'args')
+        self.reqparse.add_argument('fp', type = int, required = True,
+            help = 'No fp provided', location = 'args')
+        super(FtsReceiptRequest, self).__init__()
+
+    def get(self):
+        """
+        Get receipt with given ФН, ФД and ФП numbers
+        ФН, ФД and ФП numbers getting from fn, fd and fp query parameters
+
+        :return: Products from receipt with name, quantity and price of 1 piece of product
+        :rtype:  dict/json
+        """
+        # Parsing request JSON fields
+        args = self.reqparse.parse_args()
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username = g.user.username).first()
+        # Send request of receipt JSON
+        fts = FtsRequest()
+        request = fts.getReceipt(args['fn'], args['fd'], args['fp'], user.phone, user.fts_key)
+        # Send error JSON if bad request
+        if request['ftsRequestSuccess'] is False:
+            abort(request['responseCode'], message = request['error'])
+        # Extract products info from JSON
+        result = {}
+        result['items'] = [ { 'name': item['name'], 'quantity': item['quantity'], 'price': item['price'] }
+            for item in request['items'] ]
+        # Return extracted part of JSON
+        return result, 200
+
 # Add classes to REST API
 api.add_resource(FtsSignUp, APIv1 + '/fts/users', endpoint = 'fts_users')
+api.add_resource(FtsReceiptRequest, APIv1 + '/fts/receipts', endpoint = 'fts_receipts')
