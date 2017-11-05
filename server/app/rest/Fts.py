@@ -1,8 +1,10 @@
-from flask import request
+from flask import g, request
 from flask_restful import Resource, reqparse, abort
 from app import api
 from app.views import APIv1
+from app.models import User
 from app.FtsRequest import FtsRequest
+from app.rest.Auth import Auth
 
 class FtsSignUp(Resource):
     """
@@ -64,5 +66,46 @@ class FtsSignUp(Resource):
         # Return JSON
         return { 'message': 'SMS with password was sent to {}'.format(args['phone'])}, 200
 
+class FtsReceiptRequest(Resource):
+    """
+    Operations with FTS receipts
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
+    """
+    method_decorators = [Auth.multi_auth.login_required]
+
+    def get(self, fn, fd, fp):
+        """
+        Get receipt with given ФН, ФД and ФП numbers
+
+        :param fn: ФН number from receipt
+        :type  fn: int
+        :param fd: ФД number from receipt
+        :type  fd: int
+        :param fp: ФП number from receipt
+        :type  fp: int
+        :return: Products from receipt with name, quantity and price of 1 piece of product
+        :rtype:  dict/json
+        """
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username = g.user.username).first()
+        # Phone and key for authentication in FTS
+        login = user.phone
+        password = user.fts_key
+        # Send request of receipt JSON
+        fts = FtsRequest()
+        request = fts.getReceipt(fn, fd, fp, login, password)
+        # Send error JSON if bad request
+        if request['ftsRequestSuccess'] is False:
+            abort(request['responseCode'], message = request['error'])
+        # Extract products info from JSON
+        result = {}
+        result['items'] = [ { 'name': item['name'], 'quantity': item['quantity'], 'price': item['price'] }
+            for item in request['items']]
+        # Return extracted part of JSON
+        return result, 200
+
 # Add classes to REST API
 api.add_resource(FtsSignUp, APIv1 + '/fts/users', endpoint = 'fts_users')
+api.add_resource(FtsReceiptRequest, APIv1 + '/fts/receipts/fns/<int:fn>/fds/<int:fd>/fps/<int:fp>', endpoint = 'fts_receipts')
