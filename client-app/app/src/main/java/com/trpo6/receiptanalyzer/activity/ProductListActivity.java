@@ -19,23 +19,13 @@ public class ProductListActivity extends AppCompatActivity {
     private static final String TAG = "MyApp";
 
     ProductAdapter adapter;
-    ArrayList<Item> items = new ArrayList();
-
+    static ArrayList<Item> items = new ArrayList();
     RecyclerView productList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
-
-        // данные будут браться с сервера
-        if (items.size() == 0) {
-            items.add(new Item("Картофель", 2, 10));
-            items.add(new Item("Чай", 5, 60));
-            items.add(new Item("Яйца", 4, 50));
-            items.add(new Item("Молоко", 3, 45));
-            items.add(new Item("Макароны", 10, 30));
-        }
 
         productList = (RecyclerView) findViewById(R.id.productList);
         adapter = new ProductAdapter(items);
