@@ -4,10 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-
 
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.model.Item;
@@ -39,9 +37,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         viewHolder.nameView.setText(item.getName());
         viewHolder.countView.setText(formatValue(item.getSelectedCount()));
         viewHolder.priceView.setText(Float.toString(item.getPrice()));
-        viewHolder.incButtonListener.setItem(item);
-        viewHolder.decButtonListener.setItem(item);
-        viewHolder.deleteButtonListener.setItem(item);
         viewHolder.numberPicker.setMinValue(0);
         viewHolder.numberPicker.setMaxValue(item.getQuantity());
     }
@@ -73,30 +68,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
     class ViewHolder extends RecyclerView.ViewHolder{
         final NumberPicker numberPicker;
-        final Button incButton, decButton, delButton;
         final TextView nameView, countView, priceView;
-        final IncButtonListener incButtonListener;
-        final DecButtonListener decButtonListener;
-        final DeleteButtonListener deleteButtonListener;
         final NumberPickerListener numberPickerListener;
 
         public ViewHolder(View view){
             super(view);
             numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
             numberPicker.setWrapSelectorWheel(false);
-            incButton = (Button) view.findViewById(R.id.delButton);
-            decButton = (Button) view.findViewById(R.id.delButton);
-            delButton = (Button) view.findViewById(R.id.delButton);
             nameView = (TextView) view.findViewById(R.id.nameView);
             countView = (TextView) view.findViewById(R.id.priceView);
             priceView = (TextView) view.findViewById(R.id.priceView);
-            incButtonListener = new IncButtonListener();
-            decButtonListener = new DecButtonListener();
-            deleteButtonListener = new DeleteButtonListener();
             numberPickerListener = new NumberPickerListener();
-            incButton.setOnClickListener(incButtonListener);
-            decButton.setOnClickListener(decButtonListener);
-            delButton.setOnClickListener(deleteButtonListener);
             numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker numberPicker, int i, int i1) {
