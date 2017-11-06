@@ -25,5 +25,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent("QRscanner");
         startActivity(intent);
     }
-
+    /** Переход к первой активити, если нажали LogOut */
+    public void logOut(View view){
+        Intent intent = new Intent(this, FirstActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+    }
 }
