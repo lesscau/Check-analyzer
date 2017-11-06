@@ -69,7 +69,8 @@ public class ProductListActivity extends AppCompatActivity {
                     builder.setPositiveButton("REMOVE", new DialogInterface.OnClickListener() { //when click on DELETE
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            adapter.notifyItemRemoved(position);    //item removed from recylcerview
+                            items.remove(position);
+                            adapter.notifyItemRemoved(position); //item removed from recylcerview
 
 
                             return;
