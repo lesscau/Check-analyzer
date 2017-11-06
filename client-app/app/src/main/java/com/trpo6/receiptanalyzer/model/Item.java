@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Item {
     /** наименование продукта */
-    @SerializedName("username")
+    @SerializedName("name")
     @Expose
     private String name;
 
@@ -19,7 +19,7 @@ public class Item {
     private Integer quantity;
 
     /** количество единиц продукта, выбранных пользователем */
-    private int selectedCount;
+    transient private int selectedCount;
 
     /** стоимость одной единицы продукта */
     @SerializedName("price")
