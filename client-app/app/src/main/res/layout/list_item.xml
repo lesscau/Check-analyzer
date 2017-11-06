@@ -6,6 +6,7 @@
     android:layout_height="80dp"
     android:orientation="vertical"
     android:padding="0dp"
+    android:background="@drawable/list_item_shape"
     android:weightSum="1">
 
     <android.support.constraint.ConstraintLayout
@@ -52,7 +53,6 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.507" />
-
     </android.support.constraint.ConstraintLayout>
 
 
