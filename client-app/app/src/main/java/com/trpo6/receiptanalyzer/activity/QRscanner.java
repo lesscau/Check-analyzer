@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
     /**Запуск окна сканера*/
     @Override
     public void onCreate(Bundle state) {
+        Log.i("qr","create");
         super.onCreate(state);
         setContentView(R.layout.activity_qrscanner);
         //setupToolbar();
@@ -58,12 +60,14 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
     @Override
     public void onResume() {
         super.onResume();
+        Log.i("qr","requme");
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
     }
     /**Остановка камеры при паузе*/
     @Override
     public void onPause() {
+        Log.i("qr","pause");
         super.onPause();
         mScannerView.stopCamera();
     }
@@ -87,8 +91,21 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
             Log.i("find "+i+": ",fiscal.get(i));
             i++;
         }
+        onPause();
         // Запрос в ФНС
         getReceipt(fiscal);
+        
+        // Note:
+        // * Wait 2 seconds to resume the preview.
+        // * On older devices continuously stopping and resuming camera preview can result in freezing the app.
+        // * I don't know why this is the case but I don't have the time to figure out.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mScannerView.resumeCameraPreview(QRscanner.this);
+            }
+        }, 2000);
     }
 
     private static class CustomViewFinderView extends ViewFinderView {
