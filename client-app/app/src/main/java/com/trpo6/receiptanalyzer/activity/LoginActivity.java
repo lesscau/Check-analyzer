@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -11,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -18,6 +20,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -75,6 +79,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 attemptLogin();
             }
         });
@@ -88,8 +94,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-
-        showProgress(true);
 
         // Reset errors.
         mEmailView.setError(null);
@@ -151,6 +155,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             call.enqueue(new Callback<AuthResponse>(){
                 @Override
                 public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                    showProgress(true);
                     if (response.isSuccessful()) {
                         /**
                          * Token Got Successfully - Open main menu
@@ -167,6 +172,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         Toast toast = Toast.makeText(getApplicationContext(),
                                 "Error: "+response.message().toString(), Toast.LENGTH_LONG);
                         toast.show();
+                        showProgress(false);
                     }
                 }
 
@@ -176,6 +182,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Toast toast = Toast.makeText(getApplicationContext(),
                             "Error: "+t.toString(), Toast.LENGTH_LONG);
                     toast.show();
+                    showProgress(false);
                 }
             });
 
@@ -192,7 +199,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() >= 4;
     }
 
     /**
