@@ -1,7 +1,5 @@
 from flask import g, request
 from flask_restful import Resource, reqparse, abort
-from app import api
-from app.views import APIv1
 from app.models import User
 from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
@@ -115,7 +113,3 @@ class FtsReceiptRequest(Resource):
             } for item in request['items'] ]
         # Return extracted part of JSON
         return result, 200
-
-# Add classes to REST API
-api.add_resource(FtsSignUp, APIv1 + '/fts/users', endpoint = 'fts_users')
-api.add_resource(FtsReceiptRequest, APIv1 + '/fts/receipts', endpoint = 'fts_receipts')

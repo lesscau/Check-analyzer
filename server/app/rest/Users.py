@@ -1,10 +1,9 @@
 from flask import g
 from flask_restful import Resource, reqparse, fields, marshal, abort
-from app import api, db
+from app import db
 from app.models import User
-from app.views import APIv1
-from app.rest.Auth import Auth
 from app.FtsRequest import FtsRequest
+from app.rest.Auth import Auth
 
 # Response JSON template for /users/{id} or /users/me requests
 user_fields = {
@@ -201,8 +200,3 @@ class UserInfo(Resource):
         user = User.query.filter_by(username = username).first()
         if user is not None:
             abort(409, message="Username '{}' already exist".format(username))
-
-# Add classes to REST API
-api.add_resource(UserList, APIv1 + '/users', endpoint = 'users')
-api.add_resource(Users, APIv1 + '/users/<int:id>', endpoint = 'user')
-api.add_resource(UserInfo, APIv1 + '/users/me', endpoint = 'userme')

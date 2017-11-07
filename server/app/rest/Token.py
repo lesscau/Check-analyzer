@@ -1,8 +1,6 @@
 from flask import g
 from flask_restful import Resource
-from app import api
 from app.models import User
-from app.views import APIv1
 from app.rest.Auth import Auth
 
 class Token(Resource):
@@ -27,6 +25,3 @@ class Token(Resource):
         token = user.generate_auth_token()
         # Send token in ASCII format
         return { 'token': token.decode('ascii') }
-
-# Add class to REST API
-api.add_resource(Token, APIv1 + '/token', endpoint = 'token')
