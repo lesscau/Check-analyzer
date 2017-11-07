@@ -9,11 +9,11 @@ RUN pip install -r /tmp/requirements.txt
 
 # Set secret key for application
 ARG FLASK_APP_SECRET_KEY
-ENV FLASK_APP_SECRET_KEY ${FLASK_APP_SECRET_KEY}
+RUN if [ $FLASK_APP_SECRET_KEY!="" ]; then export FLASK_APP_SECRET_KEY=$FLASK_APP_SECRET_KEY; fi
 
 # Set database path for application
 ARG DATABASE_URL
-ENV DATABASE_URL ${DATABASE_URL}
+RUN if [ $DATABASE_URL!="" ]; then export DATABASE_URL=$DATABASE_URL; fi
 
 # Copy application
 COPY . /app
