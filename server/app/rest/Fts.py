@@ -110,8 +110,7 @@ class FtsReceiptRequest(Resource):
         result = { 'items': [] }
         for i in request['items']:
             item = { 'name': i['name'] }
-            item['quantity'] = i['quantity'] if isinstance(i['quantity'], int) else 1
-            item['price'] = i['price'] if isinstance(i['quantity'], int) else i['sum']
+            item['quantity'], item['price'] = (i['quantity'], i['price']) if isinstance(i['quantity'], int) else (1, i['sum'])
             result['items'].append(item)
         # Return extracted part of JSON
         return result, 200
