@@ -107,11 +107,12 @@ class FtsReceiptRequest(Resource):
         if request['ftsRequestSuccess'] is False:
             abort(request['responseCode'], message = request['error'])
         # Extract products info from JSON
-        result = { 'items': [] }
-        for i in request['items']:
-            item = { 'name': i['name'] }
-            item['quantity'], item['price'] = (i['quantity'], i['price']) if isinstance(i['quantity'], int) else (1, i['sum'])
-            result['items'].append(item)
+        result = {}
+        result['items'] = [ {
+            'name': item['name'],
+            'quantity': item['quantity'] if isinstance(item['quantity'], int) else 1,
+            'price': item['price'] if isinstance(item['quantity'], int) else item['sum']
+            } for item in request['items'] ]
         # Return extracted part of JSON
         return result, 200
 
