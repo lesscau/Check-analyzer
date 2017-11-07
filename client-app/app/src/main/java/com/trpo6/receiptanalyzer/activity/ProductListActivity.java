@@ -24,14 +24,21 @@ import static android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT;
 import static android.app.AlertDialog.THEME_HOLO_DARK;
 import static android.app.AlertDialog.THEME_HOLO_LIGHT;
 
+
+/**
+ * Окно списка продуктов
+ */
 public class ProductListActivity extends AppCompatActivity {
-
+    /**Тег*/
     private static final String TAG = "MyApp";
-
+    /**Адаптер списка продуктов*/
     ProductAdapter adapter;
     static ArrayList<Item> items = new ArrayList();
+    /**Список продуктов*/
+    /**View для работы со списком продуктов*/
     RecyclerView productList;
 
+    /**Запуск окна продуктов*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,27 +96,28 @@ public class ProductListActivity extends AppCompatActivity {
         //все для свайпа заканчивается здесь
     }
 
-    /** Обработчик кнопки добавления продукта */
+
+    /**Обработчик кнопки добавления продукта*/
     public void add(View view){
         Log.i(TAG,"go to add");
-        // Получение названия
+        /**Получение названия*/
         EditText productEditText = (EditText) findViewById(R.id.addProduct);
         String product = productEditText.getText().toString();
         if(product.isEmpty() && items.contains(product)) return;
 
-        // Получение общего количества
+        /**Получение общего количества*/
         EditText countEditText = (EditText) findViewById(R.id.addCount);
         String strCount = countEditText.getText().toString();
         if (strCount.equals("")) return;
         int count = Integer.parseInt(strCount);
 
-        // Получение цены
+        /** Получение цены*/
         EditText priceEditText = (EditText) findViewById(R.id.addPrice);
         String strPrice = priceEditText.getText().toString();
         if (strPrice.equals("")) return;
         float price = Float.parseFloat(strPrice);
 
-        // Добавление продукта в список
+        /** Добавление продукта в список*/
         items.add(new Item(product,count,price));
         productEditText.setText("");
         countEditText.setText("");

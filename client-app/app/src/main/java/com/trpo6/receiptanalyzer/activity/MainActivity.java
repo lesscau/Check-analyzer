@@ -9,7 +9,11 @@ import android.view.View;
 
 import com.trpo6.receiptanalyzer.R;
 
+/**
+ * Главное меню
+ */
 public class MainActivity extends AppCompatActivity {
+    /**Запуск главного меню*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -7,13 +7,18 @@ import android.view.View;
 
 import com.trpo6.receiptanalyzer.R;
 
+/**
+ * Стартовая страница
+ */
 public class FirstActivity extends AppCompatActivity {
 
+    /**Запуск стартовой страницы*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
     }
+    /**Переход к окну входа*/
     public void loginOpen(View view) {
         // действия, совершаемые после нажатия на кнопку
         // Создаем объект Intent для вызова новой Activity
@@ -21,6 +26,7 @@ public class FirstActivity extends AppCompatActivity {
         // запуск activity
         startActivity(intent);
     }
+    /**Переход к окну регистрации*/
     public void regOpen(View view) {
         // действия, совершаемые после нажатия на кнопку
         // Создаем объект Intent для вызова новой Activity

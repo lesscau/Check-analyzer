@@ -13,24 +13,56 @@ import com.trpo6.receiptanalyzer.model.Item;
 import java.util.List;
 
 /**
- * Добавление элементов списка продуктов
+ * Редактирование списка продуктов
  */
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder>  {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
+    /**
+     * Метод inflate парсит xml в объекты view
+     */
     private LayoutInflater inflater;
+    /**
+     * Номер разметки
+     */
     private int layout;
+    /**
+     * Список продуктов
+     */
     private List<Item> itemListList;
+    /**
+     * Тег
+     */
     private static final String TAG = "ProductAdapter";
+
+    /**
+     * Конструктор списка продуктов
+     *
+     * @param items Список продуктов
+     */
     public ProductAdapter(List<Item> items) {
         this.itemListList = items;
     }
 
+    /**
+     * Создание объекта паттерна ViewHolder. Суть паттерна заключается в том, что для каждого элемента списка создаётся объект,
+     * хранящий ссылки на отдельные вьюхи внутри элемента.
+     *
+     * @param parent   Родительский группа View
+     * @param viewType Тип View
+     * @return Возвращает результирующий объект паттерна
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
         return new ViewHolder(v);
     }
 
+    /**
+     * Отображение определенной позиции в списке продуктов
+     *
+     * @param viewHolder Объект паттерна ViewHolder
+     * @param position   Позиция в списке продуктов
+     */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         final Item item = itemListList.get(position);
@@ -41,37 +73,61 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         viewHolder.numberPicker.setMaxValue(item.getQuantity());
     }
 
+    /**
+     * Получение количества продуктов в списке
+     *
+     * @return Возвращает размер списка продуктов
+     */
     @Override
     public int getItemCount() {
         return itemListList.size();
     }
 
-    // Обработчик кнопки - увеличить/уменьшить выбранное количество продукта
-    private void incDecCount(Item item, int count){
+    /**
+     * Обработчик кнопки - увеличить/уменьшить выбранное количество продукта
+     */
+    private void incDecCount(Item item, int count) {
         //int count = item.getSelectedCount()+delta;
         //if(count<0) count=0;
         item.setSelectedCount(count);
         notifyItemChanged(itemListList.indexOf(item));
     }
 
-    // Обработчик кнопки удаления продукта
-    private void delProduct(Item item){
+    /**
+     * Обработчик кнопки удаления продукта
+     *
+     * @param item Конкретный элемент из списка продуктов
+     */
+    private void delProduct(Item item) {
         int pos = itemListList.indexOf(item);
         itemListList.remove(item);
         notifyItemRemoved(pos);
     }
 
-    private String formatValue(int count){
-        return String.valueOf(count) ;
+    /**
+     * Форматирование числа в строку
+     *
+     * @param count Конвертируемое число
+     * @return Результирующая строка
+     */
+    private String formatValue(int count) {
+        return String.valueOf(count);
     }
 
-
-    class ViewHolder extends RecyclerView.ViewHolder{
+    /**
+     * Шаблон каждой строки из списка продуктов
+     */
+    class ViewHolder extends RecyclerView.ViewHolder {
         final NumberPicker numberPicker;
         final TextView nameView, countView, priceView;
         final NumberPickerListener numberPickerListener;
 
-        public ViewHolder(View view){
+        /**
+         * Конструктор паттерна
+         *
+         * @param view Исходное View
+         */
+        public ViewHolder(View view) {
             super(view);
             numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
             numberPicker.setWrapSelectorWheel(false);
@@ -88,15 +144,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         }
     }
 
-    private class NumberPickerListener implements NumberPicker.OnValueChangeListener{
+    /**Класс для указания количества конкретного продукта*/
+    private class NumberPickerListener implements NumberPicker.OnValueChangeListener {
         private Item item;
 
+        /**
+         * Указывает количество конкретного продукта
+         *
+         * @param numberPicker Объект класса numberPicker
+         * @param _old         Старое значение
+         * @param _new         Новое значение
+         */
         @Override
         public void onValueChange(NumberPicker numberPicker, int _old, int _new) {
             item.setSelectedCount(_new);
         }
     }
 
+    /**Класс для увеличения количества конкретного продукта*/
     private class IncButtonListener implements View.OnClickListener {
         private Item item;
 
@@ -109,7 +174,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             this.item = item;
         }
     }
-
+    /**Класс для уменьшения количества конкретного продукта*/
     private class DecButtonListener implements View.OnClickListener {
         private Item item;
 
@@ -122,7 +187,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             this.item = item;
         }
     }
-
+    /**Класс для удаления конкретной позиции в списке продуктов*/
     private class DeleteButtonListener implements View.OnClickListener {
         private Item item;
 

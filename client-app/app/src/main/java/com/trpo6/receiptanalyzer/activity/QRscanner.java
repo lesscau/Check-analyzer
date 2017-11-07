@@ -32,13 +32,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * QR сканер
+ */
 public class QRscanner extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     private ZXingScannerView mScannerView;
 
-    /*public void setupToolbar() {
-        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-    }*/
+    /**Запуск окна сканера*/
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -54,19 +54,20 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
         contentFrame.addView(mScannerView);
     }
 
+    /**Регистрация себя, как обработчика результатов сканирования и запуск камеры*/
     @Override
     public void onResume() {
         super.onResume();
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
     }
-
+    /**Остановка камеры при паузе*/
     @Override
     public void onPause() {
         super.onPause();
         mScannerView.stopCamera();
     }
-
+    /**Обработка результатов сканирования*/
     @Override
     public void handleResult(Result rawResult) {
         Log.i("Contents = " + rawResult.getText(),", Format = " + rawResult.getBarcodeFormat().toString());
