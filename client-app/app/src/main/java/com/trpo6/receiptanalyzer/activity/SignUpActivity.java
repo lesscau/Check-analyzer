@@ -11,20 +11,20 @@ import android.widget.Toast;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
-import com.trpo6.receiptanalyzer.model.RegistrationBody;
 import com.trpo6.receiptanalyzer.model.RegistrationResponse;
+import com.trpo6.receiptanalyzer.model.SignUpBody;
 import com.trpo6.receiptanalyzer.utils.InternetConnection;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RegActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
     private EditText username;
     private EditText phone;
+    private EditText email;
     private EditText password;
-    private EditText ftsKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +33,20 @@ public class RegActivity extends AppCompatActivity {
 
         username = (EditText) findViewById(R.id.usernameTextEdit);
         phone = (EditText) findViewById(R.id.phoneTextEdit);
+        email = (EditText) findViewById(R.id.emailTextEdit);
         password = (EditText) findViewById(R.id.passwordTextEdit);
-        ftsKey = (EditText) findViewById(R.id.fts_keyTextEdit);
     }
 
+    static SignUpBody signUpBody;
     /** действия, совершаемые после нажатия на кнопку */
     public void menuOpen(View view) {
         // Проверяем, все ли поля заполнены
         String _username = username.getText().toString();
         String _phone = phone.getText().toString();
-        String _ftsKey = ftsKey.getText().toString();
+        //String _ftsKey = ftsKey.getText().toString();
+        String _email = email.getText().toString();
         String _password = password.getText().toString();
-        if (_username.length() == 0 | _phone.length() == 0 | _ftsKey.length() == 0 | _password.length() == 0){
+        if (_username.length() == 0 | _phone.length() == 0 | _email.length() == 0){
             Toast toast = Toast.makeText(getApplicationContext(),
                     "Please fill in all fields ", Toast.LENGTH_LONG);
             toast.show();
@@ -52,17 +54,19 @@ public class RegActivity extends AppCompatActivity {
         }
 
         // Создаем объект Intent для вызова новой Activity
-        final Intent intent = new Intent(this, MainActivity.class);
+        final Intent intent = new Intent(this, SignUpConfirmActivity.class);
         /**
          * Checking Internet Connection
          */
         if (InternetConnection.checkConnection(getApplicationContext())) {
             ApiService api = RetroClient.getApiService();
             //User user  = new User("89112356232","pass");
-            RegistrationBody body = new RegistrationBody(_username,_phone,Integer.parseInt(_ftsKey),_password);
-            Call<RegistrationResponse> call = api.registerUser(body);
+            //ConfirmSignUpBody body = new ConfirmSignUpBody(_username,_phone,Integer.parseInt(_ftsKey),_password);
+            signUpBody = new SignUpBody(_username,_email,_phone,_password);
+            //Call<RegistrationResponse> call = api.registerUser(body);
+            Call<RegistrationResponse> call = api.signUp(signUpBody);
             Log.i("i",username.getText().toString()+phone.getText().toString()+
-                    ftsKey.getText().toString()+password.getText().toString());
+                    email.getText().toString());
             /**
              * Enqueue Callback will be call when get response...
              */
@@ -73,7 +77,7 @@ public class RegActivity extends AppCompatActivity {
                         /**
                          * Got Successfully
                          */
-                        Log.i("success", response.toString());
+                        Log.i("success", response.message().toString());
 
                         // запуск activity
                         startActivity(intent);

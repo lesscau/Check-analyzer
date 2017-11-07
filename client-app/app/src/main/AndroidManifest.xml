@@ -30,7 +30,8 @@
         </activity>
         <activity
             android:name=".activity.ProductListActivity"
-            android:label="Список покупок">
+            android:label="Список покупок"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="productlist" />
 
@@ -55,7 +56,8 @@
         </intent-filter>
         </activity>
         <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.RegActivity"></activity>
+        <activity android:name=".activity.SignUpActivity"></activity>
+        <activity android:name=".activity.SignUpConfirmActivity"></activity>
     </application>
 
 </manifest>

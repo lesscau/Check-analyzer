@@ -107,7 +107,7 @@
         android:layout_weight="1"
         android:background="@color/colorPrimary"
         android:onClick="logOut"
-        android:text="LOG OUT"
+        android:text="ВЫХОД ИЗ АККАУНТА"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
