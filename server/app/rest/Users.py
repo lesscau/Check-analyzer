@@ -10,7 +10,6 @@ user_fields = {
     'id': fields.Integer,
     'username': fields.String,
     'phone': fields.String,
-    'url': fields.Url('user')
 }
 
 class UserList(Resource):
