@@ -10,25 +10,24 @@
     tools:context="com.trpo6.receiptanalyzer.activity.FirstActivity">
 
     <LinearLayout
-        android:layout_width="500dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:orientation="vertical">
+
 
         <Button
             android:id="@+id/login_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:background="@color/colorPrimary"
             android:onClick="loginOpen"
             android:text="войти" />
 
-        <Button
+        <Button 
             android:id="@+id/reg_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:onClick="regOpen"
             android:text="Регистрация" />
     </LinearLayout>

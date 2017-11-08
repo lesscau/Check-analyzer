@@ -94,7 +94,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
-                android:background="?attr/colorPrimary"
                 android:onClick="menuOpen"
                 android:text="ВХОД"
                 android:textColor="@android:color/white"

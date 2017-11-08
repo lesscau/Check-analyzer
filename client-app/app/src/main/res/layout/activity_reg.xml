@@ -65,7 +65,6 @@
             android:id="@+id/signupButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:onClick="menuOpen"
             android:text="SIGN UP" />
 
