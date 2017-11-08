@@ -16,8 +16,8 @@ ENV FLASK_APP_SECRET_KEY ${FLASK_APP_SECRET_KEY:-}
 ARG DATABASE_URL
 ENV DATABASE_URL ${DATABASE_URL:-}
 
-# Upgrade database
-RUN python db.py upgrade
-
 # Copy application
 COPY . /app
+
+# Upgrade database
+RUN python db.py upgrade
