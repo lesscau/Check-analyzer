@@ -6,14 +6,15 @@ COPY requirements.txt /tmp/
 # Upgrade pip and install required python packages
 RUN pip install -U pip
 RUN pip install -r /tmp/requirements.txt
+RUN pip install mysqlclient
 
 # Set secret key for application
 ARG FLASK_APP_SECRET_KEY
-RUN if [ $FLASK_APP_SECRET_KEY!="" ]; then export FLASK_APP_SECRET_KEY=$FLASK_APP_SECRET_KEY; fi
+ENV FLASK_APP_SECRET_KEY ${FLASK_APP_SECRET_KEY:-}
 
 # Set database path for application
 ARG DATABASE_URL
-RUN if [ $DATABASE_URL!="" ]; then export DATABASE_URL=$DATABASE_URL; fi
+ENV DATABASE_URL ${DATABASE_URL:-}
 
 # Copy application
 COPY . /app
