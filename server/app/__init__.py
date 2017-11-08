@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import basedir
@@ -13,7 +12,9 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 # Application database migrations
 migrate = Migrate(app, db)
-# Application REST API
-api = Api(app)
 
+# Import views (must be after the application object is created)
 from app import rest, views, models, FtsRequest
+
+# Register blueprint Receipt-Analyzer v1.0
+app.register_blueprint(rest.RAv1, url_prefix='/api/v1.0')
