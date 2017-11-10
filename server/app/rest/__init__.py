@@ -1,10 +1,10 @@
 from flask import Blueprint
-from flask_restful import Api
+from flask_restplus import Api
 
 # Receipt-Analyzer v1.0 blueprint instance
 RAv1 = Blueprint('RAv1', __name__)
 # Blueprint REST API
-api = Api(RAv1)
+api = Api(RAv1, doc='/docs/rest')
 
 # Import views (must be after the blueprint object is created)
 from app.rest import Auth, Token, Users, Fts

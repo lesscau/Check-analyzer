@@ -1,5 +1,5 @@
 from flask import g
-from flask_restful import Resource
+from flask_restplus import Resource
 from app.models import User
 from app.rest.Auth import Auth
 

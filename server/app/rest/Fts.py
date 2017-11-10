@@ -1,5 +1,5 @@
 from flask import g, request
-from flask_restful import Resource, reqparse, abort
+from flask_restplus import Resource, reqparse, abort
 from app.models import User
 from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
@@ -11,7 +11,7 @@ class FtsSignUp(Resource):
     :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
     :vartype reqparse: flask_restful.reqparse.RequestParser
     """
-    def __init__(self):
+    def __init__(self, api):
         # Define request JSON fields
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type = str, required = True,
@@ -75,7 +75,7 @@ class FtsReceiptRequest(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    def __init__(self):
+    def __init__(self, api):
         # Define request query parameters
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('fn', type = int, required = True,
