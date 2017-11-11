@@ -32,7 +32,7 @@ user_request_required.add_argument('fts_key', type = int, required = True,
 ### JSON Models ###
 
 # Request JSON template
-user_request_fields = api.model('User request',
+user_request_fields = api.model('Users request',
 {
     'username': fields.String(description='Login'),
     'password': fields.String(description='Password'),
@@ -41,7 +41,7 @@ user_request_fields = api.model('User request',
 })
 
 # Request JSON template (all fields required)
-user_request_required_fields = api.model('User request',
+user_request_required_fields = api.model('Users request (all fields required)',
 {
     'username': fields.String(description='Login', required=True),
     'password': fields.String(description='Password', required=True),
@@ -50,7 +50,7 @@ user_request_required_fields = api.model('User request',
 })
 
 # Response JSON template
-user_fields = api.model('User response',
+user_fields = api.model('Users response',
 {
     'id': fields.Integer(description='ID', required = True),
     'username': fields.String(description='Login', required = True),

@@ -30,7 +30,7 @@ receipt_request.add_argument('fp', type = int, required = True,
 ### JSON Models ###
 
 # Registration in FTS request JSON fields
-fts_user_request_fields = api.model('FTS user request',
+fts_user_request_fields = api.model('FTS users request',
 {
     'name': fields.String(description='Login', required=True),
     'email': fields.String(description='Email', required=True),
@@ -38,13 +38,13 @@ fts_user_request_fields = api.model('FTS user request',
 })
 
 # Check if user exists in Federal Tax Service JSON response
-check_fields = api.model('User response',
+check_fields = api.model('FTS existence check',
 {
     'check': fields.Boolean(description='User existing in FTS', required = True),
 })
 
 # JSON response with message
-message_fields = api.model('Message response',
+message_fields = api.model('FTS Message response',
 {
     'message': fields.String(description='Message', required = True),
 })
