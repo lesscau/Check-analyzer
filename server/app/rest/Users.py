@@ -1,5 +1,5 @@
 from flask import g
-from flask_restplus import Namespace, Resource, reqparse, fields, marshal, abort
+from flask_restplus import Namespace, Resource, fields, marshal, abort
 from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import User
@@ -7,40 +7,64 @@ from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
 # Define namespace
-api = Namespace('users', description='Operations with users', path='/')
+api = Namespace('Users', description='Operations with users', path='/')
 
-# Response JSON template for /users/{id} or /users/me requests
-user_fields = api.model('User fields',
+### JSON Parsers ###
+
+# Request JSON fields
+user_request = api.parser()
+user_request.add_argument('username', type = str, location = 'json')
+user_request.add_argument('password', type = str, location = 'json')
+user_request.add_argument('phone', type = str, location = 'json')
+user_request.add_argument('fts_key', type = int, location = 'json')
+
+# Request JSON fields (all fields required)
+user_request_required = api.parser()
+user_request_required.add_argument('username', type = str, required = True,
+    help = 'No username provided', location = 'json')
+user_request_required.add_argument('password', type = str, required = True,
+    help = 'No password provided', location = 'json')
+user_request_required.add_argument('phone', type = str, required = True,
+    help = 'No phone provided', location = 'json')
+user_request_required.add_argument('fts_key', type = int, required = True,
+    help = 'No ftskey provided', location = 'json')
+
+### JSON Models ###
+
+# Request JSON template
+user_request_fields = api.model('User request',
 {
-    'id': fields.Integer,
-    'username': fields.String,
-    'phone': fields.String,
+    'username': fields.String(description='Login'),
+    'password': fields.String(description='Password'),
+    'phone': fields.String(description='Phone number'),
+    'fts_key': fields.Integer(description='Federal Tax Service key from SMS'),
+})
+
+# Request JSON template (all fields required)
+user_request_required_fields = api.model('User request',
+{
+    'username': fields.String(description='Login', required=True),
+    'password': fields.String(description='Password', required=True),
+    'phone': fields.String(description='Phone number', required=True),
+    'fts_key': fields.Integer(description='Federal Tax Service key from SMS', required=True),
+})
+
+# Response JSON template
+user_fields = api.model('User response',
+{
+    'id': fields.Integer(description='ID', required = True),
+    'username': fields.String(description='Login', required = True),
+    'phone': fields.String(description='Phone number', required = True),
 })
 
 @api.route('/users', endpoint = 'users')
 class UserList(Resource):
     """
     Operations with list of users
-
-    :var     method_decorators: Decorators applied to methods
-    :vartype method_decorators: list
-    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
-    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
-    def __init__(self, api):
-        # Define request JSON fields
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type = str, required = True,
-            help = 'No username provided', location = 'json')
-        self.reqparse.add_argument('password', type = str, required = True,
-            help = 'No password provided', location = 'json')
-        self.reqparse.add_argument('phone', type = str, required = True,
-            help = 'No phone provided', location = 'json')
-        self.reqparse.add_argument('fts_key', type = int, required = True,
-            help = 'No ftskey provided', location = 'json')
-        super(UserList, self).__init__()
-
     @api.doc(security = None)
+    @api.expect(user_request_required_fields)
+    @api.marshal_with(user_fields, envelope = 'user', code = 201)
     def post(self):
         """
         Create new user in database
@@ -49,7 +73,7 @@ class UserList(Resource):
         :rtype:  dict/json
         """
         # Parsing request JSON fields
-        args = self.reqparse.parse_args()
+        args = user_request_required.parse_args()
         # Error checking
         self.abortIfFtsUserDoesntExist(args['phone'], args['fts_key'])
         # Create user and add to database
@@ -62,7 +86,7 @@ class UserList(Resource):
             db.session.add(user)
             db.session.commit()
             # Return JSON using template
-            return { 'user': marshal(user, user_fields) }, 201
+            return user, 201
         except IntegrityError:
             db.session.rollback()
             abort(409, message="Username '{}' already exist".format(args['username']))
@@ -89,20 +113,10 @@ class Users(Resource):
 
     :var     method_decorators: Decorators applied to methods
     :vartype method_decorators: list
-    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
-    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    def __init__(self, api):
-        # Define request JSON fields
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type = str, location = 'json')
-        self.reqparse.add_argument('password', type = str, location = 'json')
-        self.reqparse.add_argument('phone', type = str, location = 'json')
-        self.reqparse.add_argument('fts_key', type = int, location = 'json')
-        super(Users, self).__init__()
-
+    @api.marshal_with(user_fields, envelope='user')
     def get(self, id):
         """
         Get user partial info with provided id
@@ -114,7 +128,7 @@ class Users(Resource):
         # Error checking
         self.abortIfUserDoesntExist(user, id)
         # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
+        return user
 
     @staticmethod
     def abortIfUserDoesntExist(user, id):
@@ -136,20 +150,10 @@ class UserInfo(Resource):
 
     :var     method_decorators: Decorators applied to methods
     :vartype method_decorators: list
-    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
-    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    def __init__(self, api):
-        # Define request JSON fields
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type = str, location = 'json')
-        self.reqparse.add_argument('password', type = str, location = 'json')
-        self.reqparse.add_argument('phone', type = str, location = 'json')
-        self.reqparse.add_argument('fts_key', type = int, location = 'json')
-        super(UserInfo, self).__init__()
-
+    @api.marshal_with(user_fields, envelope='user')
     def get(self):
         """
         Get authorized user partial info
@@ -160,8 +164,10 @@ class UserInfo(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username = g.user.username).first()
         # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
+        return user
 
+    @api.expect(user_request_fields)
+    @api.marshal_with(user_fields, envelope='user')
     def put(self):
         """
         Modify authorized user in database
@@ -170,7 +176,7 @@ class UserInfo(Resource):
         :rtype:  dict/json
         """
         # Parsing request JSON fields
-        args = self.reqparse.parse_args()
+        args = user_request.parse_args()
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username = g.user.username).first()
         try:
@@ -183,7 +189,7 @@ class UserInfo(Resource):
                     setattr(user, key, value)
             db.session.commit()
             # Return JSON using template
-            return { 'user': marshal(user, user_fields) }
+            return user
         except IntegrityError:
             db.session.rollback()
             abort(409, message="Username '{}' already exist".format(args['username']))

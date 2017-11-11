@@ -1,10 +1,18 @@
 from flask import g
-from flask_restplus import Namespace, Resource
+from flask_restplus import Namespace, Resource, fields
 from app.models import User
 from app.rest.Auth import Auth
 
 # Define namespace
 api = Namespace('Token', description='Recieve JWS token', path='/')
+
+### JSON Models ###
+
+# Response JSON template
+token_fields = api.model('Token response',
+{
+    'token': fields.String(description='Bearer token', required = True),
+})
 
 @api.route('/token', endpoint = 'token')
 class Token(Resource):
@@ -17,6 +25,7 @@ class Token(Resource):
     method_decorators = [Auth.basic_auth.login_required]
 
     @api.doc(security = [ 'basic' ])
+    @api.marshal_with(token_fields)
     def get(self):
         """
         Obtaining bearer token for authorized user
