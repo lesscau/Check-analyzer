@@ -48,13 +48,12 @@ class FtsRequest:
     def getReceipt(self, fn, fd, fp, loginPhone, smsPass):
         url = "{}/v1/inns/*/kkts/*/fss/{}/tickets/{}?fiscalSign={}&sendToEmail=no".format(self.baseUrl, fn, fd, fp)
         auth = (loginPhone, smsPass)
-
         response = get(url, headers = self.headers, auth = auth)
 
-        # If response 202 code (no body), try 3 times again and return 408 if JSON not received
+        # If response 202 code (no body), try 10 times again and return 408 if JSON not received
         if response.status_code == 202:
             calls = 0
-            while calls < 3 and response.status_code == 202:
+            while calls < 10 and response.status_code == 202:
                 response = get(url, headers = self.headers, auth = auth)
                 calls += 1
             if response.status_code == 202:
