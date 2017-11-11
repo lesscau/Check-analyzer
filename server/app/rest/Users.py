@@ -1,18 +1,23 @@
 from flask import g
-from flask_restplus import Resource, reqparse, fields, marshal, abort
+from flask_restplus import Namespace, Resource, reqparse, fields, marshal, abort
 from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import User
 from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
+# Define namespace
+api = Namespace('users', description='Operations with users', path='/')
+
 # Response JSON template for /users/{id} or /users/me requests
-user_fields = {
+user_fields = api.model('User fields',
+{
     'id': fields.Integer,
     'username': fields.String,
     'phone': fields.String,
-}
+})
 
+@api.route('/users', endpoint = 'users')
 class UserList(Resource):
     """
     Operations with list of users
@@ -75,6 +80,7 @@ class UserList(Resource):
         if fts.checkAuthData(phone, fts_key) is False:
             abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
 
+@api.route('/users/<int:id>', endpoint = 'user')
 class Users(Resource):
     """
     Operations with user selected by id
@@ -121,6 +127,7 @@ class Users(Resource):
         if user is None:
             abort(404, message="User id {} doesn't exist".format(id))
 
+@api.route('/users/me', endpoint = 'userme')
 class UserInfo(Resource):
     """
     Operations with authorized user

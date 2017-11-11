@@ -11,6 +11,8 @@ JSON_AS_ASCII = False
 ERROR_404_HELP = False
 CSRF_ENABLED = True
 
+SWAGGER_UI_DOC_EXPANSION = 'list'
+
 if os.environ.get('FLASK_APP_SECRET_KEY') is None or os.environ.get('FLASK_APP_SECRET_KEY') is "":
     SECRET_KEY = 'FU8vYvAvQB3q8XVrtPFcjcSbv'
 else:

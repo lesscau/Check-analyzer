@@ -1,8 +1,12 @@
 from flask import g
-from flask_restplus import Resource
+from flask_restplus import Namespace, Resource
 from app.models import User
 from app.rest.Auth import Auth
 
+# Define namespace
+api = Namespace('Token', description='Recieve JWS token', path='/')
+
+@api.route('/token', endpoint = 'token')
 class Token(Resource):
     """
     Obtaining bearer token for authorized user

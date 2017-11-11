@@ -1,9 +1,13 @@
 from flask import g, request
-from flask_restplus import Resource, reqparse, abort
+from flask_restplus import Namespace, Resource, reqparse, abort
 from app.models import User
 from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
+# Define namespace
+api = Namespace('FTS', description='Requests to Federal Tax Service', path='/')
+
+@api.route('/fts/users', endpoint = 'fts_users')
 class FtsSignUp(Resource):
     """
     Register new user in Federal Tax Service
@@ -64,6 +68,7 @@ class FtsSignUp(Resource):
         # Return JSON
         return { 'message': 'SMS with password was sent to {}'.format(args['phone'])}, 200
 
+@api.route('/fts/receipts', endpoint = 'fts_receipts')
 class FtsReceiptRequest(Resource):
     """
     Operations with FTS receipts
