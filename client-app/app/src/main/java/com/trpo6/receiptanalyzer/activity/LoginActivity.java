@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -32,6 +33,7 @@ import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.AuthResponse;
+import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.InternetConnection;
 
 import java.util.ArrayList;
@@ -55,8 +57,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         startActivity(intent);
     }
 
-    /** Token string */
-    static String KEY = "";
+
 
     //private UserLoginTask mAuthTask = null;
 
@@ -163,7 +164,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         Log.i("success", response.toString());
 
                         // Сохранение токена
-                        KEY = "Bearer "+response.body().getToken();
+                        String token = "Bearer "+response.body().getToken();
+                        AuthInfo.authSave(getApplicationContext(),token);
+
                         showProgress(false);
                         menuOpen(findViewById(R.id.email_sign_in_button));
 

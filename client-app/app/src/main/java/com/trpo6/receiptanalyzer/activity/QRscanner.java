@@ -20,6 +20,7 @@ import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.Items;
+import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.InternetConnection;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
         onPause();
         // Запрос в ФНС
         getReceipt(fiscal);
-        
+
         // Note:
         // * Wait 2 seconds to resume the preview.
         // * On older devices continuously stopping and resuming camera preview can result in freezing the app.
@@ -164,10 +165,10 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
         if (InternetConnection.checkConnection(getApplicationContext())) {
             ApiService api = RetroClient.getApiService();
             //User user  = new User("89112356232","pass");
-            Log.i("token",LoginActivity.KEY);
+            Log.i("token", AuthInfo.getKey());
             final Items _items = new Items();
             //fiscal.get(0),fiscal.get(1),fiscal.get(2)
-            Call<Items> call = api.getReceipt(LoginActivity.KEY,fiscal.get(0),fiscal.get(1),fiscal.get(2));
+            Call<Items> call = api.getReceipt(AuthInfo.getKey(),fiscal.get(0),fiscal.get(1),fiscal.get(2));
             Log.i("i",call.request().toString());
             /**
              * Enqueue Callback will be call when get response...
