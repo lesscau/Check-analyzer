@@ -26,6 +26,7 @@ class FtsSignUp(Resource):
             help = 'No phone provided', location = 'json')
         super(FtsSignUp, self).__init__()
 
+    @api.doc(security = [ 'basic' ])
     def get(self):
         """
         Check if user exists in Federal Tax Service
@@ -47,6 +48,7 @@ class FtsSignUp(Resource):
         result = { 'check': auth }
         return (result, 200) if auth else (result, 404)
 
+    @api.doc(security = None)
     def post(self):
         """
         Create new user in Federal Tax Service and send password SMS

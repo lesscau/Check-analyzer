@@ -40,6 +40,7 @@ class UserList(Resource):
             help = 'No ftskey provided', location = 'json')
         super(UserList, self).__init__()
 
+    @api.doc(security = None)
     def post(self):
         """
         Create new user in database
@@ -81,6 +82,7 @@ class UserList(Resource):
             abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
 
 @api.route('/users/<int:id>', endpoint = 'user')
+@api.param('id', 'User ID in database')
 class Users(Resource):
     """
     Operations with user selected by id

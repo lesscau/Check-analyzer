@@ -16,6 +16,7 @@ class Token(Resource):
     """
     method_decorators = [Auth.basic_auth.login_required]
 
+    @api.doc(security = [ 'basic' ])
     def get(self):
         """
         Obtaining bearer token for authorized user
