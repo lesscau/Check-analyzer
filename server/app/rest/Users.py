@@ -181,6 +181,7 @@ class UserInfo(Resource):
     @api.doc(responses = {
         400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)',
         401: 'Unauthorized access',
+        404: "Can't authorize in Federal Tax Service with given phone/key",
         409: 'Username already exist',
     })
     def put(self):
@@ -202,9 +203,25 @@ class UserInfo(Resource):
                         user.hash_password(value)
                         continue
                     setattr(user, key, value)
+            # Error checking
+            self.abortIfFtsUserDoesntExist(user.phone, user.fts_key)
             db.session.commit()
             # Return JSON using template
             return user
         except IntegrityError:
             db.session.rollback()
             abort(409, message="Username '{}' already exist".format(args['username']))
+
+    @staticmethod
+    def abortIfFtsUserDoesntExist(phone, fts_key):
+        """
+        Return error JSON in 409 response if user doesn't exists in Federal Tax Service
+
+        :param username: User phone number
+        :type  username: str
+        :param username: SMS key
+        :type  username: int
+        """
+        fts = FtsRequest()
+        if fts.checkAuthData(phone, fts_key) is False:
+            abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
