@@ -26,6 +26,7 @@ class Token(Resource):
 
     @api.doc(security = [ 'basic' ])
     @api.marshal_with(token_fields)
+    @api.response(401, 'Unauthorized access')
     def get(self):
         """
         Obtaining bearer token for authorized user

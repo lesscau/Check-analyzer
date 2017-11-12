@@ -70,6 +70,10 @@ class FtsSignUp(Resource):
     """
     @api.doc(security = [ 'basic' ])
     @api.marshal_with(check_fields)
+    @api.doc(responses = {
+        400: 'The resource requires the Basic authentication',
+        404: 'check: false',
+    })
     def get(self):
         """
         Check if user exists in Federal Tax Service
@@ -94,6 +98,11 @@ class FtsSignUp(Resource):
     @api.doc(security = None)
     @api.expect(fts_user_request_fields)
     @api.marshal_with(message_fields)
+    @api.response(400, """No name/email/phone provided
+        [“Missing required property: phone”]
+        [“String is too long (35 chars), maximum 19”]
+        [“String does not match pattern ^\+\d+$: ghg”]
+        [“Object didn’t pass validation for format email: tt”]""")
     def post(self):
         """
         Create new user in Federal Tax Service and send password SMS
@@ -129,6 +138,13 @@ class FtsReceiptRequest(Resource):
     @api.param('fp', 'ФП number', required = True)
     @api.param('fd', 'ФД number', required = True)
     @api.param('fn', 'ФН number', required = True)
+    @api.doc(responses = {
+        400: 'No fn/fd/fp provided',
+        401: 'Unauthorized access',
+        403: 'the user was not found or the specified password was not correct',
+        406: 'the ticket was not found',
+        408: 'Empty JSON response',
+    })
     def get(self):
         """
         Get receipt with given ФН, ФД and ФП numbers

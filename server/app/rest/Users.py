@@ -65,6 +65,11 @@ class UserList(Resource):
     @api.doc(security = None)
     @api.expect(user_request_required_fields)
     @api.marshal_with(user_fields, envelope = 'user', code = 201)
+    @api.doc(responses = {
+        400: 'No username/password/phone/fts_key provided',
+        404: "Can't authorize in Federal Tax Service with given phone/key",
+        409: 'Username already exist',
+    })
     def post(self):
         """
         Create new user in database
@@ -117,6 +122,10 @@ class Users(Resource):
     method_decorators = [Auth.multi_auth.login_required]
 
     @api.marshal_with(user_fields, envelope='user')
+    @api.doc(responses = {
+        401: 'Unauthorized access',
+        404: "User id doesn't exist",
+    })
     def get(self, id):
         """
         Get user partial info with provided id
@@ -154,6 +163,7 @@ class UserInfo(Resource):
     method_decorators = [Auth.multi_auth.login_required]
 
     @api.marshal_with(user_fields, envelope='user')
+    @api.response(401, 'Unauthorized access')
     def get(self):
         """
         Get authorized user partial info
@@ -168,6 +178,11 @@ class UserInfo(Resource):
 
     @api.expect(user_request_fields)
     @api.marshal_with(user_fields, envelope='user')
+    @api.doc(responses = {
+        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)',
+        401: 'Unauthorized access',
+        409: 'Username already exist',
+    })
     def put(self):
         """
         Modify authorized user in database
