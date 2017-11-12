@@ -27,7 +27,7 @@ user_request_required.add_argument('password', type = str, required = True,
 user_request_required.add_argument('phone', type = str, required = True,
     help = 'No phone provided', location = 'json')
 user_request_required.add_argument('fts_key', type = int, required = True,
-    help = 'No ftskey provided', location = 'json')
+    help = 'No fts_key provided', location = 'json')
 
 ### JSON Models ###
 
