@@ -5,7 +5,7 @@ COPY requirements.txt /tmp/
 
 # Upgrade pip and install required python packages
 RUN pip install -U pip \
-	&& pip install -r /tmp/requirements.txt
+    && pip install -r /tmp/requirements.txt
 
 # Set secret key for application
 ARG FLASK_APP_SECRET_KEY
