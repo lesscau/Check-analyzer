@@ -39,12 +39,11 @@ class FtsRequest:
         response = post(url, headers=self.headers, json=data)
 
         if response.ok:
-            return json.loads(json.dumps({"ftsRequestSuccess": True}))
+            return {"ftsRequestSuccess": True}
         else:
-            JSON = {"ftsRequestSuccess": False,
+            return {"ftsRequestSuccess": False,
                     "responseCode": response.status_code,
                     "error": response.text}
-            return json.loads(json.dumps(JSON))
 
     def restorePassword(self, phone):
         """
@@ -60,12 +59,11 @@ class FtsRequest:
         response = post(url, headers=self.headers, json=data)
 
         if response.ok:
-            return json.loads(json.dumps({"ftsRequestSuccess": True}))
+            return {"ftsRequestSuccess": True}
         else:
-            JSON = {"ftsRequestSuccess": False,
+            return {"ftsRequestSuccess": False,
                     "responseCode": response.status_code,
                     "error": response.text}
-            return json.loads(json.dumps(JSON))
 
     def checkAuthData(self, loginPhone, smsPass):
         """
@@ -113,17 +111,15 @@ class FtsRequest:
                 response = get(url, headers=self.headers, auth=auth)
                 calls += 1
             if response.status_code == 202:
-                JSON = {"ftsRequestSuccess": False,
+                return {"ftsRequestSuccess": False,
                         "responseCode": 408,
                         "error": "Empty JSON response"}
-                return json.loads(json.dumps(JSON))
 
         if response.status_code == 200:
             JSON = json.loads(response.text)['document']['receipt']
             JSON["ftsRequestSuccess"] = True
             return JSON
         else:
-            JSON = {"ftsRequestSuccess": False,
+            return {"ftsRequestSuccess": False,
                     "responseCode": response.status_code,
                     "error": response.text}
-            return json.loads(json.dumps(JSON))
