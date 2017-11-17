@@ -5,7 +5,8 @@ from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
 # Define namespace
-api = Namespace('FTS', description='Requests to Federal Tax Service', path='/')
+api = Namespace('FTS', description='Requests to Federal Tax Service',
+                path='/fts')
 
 # JSON Parsers #
 
@@ -65,7 +66,7 @@ items_fields = api.model('Products response', {
 })
 
 
-@api.route('/fts/users', endpoint='fts_users')
+@api.route('/users', endpoint='fts_users')
 class FtsSignUp(Resource):
     """
     Register new user in Federal Tax Service
@@ -132,7 +133,7 @@ class FtsSignUp(Resource):
             args['phone'])}, 200
 
 
-@api.route('/fts/receipts', endpoint='fts_receipts')
+@api.route('/receipts', endpoint='fts_receipts')
 class FtsReceiptRequest(Resource):
     """
     Operations with FTS receipts

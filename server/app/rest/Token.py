@@ -4,7 +4,7 @@ from app.models import User
 from app.rest.Auth import Auth
 
 # Define namespace
-api = Namespace('Token', description='Recieve JWS token', path='/')
+api = Namespace('Token', description='Recieve JWS token', path='/token')
 
 # JSON Models #
 
@@ -14,7 +14,7 @@ token_fields = api.model('Token response', {
 })
 
 
-@api.route('/token', endpoint='token')
+@api.route('', endpoint='token')
 class Token(Resource):
     """
     Obtaining bearer token for authorized user

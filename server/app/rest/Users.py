@@ -7,7 +7,7 @@ from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
 # Define namespace
-api = Namespace('Users', description='Operations with users', path='/')
+api = Namespace('Users', description='Operations with users', path='/users')
 
 # JSON Parsers #
 
@@ -60,7 +60,7 @@ user_fields = api.model('Users response', {
 })
 
 
-@api.route('/users', endpoint='users')
+@api.route('', endpoint='users')
 class UserList(Resource):
     """
     Operations with list of users
@@ -117,7 +117,7 @@ class UserList(Resource):
                                "with given phone/key")
 
 
-@api.route('/users/<int:id>', endpoint='user')
+@api.route('/<int:id>', endpoint='user')
 @api.param('id', 'User ID in database')
 class Users(Resource):
     """
@@ -160,7 +160,7 @@ class Users(Resource):
             abort(404, message="User id {} doesn't exist".format(id))
 
 
-@api.route('/users/me', endpoint='userme')
+@api.route('/me', endpoint='userme')
 class UserInfo(Resource):
     """
     Operations with authorized user
