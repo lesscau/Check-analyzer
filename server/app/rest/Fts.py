@@ -134,7 +134,7 @@ class FtsReceiptRequest(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    @api.marshal_with(items_fields, envelope='items')
+    @api.marshal_with(items_fields)
     @api.param('fp', 'ФП number', required = True)
     @api.param('fd', 'ФД number', required = True)
     @api.param('fn', 'ФН number', required = True)
