@@ -9,7 +9,8 @@ api = Namespace('Token', description='Recieve JWS token', path='/token')
 # JSON Models #
 
 # Response JSON template
-token_fields = api.model('Token response', {
+token_fields = api.model('Token response',
+{
     'token': fields.String(description='Bearer token', required=True),
 })
 

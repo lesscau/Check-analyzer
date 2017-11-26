@@ -12,56 +12,55 @@ api = Namespace('FTS', description='Requests to Federal Tax Service',
 
 # FTS users request JSON fields
 fts_user_request = api.parser()
-fts_user_request.add_argument('name', type=str,
-                              required=True, help='No name provided',
-                              location='json')
-fts_user_request.add_argument('email', type=str,
-                              required=True, help='No email provided',
-                              location='json')
-fts_user_request.add_argument('phone', type=str,
-                              required=True, help='No phone provided',
-                              location='json')
+fts_user_request.add_argument('name', type=str, required=True,
+    help='No name provided', location='json')
+fts_user_request.add_argument('email', type=str, required=True,
+    help='No email provided', location='json')
+fts_user_request.add_argument('phone', type=str, required=True,
+    help='No phone provided', location='json')
 
 # Receipt request JSON fields
 receipt_request = api.parser()
-receipt_request.add_argument('fn', type=int,
-                             required=True, help='No fn provided',
-                             location='args')
-receipt_request.add_argument('fd', type=int,
-                             required=True, help='No fd provided',
-                             location='args')
-receipt_request.add_argument('fp', type=int,
-                             required=True, help='No fp provided',
-                             location='args')
+receipt_request.add_argument('fn', type=int, required=True,
+    help='No fn provided', location='args')
+receipt_request.add_argument('fd', type=int, required=True,
+    help='No fd provided', location='args')
+receipt_request.add_argument('fp', type=int, required=True,
+    help='No fp provided', location='args')
 
 # JSON Models #
 
 # Registration in FTS request JSON fields
-fts_user_request_fields = api.model('FTS users request', {
+fts_user_request_fields = api.model('FTS users request',
+{
     'name': fields.String(description='Login', required=True),
     'email': fields.String(description='Email', required=True),
     'phone': fields.String(description='Phone number', required=True),
 })
 
 # Check if user exists in Federal Tax Service JSON response
-check_fields = api.model('FTS existence check', {
+check_fields = api.model('FTS existence check',
+{
     'check': fields.Boolean(description='User existing in FTS', required=True),
 })
 
 # JSON response with message
-message_fields = api.model('FTS Message response', {
+message_fields = api.model('FTS Message response',
+{
     'message': fields.String(description='Message', required=True),
 })
 
 # Part of items_fields
-one_item_fields = api.model('Item response', {
+one_item_fields = api.model('Item response',
+{
     'name': fields.String(description='Product name', required=True),
     'quantity': fields.Integer(description='Quantity', required=True),
     'price': fields.Integer(description='Price', required=True),
 })
 
 # Products response JSON fields
-items_fields = api.model('Products response', {
+items_fields = api.model('Products response',
+{
     'items': fields.List(fields.Nested(one_item_fields)),
 })
 
@@ -87,8 +86,7 @@ class FtsSignUp(Resource):
         """
         # Check if authorization is Basic Auth
         if request.authorization is None:
-            abort(400,
-                  message="The resource requires the Basic authentication")
+            abort(400, message="The resource requires the Basic authentication")
         # Get phone and SMS key from Basic Auth header
         phone = request.authorization.username
         fts_key = request.authorization.password
@@ -102,8 +100,8 @@ class FtsSignUp(Resource):
     @api.doc(security=None)
     @api.expect(fts_user_request_fields)
     @api.marshal_with(message_fields)
-    @api.response(
-        400, "No name/email/phone provided\n\n"
+    @api.response(400,
+        "No name/email/phone provided\n\n"
         "[“Missing required property: phone”]\n\n"
         "[“String is too long (35 chars), maximum 19”]\n\n"
         "[“String does not match pattern ^\+\d+$: ghg”]\n\n"
@@ -121,16 +119,13 @@ class FtsSignUp(Resource):
         fts = FtsRequest()
         request = fts.signUp(args['name'], args['email'], args['phone'])
         # Restore password if user exists
-        if (request['ftsRequestSuccess'] is False
-                and request['error'] == "user exists"):
+        if request['ftsRequestSuccess'] is False and request['error'] == "user exists":
             fts.restorePassword(args['phone'])
         # Send error JSON if bad request
-        if (request['ftsRequestSuccess'] is False
-                and request['error'] != "user exists"):
+        if request['ftsRequestSuccess'] is False and request['error'] != "user exists":
             abort(request['responseCode'], message=request['error'])
         # Return JSON
-        return {'message': 'SMS with password was sent to {}'.format(
-            args['phone'])}, 200
+        return {'message': 'SMS with password was sent to {}'.format(args['phone'])}, 200
 
 
 @api.route('/receipts', endpoint='fts_receipts')
@@ -150,8 +145,7 @@ class FtsReceiptRequest(Resource):
     @api.doc(responses = {
         400: 'No fn/fd/fp provided',
         401: 'Unauthorized access',
-        403: 'the user was not found '
-             'or the specified password was not correct',
+        403: 'the user was not found or the specified password was not correct',
         406: 'the ticket was not found',
         408: 'Empty JSON response',
     })
@@ -160,8 +154,7 @@ class FtsReceiptRequest(Resource):
         Get receipt with given ФН, ФД and ФП numbers
         ФН, ФД and ФП numbers getting from fn, fd and fp query parameters
 
-        :return: Products from receipt with name,
-                 quantity and price of 1 piece of product
+        :return: Products from receipt with name, quantity and price of 1 piece of product
         :rtype:  dict/json
         """
         # Parsing request JSON fields
@@ -170,8 +163,7 @@ class FtsReceiptRequest(Resource):
         user = User.query.filter_by(username=g.user.username).first()
         # Send request of receipt JSON
         fts = FtsRequest()
-        request = fts.getReceipt(args['fn'], args['fd'], args['fp'],
-                                 user.phone, user.fts_key)
+        request = fts.getReceipt(args['fn'], args['fd'], args['fp'], user.phone, user.fts_key)
         # Send error JSON if bad request
         if request['ftsRequestSuccess'] is False:
             abort(request['responseCode'], message=request['error'])
@@ -179,10 +171,8 @@ class FtsReceiptRequest(Resource):
         result = {}
         result['items'] = [{
             'name': item['name'],
-            'quantity': item['quantity']
-            if isinstance(item['quantity'], int) else 1,
-            'price': item['price']
-            if isinstance(item['quantity'], int) else item['sum']
+            'quantity': item['quantity'] if isinstance(item['quantity'], int) else 1,
+            'price': item['price'] if isinstance(item['quantity'], int) else item['sum']
             } for item in request['items']]
         # Return extracted part of JSON
         return result, 200

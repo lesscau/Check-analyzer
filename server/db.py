@@ -16,8 +16,7 @@ def db_init():
 def db_migrate():
     now = datetime.datetime.now()
     with app.app_context():
-        migrate(message="{}_{}_{}_{}_{}".format(now.day, now.month, now.year,
-                                                now.hour, now.minute))
+        migrate(message="{}_{}_{}_{}_{}".format(now.day, now.month, now.year, now.hour, now.minute))
 
 
 def db_upgrade():

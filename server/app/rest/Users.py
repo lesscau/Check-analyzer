@@ -20,23 +20,20 @@ user_request.add_argument('fts_key', type=int, location='json')
 
 # Request JSON fields (all fields required)
 user_request_required = api.parser()
-user_request_required.add_argument('username', type=str,
-                                   required=True, help='No username provided',
-                                   location='json')
-user_request_required.add_argument('password', type=str,
-                                   required=True, help='No password provided',
-                                   location='json')
-user_request_required.add_argument('phone', type=str,
-                                   required=True, help='No phone provided',
-                                   location='json')
-user_request_required.add_argument('fts_key', type=int,
-                                   required=True, help='No fts_key provided',
-                                   location='json')
+user_request_required.add_argument('username', type=str, required=True,
+    help='No username provided', location='json')
+user_request_required.add_argument('password', type=str, required=True,
+    help='No password provided', location='json')
+user_request_required.add_argument('phone', type=str, required=True,
+    help='No phone provided', location='json')
+user_request_required.add_argument('fts_key', type=int, required=True,
+    help='No fts_key provided', location='json')
 
 # JSON Models #
 
 # Request JSON template
-user_request_fields = api.model('Users request', {
+user_request_fields = api.model('Users request',
+{
     'username': fields.String(description='Login'),
     'password': fields.String(description='Password'),
     'phone': fields.String(description='Phone number'),
@@ -44,16 +41,17 @@ user_request_fields = api.model('Users request', {
 })
 
 # Request JSON template (all fields required)
-user_request_required_fields = api.model('Users request (all required)', {
+user_request_required_fields = api.model('Users request (all required)',
+{
     'username': fields.String(description='Login', required=True),
     'password': fields.String(description='Password', required=True),
     'phone': fields.String(description='Phone number', required=True),
-    'fts_key': fields.Integer(description='Federal Tax Service key from SMS',
-                              required=True),
+    'fts_key': fields.Integer(description='Federal Tax Service key from SMS', required=True),
 })
 
 # Response JSON template
-user_fields = api.model('Users response', {
+user_fields = api.model('Users response',
+{
     'id': fields.Integer(description='ID', required=True),
     'username': fields.String(description='Login', required=True),
     'phone': fields.String(description='Phone number', required=True),
@@ -97,14 +95,12 @@ class UserList(Resource):
             return user, 201
         except IntegrityError:
             db.session.rollback()
-            abort(409, message="Username '{}' "
-                               "already exist".format(args['username']))
+            abort(409, message="Username '{}' already exist".format(args['username']))
 
     @staticmethod
     def abortIfFtsUserDoesntExist(phone, fts_key):
         """
-        Return error JSON in 409 response
-        if user doesn't exists in Federal Tax Service
+        Return error JSON in 409 response if user doesn't exists in Federal Tax Service
 
         :param username: User phone number
         :type  username: str
@@ -113,8 +109,7 @@ class UserList(Resource):
         """
         fts = FtsRequest()
         if fts.checkAuthData(phone, fts_key) is False:
-            abort(404, message="Can't authorize in Federal Tax Service "
-                               "with given phone/key")
+            abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
 
 
 @api.route('/<int:id>', endpoint='user')
@@ -187,8 +182,7 @@ class UserInfo(Resource):
     @api.expect(user_request_fields)
     @api.marshal_with(user_fields, envelope='user')
     @api.doc(responses={
-        400: 'Failed to decode JSON object: '
-             'Expecting value: line 1 column 1 (char 0)',
+        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)',
         401: 'Unauthorized access',
         404: "Can't authorize in Federal Tax Service with given phone/key",
         409: 'Username already exist',
@@ -219,14 +213,12 @@ class UserInfo(Resource):
             return user
         except IntegrityError:
             db.session.rollback()
-            abort(409, message="Username '{}' "
-                               "already exist".format(args['username']))
+            abort(409, message="Username '{}' already exist".format(args['username']))
 
     @staticmethod
     def abortIfFtsUserDoesntExist(phone, fts_key):
         """
-        Return error JSON in 409 response
-        if user doesn't exists in Federal Tax Service
+        Return error JSON in 409 response if user doesn't exists in Federal Tax Service
 
         :param username: User phone number
         :type  username: str
@@ -235,5 +227,4 @@ class UserInfo(Resource):
         """
         fts = FtsRequest()
         if fts.checkAuthData(phone, fts_key) is False:
-            abort(404, message="Can't authorize in Federal Tax Service "
-                               "with given phone/key")
+            abort(404, message="Can't authorize in Federal Tax Service with given phone/key")

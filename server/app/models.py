@@ -1,6 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import (TimedJSONWebSignatureSerializer as
-                          Serializer, BadSignature, SignatureExpired)
+from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from app import app, db
 
 
@@ -97,33 +96,25 @@ class Products(db.Model):
 
 class UserTable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id),
-                        nullable=False, unique=True, index=True)
-    table_id = db.Column(db.Integer, db.ForeignKey(Table.id),
-                         nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, unique=True, index=True)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable=False, index=True)
     price = db.Column(db.Float)
 
-    user = db.relationship('User', backref=db.backref(
-                           'user_tables', cascade="all, delete-orphan"))
-    table = db.relationship('Table', backref=db.backref(
-                            'user_tables', cascade="all, delete-orphan"))
+    user = db.relationship('User', backref=db.backref('user_tables', cascade="all, delete-orphan"))
+    table = db.relationship('Table', backref=db.backref('user_tables', cascade="all, delete-orphan"))
 
 
 class UserTableArchive(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id),
-                        nullable=False, index=True)
-    table_id = db.Column(db.Integer, db.ForeignKey(Table.id),
-                         nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable=False, index=True)
     price = db.Column(db.Float)
 
 
 class UserProduct(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id),
-                        nullable=False, index=True)
-    product_id = db.Column(db.Integer, db.ForeignKey(Products.id),
-                           nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
+    product_id = db.Column(db.Integer, db.ForeignKey(Products.id), nullable=False, index=True)
     table_id = db.Column(db.Integer, index=True)
     count = db.Column(db.Float)
     price = db.Column(db.Float)

@@ -12,14 +12,12 @@ authorizations = {
 
 # Blueprint REST API
 api = Api(RAv1,
-          authorizations=authorizations,
-          security=['basic', 'token'],
-          title='Receipt Analyzer',
-          version='1.0',
-          description='Service for the division of products from receipts '
-          'between a group of people.\n\n'
-          'Note: For token authorization type "Bearer %TOKEN%" '
-          'in api key authorization.')
+    authorizations=authorizations,
+    security=['basic', 'token'],
+    title='Receipt Analyzer',
+    version='1.0',
+    description='Service for the division of products from receipts between a group of people.\n\n'
+        'Note: For token authorization type "Bearer %TOKEN%" in api key authorization.')
 
 # Import views (must be after the blueprint object is created)
 from app.rest import Auth, Token, Users, Fts

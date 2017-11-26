@@ -98,8 +98,7 @@ class FtsRequest:
         :return:           JSON response
         :rtype:            dict
         """
-        url = "{}/v1/inns/*/kkts/*/fss/{}/tickets/{}" \
-              "?fiscalSign={}&sendToEmail=no".format(self.baseUrl, fn, fd, fp)
+        url = "{}/v1/inns/*/kkts/*/fss/{}/tickets/{}?fiscalSign={}&sendToEmail=no".format(self.baseUrl, fn, fd, fp)
         auth = (loginPhone, smsPass)
         response = get(url, headers=self.headers, auth=auth)
 
