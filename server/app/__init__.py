@@ -13,6 +13,11 @@ db = SQLAlchemy(app)
 # Application database migrations
 migrate = Migrate(app, db)
 
+# Close the database session after each request or application context shutdown
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
 # Import views (must be after the application object is created)
 from app import rest, views, models, FtsRequest
 

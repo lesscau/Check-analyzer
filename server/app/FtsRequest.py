@@ -51,7 +51,17 @@ class FtsRequest:
 
         response = get(url, headers = self.headers, auth = auth)
 
-        if response.ok:
+        # If response 202 code (no body), try 3 times again and return 408 if JSON not received
+        if response.status_code == 202:
+            calls = 0
+            while calls < 3 and response.status_code == 202:
+                response = get(url, headers = self.headers, auth = auth)
+                calls += 1
+            if response.status_code == 202:
+                JSON = {"ftsRequestSuccess": False, "responseCode": 408, "error": "Empty JSON response"}
+                return json.loads(json.dumps(JSON))
+
+        if response.status_code == 200:
             JSON = json.loads(response.text)['document']['receipt']
             JSON["ftsRequestSuccess"] = True
             return JSON

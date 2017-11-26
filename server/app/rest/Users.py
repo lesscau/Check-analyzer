@@ -1,5 +1,6 @@
 from flask import g
 from flask_restful import Resource, reqparse, fields, marshal, abort
+from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import User
 from app.FtsRequest import FtsRequest
@@ -47,7 +48,6 @@ class UserList(Resource):
         # Parsing request JSON fields
         args = self.reqparse.parse_args()
         # Error checking
-        self.abortIfUserAlreadyExist(args['username'])
         self.abortIfFtsUserDoesntExist(args['phone'], args['fts_key'])
         # Create user and add to database
         user = User(
@@ -55,22 +55,14 @@ class UserList(Resource):
             phone = args['phone'],
             fts_key = args['fts_key'])
         user.hash_password(args['password'])
-        db.session.add(user)
-        db.session.commit()
-        # Return JSON using template
-        return { 'user': marshal(user, user_fields) }, 201
-
-    @staticmethod
-    def abortIfUserAlreadyExist(username = None):
-        """
-        Return error JSON in 409 response if username already exists in database
-
-        :param username: User login
-        :type  username: str
-        """
-        user = User.query.filter_by(username = username).first()
-        if user is not None:
-            abort(409, message="Username '{}' already exist".format(username))
+        try:
+            db.session.add(user)
+            db.session.commit()
+            # Return JSON using template
+            return { 'user': marshal(user, user_fields) }, 201
+        except IntegrityError:
+            db.session.rollback()
+            abort(409, message="Username '{}' already exist".format(args['username']))
 
     @staticmethod
     def abortIfFtsUserDoesntExist(phone, fts_key):
@@ -175,27 +167,17 @@ class UserInfo(Resource):
         args = self.reqparse.parse_args()
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username = g.user.username).first()
-        # Error checking
-        self.abortIfUserAlreadyExist(args['username'])
-        # Modify user info according to JSON fields
-        for key, value in args.items():
-            if value is not None:
-                if key == "password":
-                    user.hash_password(value)
-                    continue
-                setattr(user, key, value)
-        db.session.commit()
-        # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
-
-    @staticmethod
-    def abortIfUserAlreadyExist(username = None):
-        """
-        Return error JSON in 409 response if username already exists in database
-
-        :param username: User login
-        :type  username: str
-        """
-        user = User.query.filter_by(username = username).first()
-        if user is not None:
-            abort(409, message="Username '{}' already exist".format(username))
+        try:
+            # Modify user info according to JSON fields
+            for key, value in args.items():
+                if value is not None:
+                    if key == "password":
+                        user.hash_password(value)
+                        continue
+                    setattr(user, key, value)
+            db.session.commit()
+            # Return JSON using template
+            return { 'user': marshal(user, user_fields) }
+        except IntegrityError:
+            db.session.rollback()
+            abort(409, message="Username '{}' already exist".format(args['username']))
