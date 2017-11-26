@@ -1,5 +1,5 @@
 from flask import g
-from flask_restful import abort
+from flask_restplus import abort
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 from app.models import User
 

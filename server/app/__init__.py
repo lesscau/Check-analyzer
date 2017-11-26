@@ -22,4 +22,4 @@ def shutdown_session(exception=None):
 from app import rest, views, models, FtsRequest
 
 # Register blueprint Receipt-Analyzer v1.0
-app.register_blueprint(rest.RAv1, url_prefix='/api/v1.0')
+app.register_blueprint(rest.RAv1)
