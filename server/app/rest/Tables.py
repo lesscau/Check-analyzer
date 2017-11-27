@@ -191,10 +191,20 @@ class TablesUsers(Resource):
             db.session.delete(user_table)
             db.session.commit()
             # Return JSON using template
-            return user_table, 201
         except IntegrityError:
             db.session.rollback()
             abort(400, message="User '{}' does not exist".format(user.id))
+
+        user_table_list = UserTable.query.filter_by(table_id = user_table.table_id).first()
+        if user_table_list is None:
+            table = Table.query.filter_by(id = user_table.table_id).first()
+            try: 
+                db.session.delete(table)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                abort(400, message="Table '{}' does not exist".format(table.id))
+        return user_table, 201               
 
     @api.doc(security=None)
     @api.marshal_with(user_table_response_fields)
@@ -220,5 +230,3 @@ class TablesUsers(Resource):
             'name': item.user.name
             } for item in UserTable.query.filter_by(table_id = table.id)]
         return result, 200
-
-
