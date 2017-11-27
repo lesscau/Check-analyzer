@@ -20,9 +20,10 @@ api = Api(RAv1,
         'Note: For token authorization type "Bearer %TOKEN%" in api key authorization.')
 
 # Import views (must be after the blueprint object is created)
-from app.rest import Auth, Token, Users, Fts
+from app.rest import Auth, Token, Users, Fts, Tables
 
 # Define namespaces in REST API (groups in documentation)
 api.add_namespace(Users.api)
 api.add_namespace(Fts.api)
 api.add_namespace(Token.api)
+api.add_namespace(Tables.api)
