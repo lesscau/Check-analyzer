@@ -4,17 +4,18 @@ from app.models import User
 from app.rest.Auth import Auth
 
 # Define namespace
-api = Namespace('Token', description='Recieve JWS token', path='/')
+api = Namespace('Token', description='Recieve JWS token', path='/token')
 
-### JSON Models ###
+# JSON Models #
 
 # Response JSON template
 token_fields = api.model('Token response',
 {
-    'token': fields.String(description='Bearer token', required = True),
+    'token': fields.String(description='Bearer token', required=True),
 })
 
-@api.route('/token', endpoint = 'token')
+
+@api.route('', endpoint='token')
 class Token(Resource):
     """
     Obtaining bearer token for authorized user
@@ -24,7 +25,7 @@ class Token(Resource):
     """
     method_decorators = [Auth.basic_auth.login_required]
 
-    @api.doc(security = [ 'basic' ])
+    @api.doc(security=['basic'])
     @api.marshal_with(token_fields)
     @api.response(401, 'Unauthorized access')
     def get(self):
@@ -35,8 +36,8 @@ class Token(Resource):
         :rtype:  dict/json
         """
         # Login of authorized user stores in Flask g object
-        user = User.query.filter_by(username = g.user.username).first()
+        user = User.query.filter_by(username=g.user.username).first()
         # Generate token
         token = user.generate_auth_token()
         # Send token in ASCII format
-        return { 'token': token.decode('ascii') }
+        return {'token': token.decode('ascii')}
