@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from config import basedir
 import os
 
+# Constraints naming convention when the name is not specified explicitly
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -20,7 +21,7 @@ app.config.from_object('config')
 # Application database
 db = SQLAlchemy(app, metadata=MetaData(naming_convention=naming_convention))
 # Application database migrations
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, render_as_batch=True, compare_type=True)
 
 
 # Close the database session after each request or application context shutdown

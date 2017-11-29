@@ -10,7 +10,7 @@ import datetime
 
 def db_init():
     with app.app_context():
-        init(render_as_batch=True, compare_type=True)
+        init()
 
 
 def db_migrate():
