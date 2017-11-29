@@ -22,7 +22,7 @@ product_request.add_argument(
                     'count', type=int, required=True,
                     help='No name provided', location='json')
 product_request.add_argument(
-                    'price', type=float, required=True,
+                    'price', type=int, required=True,
                     help='No name provided', location='json')
 
 
@@ -33,7 +33,6 @@ delete_product_request.add_argument(
                     help='No name provided', location='json')
 
 
-
 # JSON Models #
 
 # Creating new product request JSON fields  (all fields required)
@@ -42,7 +41,7 @@ product_request_fields = api.model(
     {
         'product_name': fields.String(description='Name', required=True),
         'count': fields.Integer(description='Count', required=True),
-        'price': fields.Float(description='Price', required=True),
+        'price': fields.Integer(description='Price', required=True),
     })
 
 # Product response JSON fields
@@ -51,7 +50,7 @@ product_response_fields = api.model(
     {
         'product_name': fields.String(description='Name'),
         'count': fields.Integer(description='Count'),
-        'price': fields.Float(description='Price'),
+        'price': fields.Integer(description='Price'),
     })
 
 # Products list response JSON fields
@@ -68,13 +67,12 @@ delete_product_request_fields = api.model(
         'product_name': fields.String(description='Name', required=True),
     })
 
-# Delete product response JSON fields 
+# Delete product response JSON fields
 delete_product_response_fields = api.model(
     'Delete product response',
     {
         'product_name': fields.String(description='Name', required=True),
     })
-
 
 
 @api.route('', endpoint='products')
@@ -108,7 +106,7 @@ class Products(Resource):
         exists_product = Products.query.filter_by(product_name=args['product_name'], price=args['price']).first()
 
         if exists_product is None:
-            # Create product and add to database 
+            # Create product and add to database
             new_product = Products(
                       table_id=user.current_table.id,
                       product_name=args['product_name'],
@@ -159,9 +157,8 @@ class Products(Resource):
         try:
             db.session.delete(product)
             # Return JSON using template
+            db.session.commit()
+            return product, 201
         except IntegrityError:
             db.session.rollback()
             abort(400, message="Product '{}' does not exist".format(product.product_name))
-
-        db.session.commit()
-        return product, 201

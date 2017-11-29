@@ -174,5 +174,30 @@ class FtsReceiptRequest(Resource):
             'quantity': item['quantity'] if isinstance(item['quantity'], int) else 1,
             'price': item['price'] if isinstance(item['quantity'], int) else item['sum']
             } for item in request['items']]
+
+        try:
+            for name, quantity, price in result['items']:
+                exists_product = Products.query.filter_by(product_name=name, price=price).first()
+
+                if exists_product is None:
+                    # Create product and add to database
+                    new_product = Products(
+                              table_id=user.current_table.id,
+                              product_name=name,
+                              count=count,
+                              price=price)
+
+                    db.session.add(new_product)
+                    db.session.flush()
+                else:
+                    setattr(exists_poduct, 'count', args['count'] + exists_product.count)
+                    db.session.flush()
+                
+                db.session.commit()
+ 
+        except:
+            db.session.rollback()
+            abort(400, message="User '{}' does not associated with any table".format(user.id))
+
         # Return extracted part of JSON
         return result, 200
