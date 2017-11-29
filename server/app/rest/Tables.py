@@ -8,7 +8,7 @@ from app.RandomPhrases.main import randomPhrase
 from datetime import datetime
 
 # Define namespace
-api = Namespace('Tables', description='Operations with users', path='/tables')
+api = Namespace('Tables', description='Operations with tables', path='/tables')
 
 
 # JSON Parsers #
@@ -17,7 +17,7 @@ api = Namespace('Tables', description='Operations with users', path='/tables')
 table_request = api.parser()
 table_request.add_argument(
                     'table_key', type=str, required=True,
-                    help='No name provided', location='json')
+                    help='No key provided', location='json')
 
 
 # JSON Models #
@@ -92,9 +92,8 @@ class Tables(Resource):
 
         try:
             db.session.add(table)
-            db.session.commit()
+            db.session.flush()
             # Return JSON using template
-            return table, 201
         except IntegrityError:
             db.session.rollback()
             abort(409, message="Table '{}' already exist".format(key))
@@ -192,7 +191,7 @@ class TablesUsers(Resource):
 
         try:
             db.session.delete(user_table)
-            db.session.commit()
+            db.session.flush()
             # Return JSON using template
         except IntegrityError:
             db.session.rollback()
@@ -203,10 +202,10 @@ class TablesUsers(Resource):
             table = Table.query.filter_by(id=user_table.table_id).first()
             try:
                 db.session.delete(table)
-                db.session.commit()
             except IntegrityError:
                 db.session.rollback()
                 abort(400, message="Table '{}' does not exist".format(table.id))
+        db.session.commit()
         return user_table, 201
 
     @api.doc(security=None)

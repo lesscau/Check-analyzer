@@ -86,10 +86,10 @@ class Table(db.Model):
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable=False)
-    product_name = db.Column(db.String(120), unique=True)
+    product_name = db.Column(db.String(120))
     count = db.Column(db.Integer)
     price = db.Column(db.Float)
-
+    db.UniqueConstraint('product_name', 'table_id', name='_unique_name_for_table_uc')
     def __repr__(self):
         return '<Product %r>' % (self.product_name)
 
