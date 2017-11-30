@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import User, Products
 from app.rest.Auth import Auth
-from app.RandomPhrases.main import randomPhrase
+from app.RandomPhrases import randomPhrase
 from datetime import datetime
 
 # Define namespace
@@ -15,22 +15,18 @@ api = Namespace('Products', description='Operations with products', path='/produ
 
 # New product request JSON fields
 product_request = api.parser()
-product_request.add_argument(
-                    'product_name', type=str, required=True,
-                    help='No name provided', location='json')
-product_request.add_argument(
-                    'count', type=int, required=True,
-                    help='No name provided', location='json')
-product_request.add_argument(
-                    'price', type=int, required=True,
-                    help='No name provided', location='json')
+product_request.add_argument('product_name', type=str, required=True,
+        help='No name provided', location='json')
+product_request.add_argument('count', type=int, required=True,
+        help='No name provided', location='json')
+product_request.add_argument('price', type=int, required=True,
+        help='No name provided', location='json')
 
 
 # Delete product request JSON fields
 delete_product_request = api.parser()
-delete_product_request.add_argument(
-                    'product_name', type=str, required=True,
-                    help='No name provided', location='json')
+delete_product_request.add_argument('product_name', type=str, required=True,
+        help='No name provided', location='json')
 
 
 # JSON Models #
@@ -83,7 +79,7 @@ class Products(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    @api.doc(security=None)
+    @api.doc()
     @api.expect(product_request_fields)
     @api.marshal_with(product_response_fields)
     @api.doc(responses={
@@ -103,36 +99,30 @@ class Products(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
-        exists_product = Products.query.filter_by(product_name=args['product_name'], price=args['price']).first()
+        exists_product = Products.query.filter_by(product_name=args['product_name'], price=args['price'], table_id=user.current_table.id).first()
 
-        if exists_product is None:
-            # Create product and add to database
-            new_product = Products(
-                      table_id=user.current_table.id,
-                      product_name=args['product_name'],
-                      count=args['count'],
-                      price=args['price'])
-
-            try:
-                db.session.add(new_product)
-                db.session.commit()
-                # Return JSON using template
-                return product, 201
-            except IntegrityError:
-                db.session.rollback()
-                abort(400, message="User '{}' does not associated with any table".format(user.id))
-
-        else:
-            try:
+        try:        
+            if exists_product is None:
+                # Create product and add to database
+                new_product = Products(
+                        table_id=user.current_table.id,
+                        product_name=args['product_name'],
+                        count=args['count'],
+                        price=args['price'])
+                db.session.add(new_product) 
+            else:
                 setattr(exists_poduct, 'count', args['count'] + exists_product.count)
-                db.session.commit()
-                # Return JSON using template
-                return exists_product, 201
-            except:
-                db.session.rollback()
-                abort(400, message="User '{}' does not associated with any table".format(user.id))
 
-    @api.doc(security=None)
+            db.session.commit()
+        
+            # Return JSON using template
+            return (new_product if exists_product is None else exists_product), 201
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message="User '{}' does not associated with any table".format(user.id))
+        
+
+    @api.doc()
     @api.expect(delete_product_request_fields)
     @api.marshal_with(delete_product_response_fields)
     @api.doc(responses={
@@ -152,13 +142,13 @@ class Products(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
-        product = Products.query.filter_by(product_name=args['product_name'], table_id=user.current_table).first()
+        product = Products.query.filter_by(product_name=args['product_name'], table_id=user.current_table.id).first()
 
         try:
             db.session.delete(product)
             # Return JSON using template
             db.session.commit()
-            return product, 201
+            return product
         except IntegrityError:
             db.session.rollback()
             abort(400, message="Product '{}' does not exist".format(product.product_name))

@@ -1,6 +1,8 @@
 from flask import g, request
 from flask_restplus import Namespace, Resource, fields, abort
-from app.models import User
+from sqlalchemy.exc import IntegrityError
+from app.models import User, Products
+from app import db
 from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
@@ -190,12 +192,12 @@ class FtsReceiptRequest(Resource):
                     db.session.add(new_product)
                     db.session.flush()
                 else:
-                    setattr(exists_poduct, 'count', args['count'] + exists_product.count)
+                    setattr(exists_poduct, 'count', quantity + exists_product.count)
                     db.session.flush()
                 
                 db.session.commit()
  
-        except:
+        except IntegrityError:
             db.session.rollback()
             abort(400, message="User '{}' does not associated with any table".format(user.id))
 

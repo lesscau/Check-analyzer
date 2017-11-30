@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models import User, Table, UserTable
 from app.rest.Auth import Auth
-from app.RandomPhrases.main import randomPhrase
+from app.RandomPhrases import randomPhrase
 from datetime import datetime
 
 # Define namespace
@@ -15,9 +15,8 @@ api = Namespace('Tables', description='Operations with tables', path='/tables')
 
 # Find table request JSON fields
 table_request = api.parser()
-table_request.add_argument(
-                    'table_key', type=str, required=True,
-                    help='No key provided', location='json')
+table_request.add_argument('table_key', type=str, required=True,
+        help='No key provided', location='json')
 
 
 # JSON Models #
@@ -68,10 +67,11 @@ class Tables(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    @api.doc(security=None)
+    @api.doc()
     @api.marshal_with(table_response_fields)
     @api.doc(responses={
         409: 'Table already exists',
+        406: 'User already connected with table',
     })
     def post(self):
         """
@@ -111,7 +111,7 @@ class Tables(Resource):
             return table, 201
         except IntegrityError:
             db.session.rollback()
-            abort(409, message="Username '{}' already exist".format(user.username))
+            abort(406, message="Username '{}' already connected with table".format(user.username))
 
     @staticmethod
     def newPhraseIfAlreadyExists():
@@ -134,7 +134,30 @@ class TablesUsers(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    @api.doc(security=None)
+    @api.doc()
+    @api.marshal_with(user_table_response_fields)
+    @api.doc(responses={
+        400: 'User does not exist at any tables'
+    })
+    def get(self):
+        """
+        Get list of users related to the same table as auth user
+
+        :return: list of users' ids and names
+        :rtype:  dict/json
+        """
+
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+
+        result = {}
+        result['items'] = [{
+            'id': item.user_id,
+            'name': item.user.name
+            } for item in UserTable.query.filter_by(table_id=user.current_table.id)]
+        return result
+
+    @api.doc()
     @api.expect(find_table_request_fields)
     @api.marshal_with(user_table_response_fields)
     @api.doc(responses={
@@ -155,12 +178,10 @@ class TablesUsers(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
-        table = Table.query.filter_by(table_key=args['table_key']).first()
-
         # Create user-table dependency
         user_table = UserTable(
              user_id=user.id,
-             table_id=table.id)
+             table_id=user.current_table.id)
 
         try:
             db.session.add(user_table)
@@ -171,10 +192,11 @@ class TablesUsers(Resource):
             db.session.rollback()
             abort(400, message="Table keyword '{}' does not exist".format(table.table_key))
 
-    @api.doc(security=None)
+    @api.doc()
     @api.marshal_with(user_table_response_fields)
     @api.doc(responses={
-        400: 'User does not exist at any tables'
+        406: 'User does not exist at any tables',
+        400: 'Table does not exist'
     })
     def delete(self):
         """
@@ -195,7 +217,7 @@ class TablesUsers(Resource):
             # Return JSON using template
         except IntegrityError:
             db.session.rollback()
-            abort(400, message="User '{}' does not exist".format(user.id))
+            abort(406, message="User '{}' does not exist".format(user.id))
 
         user_table_list = UserTable.query.filter_by(table_id=user_table.table_id).first()
         if user_table_list is None:
@@ -205,30 +227,9 @@ class TablesUsers(Resource):
             except IntegrityError:
                 db.session.rollback()
                 abort(400, message="Table '{}' does not exist".format(table.id))
-        db.session.commit()
-        return user_table, 201
-
-    @api.doc(security=None)
-    @api.marshal_with(user_table_response_fields)
-    @api.doc(responses={
-        400: 'User does not exist at any tables'
-    })
-    def get(self):
-        """
-        Get list of users related to the same table as auth user
-
-        :return: list of users' ids and names
-        :rtype:  dict/json
-        """
-
-        # Login of authorized user stores in Flask g object
-        user = User.query.filter_by(username=g.user.username).first()
-
-        table = UserTable.query.filter_by(user_id=user.id).first()
-
-        result = {}
-        result['items'] = [{
-            'id': item.user_id,
-            'name': item.user.name
-            } for item in UserTable.query.filter_by(table_id=table.id)]
-        return result, 200
+        try:
+            db.session.commit()
+            return user_table
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message="Table '{}' does not exist".format(table.id))

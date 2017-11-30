@@ -21,7 +21,7 @@ def shutdown_session(exception=None):
 
 
 # Import views (must be after the application object is created)
-from app import rest, models, FtsRequest
+from app import rest, models, FtsRequest, RandomPhrases
 
 # Register blueprint Receipt-Analyzer v1.0
 app.register_blueprint(rest.RAv1)
