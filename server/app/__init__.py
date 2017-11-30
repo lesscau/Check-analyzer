@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import basedir
@@ -13,7 +12,16 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 # Application database migrations
 migrate = Migrate(app, db)
-# Application REST API
-api = Api(app)
 
-from app import rest, views, models, FtsRequest
+
+# Close the database session after each request or application context shutdown
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
+
+# Import views (must be after the application object is created)
+from app import rest, models, FtsRequest
+
+# Register blueprint Receipt-Analyzer v1.0
+app.register_blueprint(rest.RAv1)

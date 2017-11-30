@@ -1,7 +1,8 @@
 from flask import g
-from flask_restful import abort
+from flask_restplus import abort
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
 from app.models import User
+
 
 class Auth():
     """
@@ -32,7 +33,7 @@ class Auth():
         :return: True if the password matched, False otherwise
         :rtype:  bool
         """
-        user = User.query.filter_by(username = username).first()
+        user = User.query.filter_by(username=username).first()
         if not user or not user.verify_password(password):
             return False
         # Insert authorized user in Flask g object

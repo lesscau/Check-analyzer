@@ -1,10 +1,21 @@
 from flask import g
-from flask_restful import Resource
-from app import api
+from flask_restplus import Namespace, Resource, fields
 from app.models import User
-from app.views import APIv1
 from app.rest.Auth import Auth
 
+# Define namespace
+api = Namespace('Token', description='Recieve JWS token', path='/token')
+
+# JSON Models #
+
+# Response JSON template
+token_fields = api.model('Token response',
+{
+    'token': fields.String(description='Bearer token', required=True),
+})
+
+
+@api.route('', endpoint='token')
 class Token(Resource):
     """
     Obtaining bearer token for authorized user
@@ -14,6 +25,9 @@ class Token(Resource):
     """
     method_decorators = [Auth.basic_auth.login_required]
 
+    @api.doc(security=['basic'])
+    @api.marshal_with(token_fields)
+    @api.response(401, 'Unauthorized access')
     def get(self):
         """
         Obtaining bearer token for authorized user
@@ -22,11 +36,8 @@ class Token(Resource):
         :rtype:  dict/json
         """
         # Login of authorized user stores in Flask g object
-        user = User.query.filter_by(username = g.user.username).first()
+        user = User.query.filter_by(username=g.user.username).first()
         # Generate token
         token = user.generate_auth_token()
         # Send token in ASCII format
-        return { 'token': token.decode('ascii') }
-
-# Add class to REST API
-api.add_resource(Token, APIv1 + '/token', endpoint = 'token')
+        return {'token': token.decode('ascii')}

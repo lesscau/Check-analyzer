@@ -1,44 +1,76 @@
 from flask import g
-from flask_restful import Resource, reqparse, fields, marshal, abort
-from app import api, db
+from flask_restplus import Namespace, Resource, fields, marshal, abort
+from sqlalchemy.exc import IntegrityError
+from app import db
 from app.models import User
-from app.views import APIv1
-from app.rest.Auth import Auth
 from app.FtsRequest import FtsRequest
+from app.rest.Auth import Auth
 
-# Response JSON template for /users/{id} or /users/me requests
-user_fields = {
-    'id': fields.Integer,
-    'username': fields.String,
-    'phone': fields.String,
-    'url': fields.Url('user')
-}
+# Define namespace
+api = Namespace('Users', description='Operations with users', path='/users')
 
+# JSON Parsers #
+
+# Request JSON fields
+user_request = api.parser()
+user_request.add_argument('username', type=str, location='json')
+user_request.add_argument('password', type=str, location='json')
+user_request.add_argument('phone', type=str, location='json')
+user_request.add_argument('fts_key', type=int, location='json')
+
+# Request JSON fields (all fields required)
+user_request_required = api.parser()
+user_request_required.add_argument('username', type=str, required=True,
+    help='No username provided', location='json')
+user_request_required.add_argument('password', type=str, required=True,
+    help='No password provided', location='json')
+user_request_required.add_argument('phone', type=str, required=True,
+    help='No phone provided', location='json')
+user_request_required.add_argument('fts_key', type=int, required=True,
+    help='No fts_key provided', location='json')
+
+# JSON Models #
+
+# Request JSON template
+user_request_fields = api.model('Users request',
+{
+    'username': fields.String(description='Login'),
+    'password': fields.String(description='Password'),
+    'phone': fields.String(description='Phone number'),
+    'fts_key': fields.Integer(description='Federal Tax Service key from SMS'),
+})
+
+# Request JSON template (all fields required)
+user_request_required_fields = api.model('Users request (all required)',
+{
+    'username': fields.String(description='Login', required=True),
+    'password': fields.String(description='Password', required=True),
+    'phone': fields.String(description='Phone number', required=True),
+    'fts_key': fields.Integer(description='Federal Tax Service key from SMS', required=True),
+})
+
+# Response JSON template
+user_fields = api.model('Users response',
+{
+    'id': fields.Integer(description='ID', required=True),
+    'username': fields.String(description='Login', required=True),
+    'phone': fields.String(description='Phone number', required=True),
+})
+
+
+@api.route('', endpoint='users')
 class UserList(Resource):
     """
     Operations with list of users
-
-    :var     method_decorators: Decorators applied to methods
-    :vartype method_decorators: list
-    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
-    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
-    # Applied only to get method
-    method_decorators = {'get': [Auth.multi_auth.login_required]}
-
-    def __init__(self):
-        # Define request JSON fields
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type = str, required = True,
-            help = 'No username provided', location = 'json')
-        self.reqparse.add_argument('password', type = str, required = True,
-            help = 'No password provided', location = 'json')
-        self.reqparse.add_argument('phone', type = str, required = True,
-            help = 'No phone provided', location = 'json')
-        self.reqparse.add_argument('fts_key', type = int, required = True,
-            help = 'No ftskey provided', location = 'json')
-        super(UserList, self).__init__()
-
+    @api.doc(security=None)
+    @api.expect(user_request_required_fields)
+    @api.marshal_with(user_fields, envelope='user', code=201)
+    @api.doc(responses={
+        400: 'No username/password/phone/fts_key provided',
+        404: "Can't authorize in Federal Tax Service with given phone/key",
+        409: 'Username already exist',
+    })
     def post(self):
         """
         Create new user in database
@@ -47,32 +79,23 @@ class UserList(Resource):
         :rtype:  dict/json
         """
         # Parsing request JSON fields
-        args = self.reqparse.parse_args()
+        args = user_request_required.parse_args()
         # Error checking
-        self.abortIfUserAlreadyExist(args['username'])
         self.abortIfFtsUserDoesntExist(args['phone'], args['fts_key'])
         # Create user and add to database
         user = User(
-            username = args['username'],
-            phone = args['phone'],
-            fts_key = args['fts_key'])
+            username=args['username'],
+            phone=args['phone'],
+            fts_key=args['fts_key'])
         user.hash_password(args['password'])
-        db.session.add(user)
-        db.session.commit()
-        # Return JSON using template
-        return { 'user': marshal(user, user_fields) }, 201
-
-    @staticmethod
-    def abortIfUserAlreadyExist(username = None):
-        """
-        Return error JSON in 409 response if username already exists in database
-
-        :param username: User login
-        :type  username: str
-        """
-        user = User.query.filter_by(username = username).first()
-        if user is not None:
-            abort(409, message="Username '{}' already exist".format(username))
+        try:
+            db.session.add(user)
+            db.session.commit()
+            # Return JSON using template
+            return user, 201
+        except IntegrityError:
+            db.session.rollback()
+            abort(409, message="Username '{}' already exist".format(args['username']))
 
     @staticmethod
     def abortIfFtsUserDoesntExist(phone, fts_key):
@@ -88,26 +111,23 @@ class UserList(Resource):
         if fts.checkAuthData(phone, fts_key) is False:
             abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
 
+
+@api.route('/<int:id>', endpoint='user')
+@api.param('id', 'User ID in database')
 class Users(Resource):
     """
     Operations with user selected by id
 
     :var     method_decorators: Decorators applied to methods
     :vartype method_decorators: list
-    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
-    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    def __init__(self):
-        # Define request JSON fields
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type = str, location = 'json')
-        self.reqparse.add_argument('password', type = str, location = 'json')
-        self.reqparse.add_argument('phone', type = str, location = 'json')
-        self.reqparse.add_argument('fts_key', type = int, location = 'json')
-        super(Users, self).__init__()
-
+    @api.marshal_with(user_fields, envelope='user')
+    @api.doc(responses={
+        401: 'Unauthorized access',
+        404: "User id doesn't exist",
+    })
     def get(self, id):
         """
         Get user partial info with provided id
@@ -119,7 +139,7 @@ class Users(Resource):
         # Error checking
         self.abortIfUserDoesntExist(user, id)
         # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
+        return user
 
     @staticmethod
     def abortIfUserDoesntExist(user, id):
@@ -134,26 +154,19 @@ class Users(Resource):
         if user is None:
             abort(404, message="User id {} doesn't exist".format(id))
 
+
+@api.route('/me', endpoint='userme')
 class UserInfo(Resource):
     """
     Operations with authorized user
 
     :var     method_decorators: Decorators applied to methods
     :vartype method_decorators: list
-    :ivar    reqparse: Request parsing interface to provide simple and uniform access to any variable on the flask.request object in Flask
-    :vartype reqparse: flask_restful.reqparse.RequestParser
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    def __init__(self):
-        # Define request JSON fields
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type = str, location = 'json')
-        self.reqparse.add_argument('password', type = str, location = 'json')
-        self.reqparse.add_argument('phone', type = str, location = 'json')
-        self.reqparse.add_argument('fts_key', type = int, location = 'json')
-        super(UserInfo, self).__init__()
-
+    @api.marshal_with(user_fields, envelope='user')
+    @api.response(401, 'Unauthorized access')
     def get(self):
         """
         Get authorized user partial info
@@ -162,10 +175,18 @@ class UserInfo(Resource):
         :rtype:  dict/json
         """
         # Login of authorized user stores in Flask g object
-        user = User.query.filter_by(username = g.user.username).first()
+        user = User.query.filter_by(username=g.user.username).first()
         # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
+        return user
 
+    @api.expect(user_request_fields)
+    @api.marshal_with(user_fields, envelope='user')
+    @api.doc(responses={
+        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)',
+        401: 'Unauthorized access',
+        404: "Can't authorize in Federal Tax Service with given phone/key",
+        409: 'Username already exist',
+    })
     def put(self):
         """
         Modify authorized user in database
@@ -174,35 +195,36 @@ class UserInfo(Resource):
         :rtype:  dict/json
         """
         # Parsing request JSON fields
-        args = self.reqparse.parse_args()
+        args = user_request.parse_args()
         # Login of authorized user stores in Flask g object
-        user = User.query.filter_by(username = g.user.username).first()
-        # Error checking
-        self.abortIfUserAlreadyExist(args['username'])
-        # Modify user info according to JSON fields
-        for key, value in args.items():
-            if value is not None:
-                if key == "password":
-                    user.hash_password(value)
-                    continue
-                setattr(user, key, value)
-        db.session.commit()
-        # Return JSON using template
-        return { 'user': marshal(user, user_fields) }
+        user = User.query.filter_by(username=g.user.username).first()
+        try:
+            # Modify user info according to JSON fields
+            for key, value in args.items():
+                if value is not None:
+                    if key == "password":
+                        user.hash_password(value)
+                        continue
+                    setattr(user, key, value)
+            # Error checking
+            self.abortIfFtsUserDoesntExist(user.phone, user.fts_key)
+            db.session.commit()
+            # Return JSON using template
+            return user
+        except IntegrityError:
+            db.session.rollback()
+            abort(409, message="Username '{}' already exist".format(args['username']))
 
     @staticmethod
-    def abortIfUserAlreadyExist(username = None):
+    def abortIfFtsUserDoesntExist(phone, fts_key):
         """
-        Return error JSON in 409 response if username already exists in database
+        Return error JSON in 409 response if user doesn't exists in Federal Tax Service
 
-        :param username: User login
+        :param username: User phone number
         :type  username: str
+        :param username: SMS key
+        :type  username: int
         """
-        user = User.query.filter_by(username = username).first()
-        if user is not None:
-            abort(409, message="Username '{}' already exist".format(username))
-
-# Add classes to REST API
-api.add_resource(UserList, APIv1 + '/users', endpoint = 'users')
-api.add_resource(Users, APIv1 + '/users/<int:id>', endpoint = 'user')
-api.add_resource(UserInfo, APIv1 + '/users/me', endpoint = 'userme')
+        fts = FtsRequest()
+        if fts.checkAuthData(phone, fts_key) is False:
+            abort(404, message="Can't authorize in Federal Tax Service with given phone/key")
