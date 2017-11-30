@@ -1,51 +1,15 @@
 #!/usr/bin/env python
 
-import pymorphy2
 import random
 import os
 
 def randomPhrase(nounList, adjList, count=1):
-    # Load morph analyzer
-    mp = pymorphy2.MorphAnalyzer()
     phrases = []
 
     for cnt in range(0, count):
         # Found random adj and noun from lists
         randNoun = random.choice(nounList)
         randAdj  = random.choice(adjList)
-
-        # Collect number and gender for inflect phrase
-        for i in mp.parse(randNoun):
-            if i.tag.POS == "NOUN" and i.tag.case == "nomn":
-                # Unchangeable word
-                if ("Fixd" in i.tag) == True:
-                    number = "fixd"
-                # Only plural number
-                elif ("Pltm" in i.tag) == True:
-                    number = "plur"
-                # Only single number
-                elif ("Sgtm" in i.tag) == True:
-                    number = "sing"
-                # Get string with number of noun
-                else:
-                    number = str(i.tag.number)
-
-                # Change only gender on adj
-                if number == "sing" or number == "fixd":
-                    gender = i.tag.gender
-                    if gender == None: gender = "masc"
-                    inflectVal = {gender}
-                    break
-                # Change only number on noun and adj
-                else:
-                    inflectVal = {number}
-                    break
-
-        # Inflect adj
-        for i in mp.parse(randAdj):
-            if i.tag.POS == "ADJF" and i.tag.case == "nomn":
-                # Change number or gender of adj
-                randAdj = i.inflect(inflectVal).word
 
         phrases.append("{} {}".format(randAdj, randNoun))
 
