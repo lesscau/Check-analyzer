@@ -10,65 +10,57 @@ from datetime import datetime
 # Define namespace
 api = Namespace('Products', description='Operations with products', path='/products')
 
-
 # JSON Parsers #
 
 # New product request JSON fields
 product_request = api.parser()
 product_request.add_argument('product_name', type=str, required=True,
-        help='No name provided', location='json')
+    help='No name provided', location='json')
 product_request.add_argument('count', type=int, required=True,
-        help='No name provided', location='json')
+    help='No name provided', location='json')
 product_request.add_argument('price', type=int, required=True,
-        help='No name provided', location='json')
-
+    help='No name provided', location='json')
 
 # Delete product request JSON fields
 delete_product_request = api.parser()
 delete_product_request.add_argument('product_name', type=str, required=True,
-        help='No name provided', location='json')
-
+    help='No name provided', location='json')
 
 # JSON Models #
 
 # Creating new product request JSON fields  (all fields required)
-product_request_fields = api.model(
-    'Product request',
-    {
-        'product_name': fields.String(description='Name', required=True),
-        'count': fields.Integer(description='Count', required=True),
-        'price': fields.Integer(description='Price', required=True),
-    })
+product_request_fields = api.model('Product request',
+{
+    'product_name': fields.String(description='Name', required=True),
+    'count': fields.Integer(description='Count', required=True),
+    'price': fields.Integer(description='Price', required=True),
+})
 
 # Product response JSON fields
-product_response_fields = api.model(
-    'Product response ',
-    {
-        'product_name': fields.String(description='Name'),
-        'count': fields.Integer(description='Count'),
-        'price': fields.Integer(description='Price'),
-    })
+product_response_fields = api.model('Product response',
+{
+    'product_name': fields.String(description='Name'),
+    'count': fields.Integer(description='Count'),
+    'price': fields.Integer(description='Price'),
+})
 
 # Products list response JSON fields
-product_list_response_fields = api.model(
-    'Products list response',
-    {
-        'items': fields.List(fields.Nested(product_response_fields)),
-    })
+product_list_response_fields = api.model('Products list response',
+{
+    'items': fields.List(fields.Nested(product_response_fields)),
+})
 
 # Delete product request JSON fields  (name field required)
-delete_product_request_fields = api.model(
-    'Delete product request',
-    {
-        'product_name': fields.String(description='Name', required=True),
-    })
+delete_product_request_fields = api.model('Delete product request',
+{
+    'product_name': fields.String(description='Name', required=True),
+})
 
 # Delete product response JSON fields
-delete_product_response_fields = api.model(
-    'Delete product response',
-    {
-        'product_name': fields.String(description='Name', required=True),
-    })
+delete_product_response_fields = api.model('Delete product response',
+{
+    'product_name': fields.String(description='Name', required=True),
+})
 
 
 @api.route('', endpoint='products')
@@ -79,9 +71,8 @@ class Products(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    @api.doc()
     @api.expect(product_request_fields)
-    @api.marshal_with(product_response_fields)
+    @api.marshal_with(product_response_fields, code=201)
     @api.doc(responses={
         400: 'User does not exist at any tables'
     })
@@ -105,10 +96,10 @@ class Products(Resource):
             if exists_product is None:
                 # Create product and add to database
                 new_product = Products(
-                        table_id=user.current_table.id,
-                        product_name=args['product_name'],
-                        count=args['count'],
-                        price=args['price'])
+                    table_id=user.current_table.id,
+                    product_name=args['product_name'],
+                    count=args['count'],
+                    price=args['price'])
                 db.session.add(new_product) 
             else:
                 setattr(exists_poduct, 'count', args['count'] + exists_product.count)
@@ -122,7 +113,6 @@ class Products(Resource):
             abort(400, message="User '{}' does not associated with any table".format(user.id))
         
 
-    @api.doc()
     @api.expect(delete_product_request_fields)
     @api.marshal_with(delete_product_response_fields)
     @api.doc(responses={

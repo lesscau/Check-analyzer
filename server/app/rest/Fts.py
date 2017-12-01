@@ -127,7 +127,7 @@ class FtsSignUp(Resource):
         if request['ftsRequestSuccess'] is False and request['error'] != "user exists":
             abort(request['responseCode'], message=request['error'])
         # Return JSON
-        return {'message': 'SMS with password was sent to {}'.format(args['phone'])}, 200
+        return {'message': 'SMS with password was sent to {}'.format(args['phone'])}
 
 
 @api.route('/receipts', endpoint='fts_receipts')
@@ -202,4 +202,4 @@ class FtsReceiptRequest(Resource):
             abort(400, message="User '{}' does not associated with any table".format(user.id))
 
         # Return extracted part of JSON
-        return result, 200
+        return result
