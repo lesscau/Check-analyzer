@@ -178,28 +178,28 @@ class FtsReceiptRequest(Resource):
             } for item in request['items']]
 
         try:
-            for name, quantity, price in result['items']:
+            for item in result['items']:
+                name = item['name']
+                quantity = item['quantity']
+                price = int(item['price']) / 100
+
                 exists_product = Products.query.filter_by(product_name=name, price=price).first()
 
                 if exists_product is None:
                     # Create product and add to database
                     new_product = Products(
-                              table_id=user.current_table.id,
+                              table_id=user.current_table[0].id,
                               product_name=name,
-                              count=count,
+                              count=quantity,
                               price=price)
 
                     db.session.add(new_product)
-                    db.session.flush()
                 else:
-                    setattr(exists_poduct, 'count', quantity + exists_product.count)
-                    db.session.flush()
+                    exists_product.count += quantity 
                 
-                db.session.commit()
- 
-        except IntegrityError:
+            db.session.commit()
+            # Return JSON
+            return exists_product.table.getProducts()
+        except (IntegrityError, IndexError):
             db.session.rollback()
             abort(400, message="User '{}' does not associated with any table".format(user.id))
-
-        # Return extracted part of JSON
-        return result
