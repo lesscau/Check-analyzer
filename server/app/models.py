@@ -91,7 +91,7 @@ class Products(db.Model):
     price = db.Column(db.Float)
 
     __table_args__ = (
-        db.UniqueConstraint('product_name', 'table_id', name='_unique_name_for_table_uc'),
+        db.UniqueConstraint('product_name', 'table_id', 'price', name='_unique_name_for_table_uc'),
     )
 
     def __repr__(self):
