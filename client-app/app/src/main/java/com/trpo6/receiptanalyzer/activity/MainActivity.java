@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(mActionBarToolbar);
         // проверяем, была ли ранее выполнена авторизация
         if (!AuthInfo.isAuthorized(this)){
             // Окно логина/регистрации

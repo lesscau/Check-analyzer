@@ -1,112 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:baselineAligned="false"
-    android:orientation="vertical"
-    tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="25dp">
+    android:fitsSystemWindows="true">
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_weight="1"
-        android:onClick="scanQRcode"
-        android:text="Создать стол"
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:textColor="@android:color/white"
-        android:layout_marginRight="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
-        app:layout_constraintHorizontal_bias="0.0" />
+        android:textSize="22sp"
+        android:gravity="left"/>
 
-    <Button
-        android:id="@+id/findTableButton"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_weight="1"
-        android:elevation="0dp"
-        android:text="НАЙТИ СТОЛ"
-        android:textColor="@android:color/white"
-        android:layout_marginRight="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="0dp"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_height="wrap_content"
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="vertical"
+        android:layout_gravity="bottom">
+
+        <Button
+            android:id="@+id/historyButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:text="@string/history"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:onClick="scanQRcode"
-        android:text="@string/btn_qr"
-        android:textColor="@android:color/white"
-        android:layout_marginRight="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/inputButton" />
+        android:orientation="horizontal"
+        android:layout_gravity="center">
 
-    <Button
-        android:id="@+id/inputButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_weight="1"
-        android:onClick="addItemsWindow"
-        android:text="@string/btn_enterlist"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/historyButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        <Button
+            android:id="@+id/findTableButton"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:elevation="0dp"
+            android:text="@string/find_table"
+            android:textColor="@android:color/white" />
 
-    <Button
-        android:id="@+id/historyButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="ИСТОРИЯ"
-        android:textColor="@android:color/white"
-        android:layout_marginRight="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/logoutButt" />
+        <Button
+            android:id="@+id/createTableButton"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:onClick="scanQRcode"
+            android:text="@string/create_table"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/logoutButt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_weight="1"
-        android:onClick="logOut"
-        android:text="ВЫХОД ИЗ АККАУНТА"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
-
+</android.support.design.widget.CoordinatorLayout>

@@ -22,5 +22,10 @@
         completions."
     </string>
     <string name="string_internet_connection_not_available">Can not connect to the Internet</string>
+    <string name="find_table">Найти стол</string>
+    <string name="create_table">Создать стол</string>
+    <string name="toMain">На главную</string>
+    <string name="history">История</string>
+    <string name="logout">Выход</string>
 
 </resources>

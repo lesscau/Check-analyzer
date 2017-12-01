@@ -27,12 +27,4 @@ H
         <item name="android:scrollHorizontally">true</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.DialogWindowTitle</item>
     </style>
-
-    <style name="AppTheme.Button" parent="Base.Widget.AppCompat.Button">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/default_button_selector</item>
-    </style>
-
-
 </resources>
