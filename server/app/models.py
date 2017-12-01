@@ -11,6 +11,7 @@ class User(db.Model):
     fts_key = db.Column(db.Integer, default=0)
 
     current_table = db.relationship('Table', secondary='user_table')
+    current_products = db.relationship('UserProduct')
 
     def hash_password(self, password):
         """
@@ -78,6 +79,42 @@ class Table(db.Model):
     table_date = db.Column(db.DateTime)
 
     users = db.relationship('User', secondary='user_table')
+    products = db.relationship('Products')
+    user_products = db.relationship('UserProduct')
+
+    def getProducts(self):
+        """
+        Get dict of all products in table
+
+        :return: Dict of all products in table
+        :rtype:  dict/json
+        """
+        result = {}
+        result['items'] = [{
+            'name': item.product_name,
+            'quantity': item.count,
+            'price': int(item.price * 100)
+        } for item in self.products]
+        return result
+
+    def getUserProducts(self):
+        """
+        Get dict of products chosen by every user in table
+
+        :return: Dict of users in table with their products
+        :rtype:  dict/json
+        """
+        result = {}
+        result['users'] = [{
+            'id': item.id,
+            'username': item.username,
+            'items': [{
+                'name': cart.products.product_name,
+                'quantity': cart.count,
+                'price': int(cart.price * 100)
+            } for cart in item.current_products]
+        } for item in self.users]
+        return result
 
     def __repr__(self):
         return '<Table %r>' % (self.table_key)
@@ -89,6 +126,9 @@ class Products(db.Model):
     product_name = db.Column(db.String(120))
     count = db.Column(db.Integer)
     price = db.Column(db.Float)
+
+    table = db.relationship('Table')
+    user_products = db.relationship('UserProduct')
 
     __table_args__ = (
         db.UniqueConstraint('product_name', 'table_id', 'price', name='_unique_name_for_table_uc'),
@@ -119,6 +159,10 @@ class UserProduct(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
     product_id = db.Column(db.Integer, db.ForeignKey(Products.id), nullable=False, index=True)
-    table_id = db.Column(db.Integer, index=True)
-    count = db.Column(db.Float)
+    table_id = db.Column(db.Integer, db.ForeignKey(Table.id), index=True)
+    count = db.Column(db.Integer)
     price = db.Column(db.Float)
+
+    user = db.relationship('User')
+    table = db.relationship('Table')
+    products = db.relationship('Products') 
