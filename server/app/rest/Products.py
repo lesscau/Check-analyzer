@@ -1,8 +1,10 @@
 from flask import g
 from flask_restplus import Namespace, Resource, fields, abort
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import UnmappedInstanceError
 from app import db
-from app.models import User, Products
+from app.models import User
+from app.models import Products as ProductsModel
 from app.rest.Auth import Auth
 from app.RandomPhrases import randomPhrase
 from datetime import datetime
@@ -17,14 +19,16 @@ product_request = api.parser()
 product_request.add_argument('product_name', type=str, required=True,
     help='No name provided', location='json')
 product_request.add_argument('count', type=int, required=True,
-    help='No name provided', location='json')
+    help='No count provided', location='json')
 product_request.add_argument('price', type=int, required=True,
-    help='No name provided', location='json')
+    help='No price provided', location='json')
 
 # Delete product request JSON fields
 delete_product_request = api.parser()
 delete_product_request.add_argument('product_name', type=str, required=True,
     help='No name provided', location='json')
+delete_product_request.add_argument('price', type=int, required=True,
+    help='No price provided', location='json')
 
 # JSON Models #
 
@@ -50,10 +54,11 @@ product_list_response_fields = api.model('Products list response',
     'items': fields.List(fields.Nested(product_response_fields)),
 })
 
-# Delete product request JSON fields  (name field required)
+# Delete product request JSON fields (name field required)
 delete_product_request_fields = api.model('Delete product request',
 {
     'product_name': fields.String(description='Name', required=True),
+    'price': fields.String(description='Price', required=True),
 })
 
 # Delete product response JSON fields
@@ -68,17 +73,19 @@ class Products(Resource):
     """
     Operations with list of products
 
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
     """
     method_decorators = [Auth.multi_auth.login_required]
 
     @api.expect(product_request_fields)
     @api.marshal_with(product_response_fields, code=201)
     @api.doc(responses={
-        400: 'User does not exist at any tables'
+        404: 'Username does not connected to any table'
     })
     def post(self):
         """
-        Add new product to the list of table current user sitting at
+        Add new product to the list of current user table
 
         :return: New product
         :rtype:  dict/json
@@ -90,55 +97,69 @@ class Products(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
-        exists_product = Products.query.filter_by(product_name=args['product_name'], price=args['price'], table_id=user.current_table.id).first()
+        # Create JSON output with correct type of price
+        output = {
+            'product_name': args['product_name'],
+            'count': args['count'],
+            'price': args['price'],
+        }
 
         try:        
+            exists_product = ProductsModel.query.filter_by(product_name=args['product_name'], price=args['price'] / 100, table_id=user.current_table[0].id).first()
+
             if exists_product is None:
                 # Create product and add to database
-                new_product = Products(
-                    table_id=user.current_table.id,
+                new_product = ProductsModel(
+                    table_id=user.current_table[0].id,
                     product_name=args['product_name'],
                     count=args['count'],
-                    price=args['price'])
-                db.session.add(new_product) 
+                    price=args['price'] / 100)
+                db.session.add(new_product)
             else:
-                setattr(exists_poduct, 'count', args['count'] + exists_product.count)
+                exists_product.count += args['count']
+                output['count'] = exists_product.count
 
             db.session.commit()
-        
+
             # Return JSON using template
-            return (new_product if exists_product is None else exists_product), 201
-        except IntegrityError:
+            return output, 201
+        except (IntegrityError, IndexError):
             db.session.rollback()
-            abort(400, message="User '{}' does not associated with any table".format(user.id))
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
         
 
     @api.expect(delete_product_request_fields)
     @api.marshal_with(delete_product_response_fields)
     @api.doc(responses={
-        400: 'Product does not exist'
+        400: 'Product with given price does not exist',
+        404: 'Username does not connected to any table',
     })
     def delete(self):
         """
         Delete product from the table
 
-        :return: deleted products name
+        :return: Deleted product name
         :rtype:  dict/json
         """
 
         # Parsing request JSON fields
-        args = product_request.parse_args()
+        args = delete_product_request.parse_args()
 
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
-        product = Products.query.filter_by(product_name=args['product_name'], table_id=user.current_table.id).first()
-
         try:
+            product = ProductsModel.query.filter_by(product_name=args['product_name'], price=args['price'] / 100, table_id=user.current_table[0].id).first()
+
+            if len(product.user_products) != 0:
+                for item in product.user_products:
+                    db.session.delete(item)
             db.session.delete(product)
-            # Return JSON using template
             db.session.commit()
+            # Return JSON using template
             return product
-        except IntegrityError:
+        except (IntegrityError, UnmappedInstanceError, AttributeError):
             db.session.rollback()
-            abort(400, message="Product '{}' does not exist".format(product.product_name))
+            abort(400, message="Product '{}' with given price does not exist".format(args['product_name']))
+        except IndexError:
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))

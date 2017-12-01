@@ -195,7 +195,7 @@ class FtsReceiptRequest(Resource):
 
                     db.session.add(new_product)
                 else:
-                    exists_product.count += quantity 
+                    exists_product.count += quantity
                 
             db.session.commit()
             # Return JSON
