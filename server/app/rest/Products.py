@@ -58,7 +58,7 @@ product_list_response_fields = api.model('Products list response',
 delete_product_request_fields = api.model('Delete product request',
 {
     'product_name': fields.String(description='Name', required=True),
-    'price': fields.String(description='Price', required=True),
+    'price': fields.Integer(description='Price', required=True),
 })
 
 # Delete product response JSON fields
