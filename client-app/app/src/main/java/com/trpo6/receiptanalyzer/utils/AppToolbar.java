@@ -1,5 +1,6 @@
 package com.trpo6.receiptanalyzer.utils;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
@@ -15,6 +16,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.trpo6.receiptanalyzer.R;
+import com.trpo6.receiptanalyzer.activity.FirstActivity;
 import com.trpo6.receiptanalyzer.activity.MainActivity;
 
 /**
@@ -40,7 +42,7 @@ public class AppToolbar extends AppCompatActivity {
         return mActionBarToolbar;
     }
 
-    public static Drawer setMenu(AppCompatActivity app){
+    public static Drawer setMenu(final AppCompatActivity app){
         /**
          * Создание пунктов меню
          */
@@ -70,18 +72,25 @@ public class AppToolbar extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
                         if (drawerItem.getIdentifier() == 1) {
-                            //Intent intent = new Intent(app, MainActivity.class);
-                            // запуск activity
-                            //startActivity(intent);
+                            final Intent mainIntent = new Intent(app, MainActivity.class);
+                            mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            app.startActivity(mainIntent);
                         }
                         if (drawerItem.getIdentifier() == 3) {
-                            //MainActivity.logOut(view);
+                            // стираем старый токен
+                            AuthInfo.authClear(app);
+
+                            // переход к активити логина
+                            final Intent intent = new Intent(app, FirstActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            app.startActivity(intent);
+
                             return true;
                         }
                         return false;
                     }
-
                 })
                 .build();
         return drawerResult;
