@@ -14,6 +14,10 @@ api = Namespace('Products', description='Operations with products', path='/produ
 
 # JSON Parsers #
 
+# Products list request query fields
+product_list_request = api.parser()
+product_list_request.add_argument('divide', type=int, location='args')
+
 # New product request JSON fields
 product_request = api.parser()
 product_request.add_argument('product_name', type=str, required=True,
@@ -77,6 +81,37 @@ class Products(Resource):
     :vartype method_decorators: list
     """
     method_decorators = [Auth.multi_auth.login_required]
+
+    # @api.marshal_with(user_fields, envelope='user')
+    @api.param('divide', 'Division by users if 1')
+    @api.doc(responses={
+        400: 'Input payload validation failed',
+        401: 'Unauthorized access',
+        404: 'Username does not connected to any table',
+    })
+    def get(self):
+        """
+        Get all products in table (with/without division by users)
+        For division by users use divide=1 query parameter
+
+        :return: Products in table
+        :rtype:  dict/json
+        """
+        # Parsing request query fields
+        args = product_list_request.parse_args()
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+        
+        try:
+            if args['divide'] is not None and args['divide'] == 1:
+                response = user.current_table[0].getUserProducts()
+            else:
+                response = user.current_table[0].getProducts()
+            
+            # Return JSON using template
+            return response
+        except IndexError:
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
 
     @api.expect(product_request_fields)
     @api.marshal_with(product_response_fields, code=201)
