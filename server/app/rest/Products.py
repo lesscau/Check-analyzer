@@ -82,7 +82,6 @@ class Products(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    # @api.marshal_with(user_fields, envelope='user')
     @api.param('divide', 'Division by users if 1')
     @api.doc(responses={
         400: 'Input payload validation failed',
