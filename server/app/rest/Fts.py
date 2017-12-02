@@ -148,6 +148,7 @@ class FtsReceiptRequest(Resource):
         400: 'No fn/fd/fp provided',
         401: 'Unauthorized access',
         403: 'the user was not found or the specified password was not correct',
+        404: 'Username does not connected to any table',
         406: 'the ticket was not found',
         408: 'Empty JSON response',
     })
@@ -202,4 +203,4 @@ class FtsReceiptRequest(Resource):
             return exists_product.table.getProducts()
         except (IntegrityError, IndexError):
             db.session.rollback()
-            abort(400, message="User '{}' does not associated with any table".format(user.id))
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
