@@ -33,7 +33,7 @@ find_table_request_fields = api.model('UserTable request',
 })
 
 # TablesUsers response JSON template
-user_table_response_fields = api.model('UserTable request',
+user_table_response_fields = api.model('UserTable response',
 {
     'table_id': fields.Integer(description='Table id', required=True),
     'user_id': fields.Integer(description='User id')
