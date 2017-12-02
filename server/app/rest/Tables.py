@@ -65,6 +65,7 @@ class Tables(Resource):
 
     @api.marshal_with(table_response_fields, code=201)
     @api.doc(responses={
+        401: 'Unauthorized access',
         406: 'User already connected with table',
         409: 'Table already exists',
     })
@@ -133,6 +134,7 @@ class TablesUsers(Resource):
 
     @api.marshal_with(user_table_list_response_fields)
     @api.doc(responses={
+        401: 'Unauthorized access',
         404: 'Username does not connected to any table'
     })
     def get(self):
@@ -159,7 +161,9 @@ class TablesUsers(Resource):
     @api.expect(find_table_request_fields)
     @api.marshal_with(user_table_response_fields, code=201)
     @api.doc(responses={
-        400: 'No table_key provided',
+        400: 'No table_key provided\n\n'
+             'Input payload validation failed',
+        401: 'Unauthorized access',
         404: 'Table keyword does not exist',
         406: 'Username already connected with table',
     })
@@ -199,6 +203,7 @@ class TablesUsers(Resource):
     @api.marshal_with(user_table_response_fields)
     @api.doc(responses={
         400: 'Table does not exist',
+        401: 'Unauthorized access',
         404: 'Username does not connected to any table',
     })
     def delete(self):

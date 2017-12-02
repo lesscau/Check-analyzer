@@ -21,7 +21,7 @@ fts_user_request.add_argument('email', type=str, required=True,
 fts_user_request.add_argument('phone', type=str, required=True,
     help='No phone provided', location='json')
 
-# Receipt request JSON fields
+# Receipt request query fields
 receipt_request = api.parser()
 receipt_request.add_argument('fn', type=int, required=True,
     help='No fn provided', location='args')
@@ -107,7 +107,8 @@ class FtsSignUp(Resource):
         "[“Missing required property: phone”]\n\n"
         "[“String is too long (35 chars), maximum 19”]\n\n"
         "[“String does not match pattern ^\+\d+$: ghg”]\n\n"
-        "[“Object didn’t pass validation for format email: tt”]")
+        "[“Object didn’t pass validation for format email: tt”]\n\n"
+        "Input payload validation failed")
     def post(self):
         """
         Create new user in Federal Tax Service and send password SMS
@@ -145,7 +146,8 @@ class FtsReceiptRequest(Resource):
     @api.param('fd', 'ФД number', required = True)
     @api.param('fn', 'ФН number', required = True)
     @api.doc(responses = {
-        400: 'No fn/fd/fp provided',
+        400: 'No fn/fd/fp provided\n\n'
+             'Input payload validation failed',
         401: 'Unauthorized access',
         403: 'the user was not found or the specified password was not correct',
         404: 'Username does not connected to any table',
@@ -160,7 +162,7 @@ class FtsReceiptRequest(Resource):
         :return: Products from receipt with name, quantity and price of 1 piece of product
         :rtype:  dict/json
         """
-        # Parsing request JSON fields
+        # Parsing request query fields
         args = receipt_request.parse_args()
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()

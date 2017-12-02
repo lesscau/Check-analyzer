@@ -116,7 +116,9 @@ class Products(Resource):
     @api.expect(product_request_fields)
     @api.marshal_with(product_response_fields, code=201)
     @api.doc(responses={
-        404: 'Username does not connected to any table'
+        400: 'Input payload validation failed',
+        401: 'Unauthorized access',
+        404: 'Username does not connected to any table',
     })
     def post(self):
         """
@@ -166,7 +168,9 @@ class Products(Resource):
     @api.expect(delete_product_request_fields)
     @api.marshal_with(delete_product_response_fields)
     @api.doc(responses={
-        400: 'Product with given price does not exist',
+        400: 'Product with given price does not exist\n\n'
+             'Input payload validation failed',
+        401: 'Unauthorized access',
         404: 'Username does not connected to any table',
     })
     def delete(self):

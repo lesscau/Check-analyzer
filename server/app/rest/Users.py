@@ -67,7 +67,8 @@ class UserList(Resource):
     @api.expect(user_request_required_fields)
     @api.marshal_with(user_fields, envelope='user', code=201)
     @api.doc(responses={
-        400: 'No username/password/phone/fts_key provided',
+        400: 'No username/password/phone/fts_key provided\n\n'
+             'Input payload validation failed',
         404: "Can't authorize in Federal Tax Service with given phone/key",
         409: 'Username already exist',
     })
@@ -182,7 +183,8 @@ class UserInfo(Resource):
     @api.expect(user_request_fields)
     @api.marshal_with(user_fields, envelope='user')
     @api.doc(responses={
-        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)',
+        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)\n\n'
+             'Input payload validation failed',
         401: 'Unauthorized access',
         404: "Can't authorize in Federal Tax Service with given phone/key",
         409: 'Username already exist',
