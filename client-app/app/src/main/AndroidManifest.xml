@@ -14,28 +14,23 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-
-
-        <activity android:name=".activity.MainActivity"
+        <activity
+            android:name=".activity.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".activity.FirstActivity"> </activity>
-
+        <activity android:name=".activity.FirstActivity"></activity>
         <activity
             android:name=".activity.ProductListActivity"
-            android:label="Список покупок"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="productlist" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.QRscanner"
             android:label="Сканирование чека">
@@ -44,11 +39,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-
         <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.SignUpActivity"/>
-        <activity android:name=".activity.SignUpConfirmActivity"/>
+        <activity android:name=".activity.SignUpActivity" />
+        <activity android:name=".activity.SignUpConfirmActivity" />
+        <activity android:name=".activity.CreateTableActivity">
+            android:name=".activity.CreateTableActivity"
+            <intent-filter>
+                <action android:name="createTable" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -5,17 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.trpo6.receiptanalyzer.R;
+import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
 
 /**
@@ -23,7 +18,6 @@ import com.trpo6.receiptanalyzer.utils.AuthInfo;
  */
 public class MainActivity extends AppCompatActivity {
 
-    //private FloatingNavigationView mFloatingNavigationView;
     private Drawer drawerResult = null;
     /**
      * Запуск главного меню
@@ -32,48 +26,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(mActionBarToolbar);
-        if(getSupportActionBar() != null){
-            Log.i("toolbar","not null");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        else
-            Log.e("Toolbar","is null");
-
-        drawerResult = new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(mActionBarToolbar)
-                .withActionBarDrawerToggle(true)
-                .withHeader(R.layout.drawer_header)
-                .addDrawerItems(
-                    new PrimaryDrawerItem()
-                        .withName(R.string.toMain)
-                        .withIcon(FontAwesome.Icon.faw_home)
-                        .withIdentifier(1),
-                    new PrimaryDrawerItem()
-                        .withName(R.string.history)
-                        .withIcon(FontAwesome.Icon.faw_history)
-                        .withIdentifier(2),
-                    new DividerDrawerItem(),
-                    new SecondaryDrawerItem()
-                        .withName(R.string.logout)
-                        .withIcon(FontAwesome.Icon.faw_sign_out)
-                        .withIdentifier(3)
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener(){
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem.getIdentifier()==3){
-                            logOut(view);
-                            return true;
-                        }
-                        return false;
-                    }
-
-                })
-                .build();
+        Toolbar toolbar = AppToolbar.setToolbar(this, getString(R.string.app_name));
+        Drawer drawer = AppToolbar.setMenu(this);
 
         // проверяем, была ли ранее выполнена авторизация
         if (!AuthInfo.isAuthorized(this)) {
@@ -84,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
+    }
+
+    public void createTable(View view){
+        Intent intent = new Intent("createTable");
+        startActivity(intent);
     }
 
     /**

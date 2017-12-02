@@ -1,5 +1,6 @@
 package com.trpo6.receiptanalyzer.activity;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,33 +9,43 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.mikepenz.materialdrawer.Drawer;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.adapter.ProductAdapter;
+import com.trpo6.receiptanalyzer.adapter.UserAdapter;
 import com.trpo6.receiptanalyzer.model.Item;
+import com.trpo6.receiptanalyzer.utils.AppToolbar;
 
 import java.util.ArrayList;
-
-import static android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT;
-import static android.app.AlertDialog.THEME_HOLO_DARK;
-import static android.app.AlertDialog.THEME_HOLO_LIGHT;
 
 
 /**
  * Окно списка продуктов
  */
 public class ProductListActivity extends AppCompatActivity {
-    /**Тег*/
-    private static final String TAG = "MyApp";
+    /** Список временных пользователей */
+    public ArrayList<String> tempUsers = new ArrayList();
+    /** Адаптер списка пользователей */
+    UserAdapter userAdapter;
+    /**View для работы со списком продуктов*/
+    RecyclerView userList;
+
+
     /**Адаптер списка продуктов*/
-    ProductAdapter adapter;
-    static ArrayList<Item> items = new ArrayList();
+    ProductAdapter productAdapter;
     /**Список продуктов*/
+    static ArrayList<Item> items = new ArrayList();
     /**View для работы со списком продуктов*/
     RecyclerView productList;
 
@@ -44,12 +55,15 @@ public class ProductListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
+        Toolbar toolbar = AppToolbar.setToolbar(this, "");
+        Drawer drawer = AppToolbar.setMenu(this);
+
         productList = (RecyclerView) findViewById(R.id.productList);
-        adapter = new ProductAdapter(items);
+        productAdapter = new ProductAdapter(items);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
 
-        productList.setAdapter(adapter);
+        productList.setAdapter(productAdapter);
         productList.setLayoutManager(layoutManager);
         productList.setItemAnimator(itemAnimator);
 
@@ -72,7 +86,7 @@ public class ProductListActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     items.remove(position);
-                                    adapter.notifyItemRemoved(position); //item removed from recylcerview
+                                    productAdapter.notifyItemRemoved(position); //item removed from recylcerview
 
 
                                     return;
@@ -81,8 +95,8 @@ public class ProductListActivity extends AppCompatActivity {
                             .setNegativeButton("Нет", new DialogInterface.OnClickListener() {  //not removing items if cancel is done
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    adapter.notifyItemRemoved(position + 1);    //notifies the RecyclerView Adapter that data in adapter has been removed at a particular position.
-                                    adapter.notifyItemRangeChanged(position, adapter.getItemCount());   //notifies the RecyclerView Adapter that positions of element in adapter has been changed from position(removed element index to end of list), please update it.
+                                    productAdapter.notifyItemRemoved(position + 1);    //notifies the RecyclerView Adapter that data in adapter has been removed at a particular position.
+                                    productAdapter.notifyItemRangeChanged(position, productAdapter.getItemCount());   //notifies the RecyclerView Adapter that positions of element in adapter has been changed from position(removed element index to end of list), please update it.
                                     return;
                                 }
                             });
@@ -99,7 +113,6 @@ public class ProductListActivity extends AppCompatActivity {
 
     /**Обработчик кнопки добавления продукта*/
     public void add(View view){
-        Log.i(TAG,"go to add");
         /**Получение названия*/
         EditText productEditText = (EditText) findViewById(R.id.addProduct);
         String product = productEditText.getText().toString();
@@ -122,7 +135,7 @@ public class ProductListActivity extends AppCompatActivity {
         productEditText.setText("");
         countEditText.setText("");
         priceEditText.setText("");
-        adapter.notifyItemInserted(items.size()-1);
+        productAdapter.notifyItemInserted(items.size()-1);
     }
 
     /** Переход к главной активити по нажатию кнопки назад */
@@ -132,5 +145,46 @@ public class ProductListActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_product_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Integer itemId = item.getItemId();
+        /*
+        if(itemId == R.id.action_edit_user){
+            Dialog dialog = new Dialog(getBaseContext());
+            dialog.setContentView(R.layout.dialog_edit_user);
+            dialog.setTitle("Список участников");
+            dialog.setCanceledOnTouchOutside(true);
+            dialog.setCancelable(true);
+            dialog.show();
+
+            EditText newUser = (EditText) dialog.findViewById(R.id.et_new_user);
+            Button addButt = (Button) dialog.findViewById(R.id.del_user_button);
+            Button closeButt = (Button) dialog.findViewById(R.id.close_dialog_button);
+            tempUsers.add("fff");
+
+            userList = (RecyclerView) dialog.findViewById(R.id.userListView);
+            userAdapter = new UserAdapter(tempUsers);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+
+            userList.setAdapter(userAdapter);
+            userList.setLayoutManager(layoutManager);
+            userList.setItemAnimator(itemAnimator);
+        }
+        */
+        if(itemId == R.id.action_qr){
+            Intent intent = new Intent("QRscanner");
+            startActivity(intent);
+            return  true;
+        }
+        return false;
     }
 }

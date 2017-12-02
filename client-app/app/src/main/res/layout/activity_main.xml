@@ -60,7 +60,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="16dp"
             android:layout_weight="1"
-            android:onClick="scanQRcode"
+            android:onClick="createTable"
             android:text="@string/create_table" />
     </LinearLayout>
 
