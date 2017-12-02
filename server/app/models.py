@@ -91,6 +91,7 @@ class Table(db.Model):
         """
         result = {}
         result['items'] = [{
+            'id': item.id,
             'name': item.product_name,
             'quantity': item.count,
             'price': int(item.price * 100)
@@ -109,6 +110,7 @@ class Table(db.Model):
             'id': item.id,
             'username': item.username,
             'items': [{
+                'id': cart.products.id,
                 'name': cart.products.product_name,
                 'quantity': cart.count,
                 'price': int(cart.price * 100)

@@ -16,7 +16,7 @@ class FtsRequest:
 
     def __init__(self):
         self.headers = {'Device-Id':     uuid.uuid4().hex,
-                        'Device-OS':     "Adnroid 4.4.4",
+                        'Device-OS':     "Android 4.4.4",
                         'Version':       "2",
                         'ClientVersion': "1.4.1.3",
                         'user-agent':    "okhttp/3.0.1"}
