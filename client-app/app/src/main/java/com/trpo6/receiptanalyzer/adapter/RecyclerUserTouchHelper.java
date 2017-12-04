@@ -1,6 +1,5 @@
 package com.trpo6.receiptanalyzer.adapter;
 
-import android.app.Dialog;
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -10,11 +9,11 @@ import android.view.View;
  * Created by lessc on 03.12.2017.
  */
 
-public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback{
+public class RecyclerUserTouchHelper extends ItemTouchHelper.SimpleCallback{
 
     private RecyclerItemTouchHelperListener listener;
 
-    public RecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
+    public RecyclerUserTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
         super(dragDirs, swipeDirs);
         this.listener = listener;
     }

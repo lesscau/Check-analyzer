@@ -2,20 +2,15 @@ package com.trpo6.receiptanalyzer.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.trpo6.receiptanalyzer.R;
-import com.trpo6.receiptanalyzer.activity.ProductListActivity;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by lessc on 02.12.2017.
@@ -26,7 +21,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     private Context context;
     /** Список пользователей*/
     private List<String> records;
-
     public UserAdapter(Context context, List<String> records) {
         this.records = records;
         this.context = context;
@@ -49,21 +43,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         holder.name.setText(record);
 
     }
-        /**
-         * Обработчик кнопки удаления участника
-         *
-         * @param pos Конкретный элемент из списка
-         */
-        void delUser(int pos){
-            Log.i("records pos",records.get(pos)+" "+pos);
-
-            records.remove(pos);
-            //ProductListActivity.tempUsers.remove(pos);
-            notifyItemRemoved(pos);
-
-            Log.i("main list size",""+ProductListActivity.tempUsers.size());
-            Log.i("local list size",""+records.size());
-        }
 
     @Override
     public int getItemCount() {

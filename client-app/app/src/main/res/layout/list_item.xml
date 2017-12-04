@@ -1,60 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:orientation="vertical"
-    android:padding="0dp"
     android:background="@drawable/list_item_shape"
-    android:weightSum="1">
+    android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/productList_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/material_drawer_primary_dark">
 
-    <android.support.constraint.ConstraintLayout
+        <ImageView
+            android:id="@+id/delete_icon"
+            android:layout_width="@dimen/ic_delete"
+            android:layout_height="@dimen/ic_delete"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_delete_sweep_white_24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/delete_icon"
+            android:text="@string/delete"
+            android:textColor="#fff"
+            android:textSize="13sp"
+            android:id="@+id/textView" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/productList_foreground"
+        android:background="@color/material_drawer_dark_header_selection_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/nameView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/priceView"
             android:layout_weight="1.31"
             android:gravity="center_vertical"
             android:textAlignment="center"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/priceView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/priceView"
             android:layout_width="60dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:textSize="18sp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/numberPicker"
             android:gravity="center_vertical|center_horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/numberPicker"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            android:textSize="18sp" />
 
         <NumberPicker
             android:id="@+id/numberPicker"
             android:layout_width="40dp"
-            android:layout_height="0dp"
-            android:layout_marginRight="8dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:orientation="vertical"
-            android:theme="@style/AppTheme.Picker"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.507" />
-    </android.support.constraint.ConstraintLayout>
+            android:theme="@style/AppTheme.Picker" />
+    </RelativeLayout>
 
 
-</LinearLayout>
+
+
+
+</FrameLayout>
