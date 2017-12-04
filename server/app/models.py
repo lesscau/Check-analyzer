@@ -78,8 +78,8 @@ class Table(db.Model):
     table_date = db.Column(db.DateTime)
 
     users = db.relationship('User', secondary='user_table')
-    products = db.relationship('Products')
-    user_products = db.relationship('UserProduct')
+    products = db.relationship('Products', cascade="all, delete-orphan")
+    user_products = db.relationship('UserProduct', cascade="all, delete-orphan")
 
     def getProducts(self):
         """
@@ -129,7 +129,7 @@ class Products(db.Model):
     price = db.Column(db.Float)
 
     table = db.relationship('Table')
-    user_products = db.relationship('UserProduct')
+    user_products = db.relationship('UserProduct', cascade="all, delete-orphan")
 
     __table_args__ = (
         db.UniqueConstraint('product_name', 'table_id', 'price', name='_unique_name_for_table_uc'),

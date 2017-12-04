@@ -1,5 +1,6 @@
 from flask import g, request
 from flask_restplus import Namespace, Resource, fields, abort
+from sqlalchemy import cast, String
 from sqlalchemy.exc import IntegrityError
 from app.models import User, Products
 from app import db
@@ -186,7 +187,10 @@ class FtsReceiptRequest(Resource):
                 quantity = item['quantity']
                 price = int(item['price']) / 100
 
-                exists_product = Products.query.filter_by(product_name=name, price=price).first()
+                exists_product = Products.query.filter(
+                    Products.product_name == name,
+                    cast(Products.price, String()) == str(price), 
+                    Products.table_id == user.current_table[0].id).first()
 
                 if exists_product is None:
                     # Create product and add to database
@@ -199,10 +203,10 @@ class FtsReceiptRequest(Resource):
                     db.session.add(new_product)
                 else:
                     exists_product.count += quantity
-                
+
             db.session.commit()
             # Return JSON
-            return exists_product.table.getProducts()
+            return exists_product.table.getProducts() if exists_product is not None else new_product.table.getProducts()
         except (IntegrityError, IndexError):
             db.session.rollback()
             abort(404, message="Username '{}' does not connected to any table".format(user.username))

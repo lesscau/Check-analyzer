@@ -221,7 +221,8 @@ class TablesUsers(Resource):
 
         try:
             db.session.delete(user_table)
-            # Return JSON using template
+            for item in user.current_products:
+                db.session.delete(item)
         except UnmappedInstanceError:
             db.session.rollback()
             abort(404, message="Username '{}' does not connected to any table".format(user.username))
@@ -231,6 +232,7 @@ class TablesUsers(Resource):
             if user_table_list is None:
                 db.session.delete(user_table.table)
             db.session.commit()
+            # Return JSON using template
             return user_table
         except (IntegrityError, UnmappedInstanceError):
             db.session.rollback()

@@ -1,5 +1,6 @@
 from flask import g
 from flask_restplus import Namespace, Resource, fields, abort
+from sqlalchemy import cast, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from app import db
@@ -140,8 +141,11 @@ class Products(Resource):
             'price': args['price'],
         }
 
-        try:        
-            exists_product = ProductsModel.query.filter_by(product_name=args['product_name'], price=args['price'] / 100, table_id=user.current_table[0].id).first()
+        try:
+            exists_product = ProductsModel.query.filter(
+                ProductsModel.product_name == args['product_name'],
+                cast(ProductsModel.price, String()) == str(args['price'] / 100), 
+                ProductsModel.table_id == user.current_table[0].id).first()
 
             if exists_product is None:
                 # Create product and add to database
@@ -187,7 +191,10 @@ class Products(Resource):
         user = User.query.filter_by(username=g.user.username).first()
 
         try:
-            product = ProductsModel.query.filter_by(product_name=args['product_name'], price=args['price'] / 100, table_id=user.current_table[0].id).first()
+            product = ProductsModel.query.filter(
+                ProductsModel.product_name == args['product_name'],
+                cast(ProductsModel.price, String()) == str(args['price'] / 100), 
+                ProductsModel.table_id == user.current_table[0].id).first()
 
             if len(product.user_products) != 0:
                 for item in product.user_products:
