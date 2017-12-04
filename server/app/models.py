@@ -75,7 +75,6 @@ class User(db.Model):
 class Table(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     table_key = db.Column(db.String(120), index=True, unique=True)
-    table_info = db.Column(db.Integer, default="")
     table_date = db.Column(db.DateTime)
 
     users = db.relationship('User', secondary='user_table')
