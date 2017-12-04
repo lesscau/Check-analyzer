@@ -27,5 +27,6 @@
     <string name="toMain">На главную</string>
     <string name="history">История</string>
     <string name="logout">Выход</string>
+    <string name="delete">Удалить</string>
 
 </resources>

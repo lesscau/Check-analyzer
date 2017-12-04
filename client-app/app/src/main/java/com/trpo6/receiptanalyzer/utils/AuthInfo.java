@@ -13,8 +13,20 @@ public class AuthInfo{
     /** Token string */
     private static String key = "";
 
+    /** Username */
+    private static String name = "";
+
     public static void setKey(String key) {
         AuthInfo.key = key;
+    }
+
+    public static void setName(String name) {
+        AuthInfo.name = name;
+    }
+
+    public static String getName() {
+
+        return name;
     }
 
     public static String getKey() {
@@ -32,17 +44,20 @@ public class AuthInfo{
     public static boolean isAuthorized(Context context) {
         SharedPreferences sp = context.getSharedPreferences(path, Context.MODE_PRIVATE);
         key = sp.getString("token","");
-        if (key.length()==0)
+        name=sp.getString("name","");
+        if (key.isEmpty() || name.isEmpty())
             return false;
         return true;
     }
 
     /** Сохранение данных об авторизации */
-    public static void authSave(Context context, String token) {
+    public static void authSave(Context context, String name, String token) {
         SharedPreferences sp =  context.getSharedPreferences(path,Context.MODE_PRIVATE);
         SharedPreferences.Editor e = sp.edit();
         e.putString("token", token);
+        e.putString("name",name);
         setKey(token);
+        setName(name);
         e.commit();
     }
 
@@ -52,6 +67,7 @@ public class AuthInfo{
         SharedPreferences sp = context.getSharedPreferences(path, Context.MODE_PRIVATE);
         SharedPreferences.Editor e = sp.edit();
         e.putString("token","");
+        e.putString("name","");
         e.commit();
     }
 }

@@ -190,7 +190,7 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
                         openProductList();
 
                     } else {
-                        Log.e("err0", response.toString());
+                        Log.e("err0", response.toString()+response.message()+response.body());
                     }
                 }
 

@@ -33,6 +33,7 @@ import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.AuthResponse;
+import com.trpo6.receiptanalyzer.model.User;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.InternetConnection;
 
@@ -131,14 +132,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
             focusView.requestFocus();
         } else {
-            sendTokenRequest(email, password);
+            User user = new User(email,password);
+            sendTokenRequest(user.getName(), user.getPass());
         }
     }
 
     /**
      * Запрос к серверу на получение токена
      */
-    private void sendTokenRequest(final String email, final String password){
+    private void sendTokenRequest(final String name, final String password){
         /**
          * Checking Internet Connection
          */
@@ -146,7 +148,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             ApiService api = RetroClient.getApiService();
 
             String authorizationString = "Basic " + Base64.encodeToString(
-                    (email+":"+password).getBytes(),Base64.NO_WRAP);
+                    (name+":"+password).getBytes(),Base64.NO_WRAP);
 
             Call<AuthResponse> call = api.getToken(authorizationString);
             Log.i("i",call.request().toString());
@@ -165,7 +167,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                         // Сохранение токена
                         String token = "Bearer "+response.body().getToken();
-                        AuthInfo.authSave(getApplicationContext(),token);
+                        AuthInfo.authSave(getApplicationContext(),name,token);
+                        Log.i("token:", token);
 
                         showProgress(false);
                         menuOpen(findViewById(R.id.email_sign_in_button));

@@ -80,7 +80,7 @@ public class SignUpConfirmActivity extends AppCompatActivity {
                     } else {
                         Log.e("err0", response.toString());
                         Toast toast = Toast.makeText(getApplicationContext(),
-                                "Error: "+response.message(), Toast.LENGTH_LONG);
+                                "Error: "+response.message()+response.body(), Toast.LENGTH_LONG);
                         toast.show();
                     }
                 }
