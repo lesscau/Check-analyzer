@@ -65,16 +65,9 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
-        Toolbar toolbar = AppToolbar.setToolbar(this, "some code");
+        Toolbar toolbar = AppToolbar.setToolbar(this, AuthInfo.getTableKey());
         Drawer drawer = AppToolbar.setMenu(this);
         mActivityView = getLayoutInflater().inflate(R.layout.activity_product_list, null);
-
-
-        // temp items
-        items.add(new Item("apple",5,30.99f));
-        items.add(new Item("bananas",8,60.8f));
-        items.add(new Item("dog",1,200));
-
 
         productListView = (RecyclerView) findViewById(R.id.productList);
         productAdapter = new ProductAdapter(items);

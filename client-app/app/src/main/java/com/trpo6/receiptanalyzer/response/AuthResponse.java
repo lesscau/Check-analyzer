@@ -1,4 +1,4 @@
-package com.trpo6.receiptanalyzer.model;
+package com.trpo6.receiptanalyzer.response;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

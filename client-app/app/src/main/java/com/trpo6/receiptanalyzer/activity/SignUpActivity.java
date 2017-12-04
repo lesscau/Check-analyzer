@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
-import com.trpo6.receiptanalyzer.model.RegistrationResponse;
+import com.trpo6.receiptanalyzer.response.RegistrationResponse;
 import com.trpo6.receiptanalyzer.model.SignUpBody;
 import com.trpo6.receiptanalyzer.utils.InternetConnection;
 

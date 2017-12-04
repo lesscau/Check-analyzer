@@ -13,12 +13,13 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:layout_height="?android:actionBarSize"
         android:background="@color/material_drawer_primary"/>
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -30,10 +31,10 @@
             android:id="@+id/createTableTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Код стола:"
-            android:textSize="34dp"
             android:gravity="center"
+            android:text="Код вашего стола:"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textSize="34dp"
             app:layout_constraintBottom_toTopOf="@+id/tableCodeTextView"
             app:layout_constraintEnd_toEndOf="@+id/tableCodeTextView"
             app:layout_constraintHorizontal_bias="0.5"
@@ -54,9 +55,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="24dp"
             android:paddingBottom="48dp"
-            android:text="Сообщи этот код друзьям, чтобы они смогли присоединиться"
+            android:paddingTop="24dp"
+            android:text="@string/create_table_message"
             android:textSize="30dp" />
 
         <Button

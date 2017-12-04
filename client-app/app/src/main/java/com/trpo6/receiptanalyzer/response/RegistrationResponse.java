@@ -1,4 +1,4 @@
-package com.trpo6.receiptanalyzer.model;
+package com.trpo6.receiptanalyzer.response;
 
 /**
  * Created by lessc on 03.11.2017.

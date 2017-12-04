@@ -18,6 +18,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.activity.FirstActivity;
 import com.trpo6.receiptanalyzer.activity.MainActivity;
+import com.trpo6.receiptanalyzer.api.ApiService;
+import com.trpo6.receiptanalyzer.api.RetroClient;
+import com.trpo6.receiptanalyzer.response.CreateTableResponse;
+import com.trpo6.receiptanalyzer.response.DisconnectFromTableResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by lessc on 01.12.2017.
@@ -57,12 +65,7 @@ public class AppToolbar extends AppCompatActivity {
                                 .withName(R.string.toMain)
                                 .withIcon(FontAwesome.Icon.faw_home)
                                 .withIdentifier(1),
-                        // История
-                        new PrimaryDrawerItem()
-                                .withName(R.string.history)
-                                .withIcon(FontAwesome.Icon.faw_history)
-                                .withIdentifier(2),
-                        new DividerDrawerItem(),
+
                         //Выход
                         new SecondaryDrawerItem()
                                 .withName(R.string.logout)
@@ -75,8 +78,29 @@ public class AppToolbar extends AppCompatActivity {
 
                         if (drawerItem.getIdentifier() == 1) {
                             final Intent mainIntent = new Intent(app, MainActivity.class);
-                            mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                            app.startActivity(mainIntent);
+                            if (!InternetConnection.checkConnection(app)) {
+                                Log.e("error", "can not connect");
+                                return false;
+                            }
+
+                            ApiService api = RetroClient.getApiService();
+                            Call<DisconnectFromTableResponse> call = api.disconnectFromTable(AuthInfo.getKey());
+                            call.enqueue(new Callback<DisconnectFromTableResponse>() {
+                                @Override
+                                public void onResponse(Call<DisconnectFromTableResponse> call, Response<DisconnectFromTableResponse> response) {
+                                    Log.i("table resp",response.toString());
+                                    if((response.code())!=200)
+                                        return;
+                                    AuthInfo.keyTableClear(app);
+                                    Intent intent = new Intent(app,MainActivity.class);
+                                    app.startActivity(intent);
+                                }
+
+                                @Override
+                                public void onFailure(Call<DisconnectFromTableResponse> call, Throwable t) {
+                                    Log.e("err1", t.toString());
+                                }
+                            });
                         }
                         if (drawerItem.getIdentifier() == 3) {
                             // стираем старый токен
