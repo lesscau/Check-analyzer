@@ -237,3 +237,34 @@ class TablesUsers(Resource):
         except (IntegrityError, UnmappedInstanceError):
             db.session.rollback()
             abort(400, message="Table '{}' does not exist".format(user_table.table.table_key))
+
+@api.route('/me', endpoint='tables_me')
+class TablesInfo(Resource):
+    """
+    Information about user current table
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
+    """
+    method_decorators = [Auth.multi_auth.login_required]
+
+    @api.marshal_with(table_response_fields)
+    @api.doc(responses={
+        401: 'Unauthorized access',
+        404: 'Username does not connected to any table'
+    })
+    def get(self):
+        """
+        Get table key of user current table
+
+        :return: Table key phrase
+        :rtype:  dict/json
+        """
+
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+
+        try:
+            return user.current_table[0]
+        except IndexError:
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
