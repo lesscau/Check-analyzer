@@ -50,6 +50,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
+            android:onClick="connectTable"
             android:text="@string/find_table" />
 
         <Button

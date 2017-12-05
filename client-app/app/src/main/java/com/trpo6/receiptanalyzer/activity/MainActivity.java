@@ -54,6 +54,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Подключение к созданному столу
+     * @param view
+     */
+    public void connectTable(View view){
+        Intent intent = new Intent("connectTable");
+        startActivity(intent);
+    }
+
+    /**
+     * Создание нового стола
+     * @param view
+     */
     public void createTable(View view){
         if (!NetworkUtils.checkConnection(getApplicationContext())) {
             Log.e("error", "can not connect");

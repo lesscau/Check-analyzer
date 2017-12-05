@@ -94,6 +94,7 @@ public class AuthInfo{
         SharedPreferences.Editor e = sp.edit();
         e.putString("token","");
         e.putString("name","");
+        e.putString("key_table","");
         e.commit();
     }
 

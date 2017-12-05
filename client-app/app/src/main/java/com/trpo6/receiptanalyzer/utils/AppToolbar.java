@@ -15,6 +15,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.activity.FirstActivity;
 import com.trpo6.receiptanalyzer.activity.MainActivity;
+import com.trpo6.receiptanalyzer.activity.ProductListActivity;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.response.DisconnectFromTableResponse;

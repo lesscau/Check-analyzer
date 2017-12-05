@@ -1,5 +1,6 @@
 package com.trpo6.receiptanalyzer.api;
 
+import com.trpo6.receiptanalyzer.model.ConnectTableRequest;
 import com.trpo6.receiptanalyzer.response.AuthResponse;
 import com.trpo6.receiptanalyzer.response.CreateTableResponse;
 import com.trpo6.receiptanalyzer.model.Items;
@@ -39,6 +40,10 @@ public interface ApiService {
     /** Создание стола */
     @POST(APIv1 + "/tables")
     Call<CreateTableResponse> getTable(@Header("Authorization") String auth);
+
+    /** Подключение к столу */
+    @POST(APIv1 + "/tables/users")
+    Call<DisconnectFromTableResponse> connectTable(@Header("Authorization") String auth, @Body CreateTableResponse createTableResponse);
 
     /** Отключение от стола */
     @DELETE(APIv1+"/tables/users")

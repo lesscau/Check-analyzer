@@ -32,5 +32,6 @@ public class CreateTableActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    @Override
+    public void onBackPressed() {}
 }

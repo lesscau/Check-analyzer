@@ -11,7 +11,13 @@ public class CreateTableResponse {
     public String getTableKey() {
         return tableKey;
     }
+
+    public void setTableKey(String tableKey) {
+        this.tableKey = tableKey;
+    }
+
     @SerializedName("table_key")
     @Expose
+
     private String tableKey;
 }

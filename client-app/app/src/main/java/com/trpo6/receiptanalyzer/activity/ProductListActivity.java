@@ -63,11 +63,11 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_list);
+        setContentView(R.layout.activity_edit_product_list);
 
         Toolbar toolbar = AppToolbar.setToolbar(this, AuthInfo.getTableKey());
         Drawer drawer = AppToolbar.setMenu(this);
-        mActivityView = getLayoutInflater().inflate(R.layout.activity_product_list, null);
+        mActivityView = getLayoutInflater().inflate(R.layout.activity_edit_product_list, null);
 
         productListView = (RecyclerView) findViewById(R.id.productList);
         productAdapter = new ProductAdapter(items);
@@ -132,15 +132,6 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         priceEditText.setText("");
         productAdapter.notifyItemInserted(items.size()-1);
 
-    }
-
-    /** Переход к главной активити по нажатию кнопки назад */
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
     }
 
     @Override
@@ -297,5 +288,9 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }
