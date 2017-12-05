@@ -9,7 +9,7 @@
     <color name="material_drawer_primary">#00838e</color>
     <color name="material_drawer_accent">#00838e</color>
 
-    <color name="material_drawer_background">#F9F9F9</color>
+    <color name="material_drawer_background">#f9f9f9</color>
 
     <color name="material_drawer_primary_text">#DE000000</color>
     <color name="material_drawer_primary_icon">#8A000000</color>

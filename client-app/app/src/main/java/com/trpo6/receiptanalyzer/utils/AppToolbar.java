@@ -1,9 +1,7 @@
 package com.trpo6.receiptanalyzer.utils;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -11,7 +9,6 @@ import android.view.View;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -20,7 +17,6 @@ import com.trpo6.receiptanalyzer.activity.FirstActivity;
 import com.trpo6.receiptanalyzer.activity.MainActivity;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
-import com.trpo6.receiptanalyzer.response.CreateTableResponse;
 import com.trpo6.receiptanalyzer.response.DisconnectFromTableResponse;
 
 import retrofit2.Call;
@@ -78,7 +74,7 @@ public class AppToolbar extends AppCompatActivity {
 
                         if (drawerItem.getIdentifier() == 1) {
                             final Intent mainIntent = new Intent(app, MainActivity.class);
-                            if (!InternetConnection.checkConnection(app)) {
+                            if (!NetworkUtils.checkConnection(app)) {
                                 Log.e("error", "can not connect");
                                 return false;
                             }

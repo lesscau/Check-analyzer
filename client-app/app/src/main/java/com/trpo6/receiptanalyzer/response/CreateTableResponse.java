@@ -11,7 +11,6 @@ public class CreateTableResponse {
     public String getTableKey() {
         return tableKey;
     }
-
     @SerializedName("table_key")
     @Expose
     private String tableKey;

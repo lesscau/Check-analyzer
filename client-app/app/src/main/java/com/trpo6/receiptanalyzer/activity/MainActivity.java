@@ -15,7 +15,7 @@ import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.response.CreateTableResponse;
 import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
-import com.trpo6.receiptanalyzer.utils.InternetConnection;
+import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createTable(View view){
-        if (!InternetConnection.checkConnection(getApplicationContext())) {
+        if (!NetworkUtils.checkConnection(getApplicationContext())) {
             Log.e("error", "can not connect");
             return;
         }
@@ -65,9 +65,11 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<CreateTableResponse>() {
             @Override
             public void onResponse(Call<CreateTableResponse> call, Response<CreateTableResponse> response) {
-                Log.i("table resp",response.toString());
-                if((response.code())!=201)
+                Log.i("table resp",response.toString()+response.body());
+                if(!response.isSuccessful()) {
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                     return;
+                }
                 String tableKey = response.body().getTableKey();
                 AuthInfo.keyTableSave(getApplicationContext(),tableKey);
                 Log.i("tableCode",tableKey);
@@ -100,10 +102,5 @@ public class MainActivity extends AppCompatActivity {
      * Игнорирование нажатия кнопки "назад"
      */
     @Override
-    public void onBackPressed() {
-        if(drawerResult.isDrawerOpen()){
-            drawerResult.closeDrawer();
-        }
-        else{}
-    }
+    public void onBackPressed() {}
 }

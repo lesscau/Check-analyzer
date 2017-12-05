@@ -32,7 +32,7 @@ import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.response.AuthResponse;
 import com.trpo6.receiptanalyzer.model.User;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
-import com.trpo6.receiptanalyzer.utils.InternetConnection;
+import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +141,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         /**
          * Checking Internet Connection
          */
-        if (InternetConnection.checkConnection(getApplicationContext())) {
+        if (NetworkUtils.checkConnection(getApplicationContext())) {
             ApiService api = RetroClient.getApiService();
 
             String authorizationString = "Basic " + Base64.encodeToString(
@@ -171,10 +171,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         menuOpen(findViewById(R.id.email_sign_in_button));
 
                     } else {
-                        Log.e("err0", response.toString());
-                        Toast toast = Toast.makeText(getApplicationContext(),
-                                "Error: "+response.message().toString(), Toast.LENGTH_LONG);
-                        toast.show();
+                        NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                         showProgress(false);
                     }
                 }
