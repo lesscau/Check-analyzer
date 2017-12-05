@@ -166,7 +166,55 @@ class Products(Resource):
         except (IntegrityError, IndexError):
             db.session.rollback()
             abort(404, message="Username '{}' does not connected to any table".format(user.username))
-        
+
+    @api.expect(product_request_fields)
+    @api.marshal_with(product_response_fields)
+    @api.doc(responses={
+        400: 'Product with given price does not exist\n\n'
+             'Input payload validation failed',
+        401: 'Unauthorized access',
+        404: 'Username does not connected to any table',
+    })
+    def put(self):
+        """
+        Change count of product in the list of current user table
+
+        :return: Changed product
+        :rtype:  dict/json
+        """
+
+        # Parsing request JSON fields
+        args = product_request.parse_args()
+
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+
+        # Create JSON output with correct type of price
+        output = {
+            'product_name': args['product_name'],
+            'count': args['count'],
+            'price': args['price'],
+        }
+
+        try:
+            exists_product = ProductsModel.query.filter(
+                ProductsModel.product_name == args['product_name'],
+                cast(ProductsModel.price, String()) == str(args['price'] / 100), 
+                ProductsModel.table_id == user.current_table[0].id).first()
+
+            if exists_product is None:
+                abort(400, message="Product '{}' with given price does not exist".format(args['product_name']))
+            else:
+                exists_product.count = args['count']
+                output['count'] = exists_product.count
+
+            db.session.commit()
+
+            # Return JSON using template
+            return output
+        except (IntegrityError, IndexError):
+            db.session.rollback()
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))        
 
     @api.expect(delete_product_request_fields)
     @api.marshal_with(delete_product_response_fields)
