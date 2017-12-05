@@ -48,8 +48,7 @@ public class SignUpConfirmActivity extends AppCompatActivity {
             return;
         }
 
-        // Создаем объект Intent для вызова новой Activity
-        final Intent intent = new Intent(this, MainActivity.class);
+
         /**
          * Checking Internet Connection
          */
@@ -73,7 +72,8 @@ public class SignUpConfirmActivity extends AppCompatActivity {
                          * Got Successfully
                          */
                         Log.i("success", response.message().toString());
-
+                        // Создаем объект Intent для вызова новой Activity
+                        final Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         // запуск activity
                         startActivity(intent);
                     } else {

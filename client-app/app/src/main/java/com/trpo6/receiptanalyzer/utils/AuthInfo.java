@@ -17,6 +17,9 @@ public class AuthInfo{
     /** Username */
     private static String name = "";
 
+    /** Password */
+    private static String password = "";
+
     /** Table key */
     private static String tableKey = "";
 
@@ -48,6 +51,14 @@ public class AuthInfo{
         return key;
     }
 
+    public static String getPassword() {
+        return password;
+    }
+
+    public static void setPassword(String password) {
+        AuthInfo.password = password;
+    }
+
     /**
      * Проверяет, авторизован ли текущий пользователь
      * @param context
@@ -57,7 +68,8 @@ public class AuthInfo{
         SharedPreferences sp = context.getSharedPreferences(path, Context.MODE_PRIVATE);
         key = sp.getString("token","");
         name=sp.getString("name","");
-        if (key.isEmpty() || name.isEmpty())
+        password=sp.getString("password","");
+        if (key.isEmpty() || name.isEmpty() || password.isEmpty())
             return false;
         return true;
     }
@@ -77,13 +89,15 @@ public class AuthInfo{
     }
 
     /** Сохранение данных об авторизации */
-    public static void authSave(Context context, String name, String token) {
+    public static void authSave(Context context, String name, String pass, String token) {
         SharedPreferences sp =  context.getSharedPreferences(path,Context.MODE_PRIVATE);
         SharedPreferences.Editor e = sp.edit();
         e.putString("token", token);
         e.putString("name",name);
+        e.putString("password",password);
         setKey(token);
         setName(name);
+        setPassword(pass);
         e.commit();
     }
 
@@ -94,6 +108,7 @@ public class AuthInfo{
         SharedPreferences.Editor e = sp.edit();
         e.putString("token","");
         e.putString("name","");
+        e.putString("password","");
         e.putString("key_table","");
         e.commit();
     }

@@ -115,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent("productlist");
             startActivity(intent);
         }
+        if (!NetworkUtils.checkConnection(getApplicationContext())) {
+            Log.e("error", "can not connect");
+            return;
+        }
         Call<CreateTableResponse> call = api.getTable(AuthInfo.getKey());
         call.enqueue(new Callback<CreateTableResponse>() {
             @Override

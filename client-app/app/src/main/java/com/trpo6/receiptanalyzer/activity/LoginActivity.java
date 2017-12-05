@@ -164,7 +164,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                         // Сохранение токена
                         String token = "Bearer "+response.body().getToken();
-                        AuthInfo.authSave(getApplicationContext(),name,token);
+                        AuthInfo.authSave(getApplicationContext(),name,password,token);
                         Log.i("token:", token);
 
                         showProgress(false);
@@ -263,7 +263,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
-
         addEmailsToAutoComplete(emails);
     }
 

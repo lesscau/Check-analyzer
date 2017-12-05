@@ -49,7 +49,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
-
     </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.FloatingActionButton

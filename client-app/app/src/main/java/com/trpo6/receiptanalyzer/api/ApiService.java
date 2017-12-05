@@ -25,36 +25,76 @@ public interface ApiService {
 
     String APIv1 = "/api/v1.0";
 
-    /** Получение токена */
+    /**
+     * Получение токена
+     * @param auth токен
+     * @return
+     */
     @GET(APIv1 + "/token")
     Call<AuthResponse> getToken(@Header("Authorization") String auth);
 
-    /** Регистрация нового пользователя */
+    /**
+     * Регистрация нового пользователя
+     * @param signUpBody данные для регистрации
+     * @return
+     */
     @POST(APIv1 + "/fts/users")
     Call<RegistrationResponse> signUp(@Body SignUpBody signUpBody);
 
-    /** Код подтверждения для регистрации нового пользователя */
+    /**
+     * Код подтверждения для регистрации нового пользователя
+     * @param confirmSignUpBody код подтверждения из sms
+     * @return
+     */
     @POST(APIv1 + "/users")
     Call<RegistrationResponse> registerUser(@Body ConfirmSignUpBody confirmSignUpBody);
 
-    /** Создание стола */
+    /**
+     * Создание стола
+     * @param auth токен
+     * @return
+     */
     @POST(APIv1 + "/tables")
     Call<CreateTableResponse> createTable(@Header("Authorization") String auth);
 
-    /** Подключение к столу */
+    /**
+     * Подключение к столу
+     * @param auth токен
+     * @param createTableResponse код стола
+     * @return
+     */
     @POST(APIv1 + "/tables/users")
     Call<DisconnectFromTableResponse> connectTable(@Header("Authorization") String auth, @Body CreateTableResponse createTableResponse);
 
-    /** Проверка на подключение к столу */
+    /**
+     * Проверка на подключение к столу
+     * @param auth токен
+     * @return
+     */
     @GET(APIv1 + "/tables/me")
     Call<CreateTableResponse> getTable(@Header("Authorization") String auth);
 
-    /** Отключение от стола */
+    /**
+     * Отключение от стола
+     * @param auth токен
+     * @return
+     */
     @DELETE(APIv1+"/tables/users")
     Call<DisconnectFromTableResponse> disconnectFromTable(@Header("Authorization") String auth);
 
-    /** Список продуктов из чека */
+    /**
+     * Список продуктов из чека
+     * @param auth токен
+     * @param fn
+     * @param fd
+     * @param fp
+     * @return
+     */
     @GET(APIv1 + "/fts/receipts")
     Call<Items> getReceipt(@Header("Authorization") String auth,
                            @Query("fn") String fn, @Query("fd") String fd, @Query("fp") String fp);
+
+    /** Список продуктов из текущего стола */
+    @GET(APIv1 + "/products")
+    Call<Items> getTableProducts(@Header("Authorization") String auth);
 }

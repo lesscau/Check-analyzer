@@ -22,23 +22,37 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.adapter.ProductAdapter;
 import com.trpo6.receiptanalyzer.adapter.RecyclerProductTouchHelper;
 import com.trpo6.receiptanalyzer.adapter.RecyclerUserTouchHelper;
 import com.trpo6.receiptanalyzer.adapter.UserAdapter;
+import com.trpo6.receiptanalyzer.api.ApiService;
+import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.Item;
+import com.trpo6.receiptanalyzer.model.Items;
 import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
+import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.http.Header;
 
 /**
  * Окно списка продуктов
  */
 public class ProductListActivity extends AppCompatActivity implements RecyclerUserTouchHelper.RecyclerItemTouchHelperListener,
         RecyclerProductTouchHelper.RecyclerItemTouchHelperListener{
+
     LayoutInflater inflater;
     /** custom dialog view */
     View mDialogView;
@@ -53,10 +67,12 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /** Адаптер списка пользователей */
     UserAdapter userAdapter;
 
-    /**Адаптер списка продуктов*/
+    /** Адаптер списка продуктов */
     ProductAdapter productAdapter;
+
     /**Список продуктов*/
     public static ArrayList<Item> producListItems = new ArrayList();
+
     /**View для работы со списком продуктов*/
     RecyclerView productListView;
 
@@ -67,6 +83,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         setContentView(R.layout.activity_edit_product_list);
         Toolbar toolbar = AppToolbar.setToolbar(this, AuthInfo.getTableKey());
         Drawer drawer = AppToolbar.setMenu(this);
+
         mActivityView = getLayoutInflater().inflate(R.layout.activity_edit_product_list, null);
 
         productListView = (RecyclerView) findViewById(R.id.productList);
@@ -77,6 +94,23 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         productListView.setAdapter(productAdapter);
         productListView.setLayoutManager(layoutManager);
         productListView.setItemAnimator(itemAnimator);
+
+        // Получаем список продуктов стола
+        getTableProducts();
+        // Create the AccountHeader
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(
+                        new ProfileDrawerItem().withName("Mike Penz").withEmail("mikepenz@gmail.com").withIcon(getResources().getDrawable(R.drawable.ic_place_white_24dp))
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
 
         // adding item touch helper
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerProductTouchHelper(0, ItemTouchHelper.LEFT, this);
@@ -106,7 +140,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     }
 
 
-    /**Обработчик кнопки добавления продукта*/
+    /** Обработчик кнопки добавления продукта */
     public void add(View view){
         /**Получение названия*/
         EditText productEditText = (EditText) findViewById(R.id.addProduct);
@@ -289,6 +323,49 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
             snackbar.show();
         }
     }
+
+    /** Получение списка продуктов текущего стола */
+    private void getTableProducts(){
+        ApiService api = RetroClient.getApiService();
+        //User user  = new User("89112356232","pass");
+        Log.i("token", AuthInfo.getKey());
+        final Items _items = new Items();
+        //fiscal.get(0),fiscal.get(1),fiscal.get(2)
+        Call<Items> call = api.getTableProducts(AuthInfo.getKey());
+        Log.i("i",call.request().toString());
+        if (!NetworkUtils.checkConnection(getApplicationContext())) {
+            Log.e("error", "can not connect");
+            return;
+        }
+        /**
+         * Enqueue Callback will be call when get response...
+         */
+        call.enqueue(new Callback<Items>() {
+            @Override
+            public void onResponse(Call<Items> call, Response<Items> response) {
+                if (response.isSuccessful()) {
+                    /**
+                     * Got Successfully
+                     */
+                    //String ans = response.body().toString();
+                    Log.i("success", response.body().toString());
+                    _items.setItems(response.body().getItems());
+                    _items.correctPrice();
+                    ProductListActivity.producListItems.addAll(_items.getItems());
+
+                } else {
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Items> call, Throwable t) {
+                Log.e("err1", t.toString());
+            }
+        });
+
+    }
+
 
     /** Переход к разделению прдуктов*/
     public void toShareProductList(View view){
