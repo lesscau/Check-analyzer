@@ -22,7 +22,7 @@ product_list_request.add_argument('divide', type=int, location='args')
 # New product request JSON fields
 product_request = api.parser()
 product_request.add_argument('product_name', type=str, required=True,
-    help='No name provided', location='json')
+    help='No product_name provided', location='json')
 product_request.add_argument('count', type=int, required=True,
     help='No count provided', location='json')
 product_request.add_argument('price', type=int, required=True,
@@ -31,7 +31,7 @@ product_request.add_argument('price', type=int, required=True,
 # Delete product request JSON fields
 delete_product_request = api.parser()
 delete_product_request.add_argument('product_name', type=str, required=True,
-    help='No name provided', location='json')
+    help='No product_name provided', location='json')
 delete_product_request.add_argument('price', type=int, required=True,
     help='No price provided', location='json')
 
