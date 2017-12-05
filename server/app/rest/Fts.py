@@ -1,6 +1,9 @@
 from flask import g, request
 from flask_restplus import Namespace, Resource, fields, abort
-from app.models import User
+from sqlalchemy import cast, String
+from sqlalchemy.exc import IntegrityError
+from app.models import User, Products
+from app import db
 from app.FtsRequest import FtsRequest
 from app.rest.Auth import Auth
 
@@ -19,7 +22,7 @@ fts_user_request.add_argument('email', type=str, required=True,
 fts_user_request.add_argument('phone', type=str, required=True,
     help='No phone provided', location='json')
 
-# Receipt request JSON fields
+# Receipt request query fields
 receipt_request = api.parser()
 receipt_request.add_argument('fn', type=int, required=True,
     help='No fn provided', location='args')
@@ -105,7 +108,8 @@ class FtsSignUp(Resource):
         "[“Missing required property: phone”]\n\n"
         "[“String is too long (35 chars), maximum 19”]\n\n"
         "[“String does not match pattern ^\+\d+$: ghg”]\n\n"
-        "[“Object didn’t pass validation for format email: tt”]")
+        "[“Object didn’t pass validation for format email: tt”]\n\n"
+        "Input payload validation failed")
     def post(self):
         """
         Create new user in Federal Tax Service and send password SMS
@@ -125,7 +129,7 @@ class FtsSignUp(Resource):
         if request['ftsRequestSuccess'] is False and request['error'] != "user exists":
             abort(request['responseCode'], message=request['error'])
         # Return JSON
-        return {'message': 'SMS with password was sent to {}'.format(args['phone'])}, 200
+        return {'message': 'SMS with password was sent to {}'.format(args['phone'])}
 
 
 @api.route('/receipts', endpoint='fts_receipts')
@@ -143,9 +147,11 @@ class FtsReceiptRequest(Resource):
     @api.param('fd', 'ФД number', required = True)
     @api.param('fn', 'ФН number', required = True)
     @api.doc(responses = {
-        400: 'No fn/fd/fp provided',
+        400: 'No fn/fd/fp provided\n\n'
+             'Input payload validation failed',
         401: 'Unauthorized access',
         403: 'the user was not found or the specified password was not correct',
+        404: 'Username does not connected to any table',
         406: 'the ticket was not found',
         408: 'Empty JSON response',
     })
@@ -157,7 +163,7 @@ class FtsReceiptRequest(Resource):
         :return: Products from receipt with name, quantity and price of 1 piece of product
         :rtype:  dict/json
         """
-        # Parsing request JSON fields
+        # Parsing request query fields
         args = receipt_request.parse_args()
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
@@ -174,5 +180,33 @@ class FtsReceiptRequest(Resource):
             'quantity': item['quantity'] if isinstance(item['quantity'], int) else 1,
             'price': item['price'] if isinstance(item['quantity'], int) else item['sum']
             } for item in request['items']]
-        # Return extracted part of JSON
-        return result, 200
+
+        try:
+            for item in result['items']:
+                name = item['name']
+                quantity = item['quantity']
+                price = int(item['price']) / 100
+
+                exists_product = Products.query.filter(
+                    Products.product_name == name,
+                    cast(Products.price, String()) == str(price), 
+                    Products.table_id == user.current_table[0].id).first()
+
+                if exists_product is None:
+                    # Create product and add to database
+                    new_product = Products(
+                              table_id=user.current_table[0].id,
+                              product_name=name,
+                              count=quantity,
+                              price=price)
+
+                    db.session.add(new_product)
+                else:
+                    exists_product.count += quantity
+
+            db.session.commit()
+            # Return JSON
+            return exists_product.table.getProducts() if exists_product is not None else new_product.table.getProducts()
+        except (IntegrityError, IndexError):
+            db.session.rollback()
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))

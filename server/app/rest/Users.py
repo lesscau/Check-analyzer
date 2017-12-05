@@ -67,7 +67,8 @@ class UserList(Resource):
     @api.expect(user_request_required_fields)
     @api.marshal_with(user_fields, envelope='user', code=201)
     @api.doc(responses={
-        400: 'No username/password/phone/fts_key provided',
+        400: 'No username/password/phone/fts_key provided\n\n'
+             'Input payload validation failed',
         404: "Can't authorize in Federal Tax Service with given phone/key",
         409: 'Username already exist',
     })
@@ -82,6 +83,7 @@ class UserList(Resource):
         args = user_request_required.parse_args()
         # Error checking
         self.abortIfFtsUserDoesntExist(args['phone'], args['fts_key'])
+
         # Create user and add to database
         user = User(
             username=args['username'],
@@ -91,11 +93,20 @@ class UserList(Resource):
         try:
             db.session.add(user)
             db.session.commit()
-            # Return JSON using template
-            return user, 201
         except IntegrityError:
             db.session.rollback()
             abort(409, message="Username '{}' already exist".format(args['username']))
+
+        # Update FTS key for all users with the same phone
+        try:
+            for u in User.query.filter_by(phone=user.phone).all():
+                u.fts_key = args['fts_key']
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+        # Return JSON using template
+        return user, 201
 
     @staticmethod
     def abortIfFtsUserDoesntExist(phone, fts_key):
@@ -182,7 +193,8 @@ class UserInfo(Resource):
     @api.expect(user_request_fields)
     @api.marshal_with(user_fields, envelope='user')
     @api.doc(responses={
-        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)',
+        400: 'Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)\n\n'
+             'Input payload validation failed',
         401: 'Unauthorized access',
         404: "Can't authorize in Federal Tax Service with given phone/key",
         409: 'Username already exist',
@@ -198,6 +210,7 @@ class UserInfo(Resource):
         args = user_request.parse_args()
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
+        
         try:
             # Modify user info according to JSON fields
             for key, value in args.items():
@@ -209,11 +222,21 @@ class UserInfo(Resource):
             # Error checking
             self.abortIfFtsUserDoesntExist(user.phone, user.fts_key)
             db.session.commit()
-            # Return JSON using template
-            return user
         except IntegrityError:
             db.session.rollback()
             abort(409, message="Username '{}' already exist".format(args['username']))
+
+        # Update FTS key for all users with the same phone
+        try:
+            if args['fts_key'] is not None:
+                for u in User.query.filter_by(phone=user.phone).all():
+                    u.fts_key = args['fts_key']
+                db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+        # Return JSON using template
+        return user
 
     @staticmethod
     def abortIfFtsUserDoesntExist(phone, fts_key):
