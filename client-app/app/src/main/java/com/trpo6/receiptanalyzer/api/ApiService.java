@@ -39,11 +39,15 @@ public interface ApiService {
 
     /** Создание стола */
     @POST(APIv1 + "/tables")
-    Call<CreateTableResponse> getTable(@Header("Authorization") String auth);
+    Call<CreateTableResponse> createTable(@Header("Authorization") String auth);
 
     /** Подключение к столу */
     @POST(APIv1 + "/tables/users")
     Call<DisconnectFromTableResponse> connectTable(@Header("Authorization") String auth, @Body CreateTableResponse createTableResponse);
+
+    /** Проверка на подключение к столу */
+    @GET(APIv1 + "/tables/me")
+    Call<CreateTableResponse> getTable(@Header("Authorization") String auth);
 
     /** Отключение от стола */
     @DELETE(APIv1+"/tables/users")

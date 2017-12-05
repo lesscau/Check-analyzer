@@ -27,17 +27,17 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private Drawer drawerResult = null;
+    private ApiService api;
     /**
      * Запуск главного меню
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = AppToolbar.setToolbar(this, getString(R.string.app_name));
         Drawer drawer = AppToolbar.setMenu(this);
-
+        api = RetroClient.getApiService();
         // проверяем, была ли ранее выполнена авторизация
         if (!AuthInfo.isAuthorized(this)) {
             // Окно логина/регистрации
@@ -45,13 +45,8 @@ public class MainActivity extends AppCompatActivity {
             // запуск activity
             startActivity(intent);
         }
-
         // проверяем, подключен ли пользователь к столу
-        // если подключен - открываем список стола
-        if(AuthInfo.isConnectedToTable(this)){
-            Intent intent = new Intent("productlist");
-            startActivity(intent);
-        }
+        connectToTable();
     }
 
     /**
@@ -73,8 +68,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        ApiService api = RetroClient.getApiService();
-        Call<CreateTableResponse> call = api.getTable(AuthInfo.getKey());
+        Call<CreateTableResponse> call = api.createTable(AuthInfo.getKey());
         call.enqueue(new Callback<CreateTableResponse>() {
             @Override
             public void onResponse(Call<CreateTableResponse> call, Response<CreateTableResponse> response) {
@@ -109,6 +103,39 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, FirstActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
+    }
+
+    /**
+     * Переход к редактрованию стола, если юзер подключен к столу
+     */
+    private void connectToTable(){
+        // проверяем, подключен ли пользователь к столу
+        // если подключен - открываем список стола
+        if(AuthInfo.isConnectedToTable(this)){
+            Intent intent = new Intent("productlist");
+            startActivity(intent);
+        }
+        Call<CreateTableResponse> call = api.getTable(AuthInfo.getKey());
+        call.enqueue(new Callback<CreateTableResponse>() {
+            @Override
+            public void onResponse(Call<CreateTableResponse> call, Response<CreateTableResponse> response) {
+                Log.i("table resp",response.toString()+response.body());
+                if(!response.isSuccessful()) {
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+                    return;
+                }
+                String tableKey = response.body().getTableKey();
+                AuthInfo.keyTableSave(getApplicationContext(),tableKey);
+                Log.i("tableCode",tableKey);
+                Intent intent = new Intent("productlist");
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(Call<CreateTableResponse> call, Throwable t) {
+                Log.e("err1", t.toString());
+            }
+        });
     }
 
     /**
