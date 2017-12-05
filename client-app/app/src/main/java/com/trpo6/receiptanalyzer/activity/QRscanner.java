@@ -21,7 +21,7 @@ import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.Items;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
-import com.trpo6.receiptanalyzer.utils.InternetConnection;
+import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -162,7 +162,7 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
         /**
          * Checking Internet Connection
          */
-        if (InternetConnection.checkConnection(getApplicationContext())) {
+        if (NetworkUtils.checkConnection(getApplicationContext())) {
             ApiService api = RetroClient.getApiService();
             //User user  = new User("89112356232","pass");
             Log.i("token", AuthInfo.getKey());
@@ -184,13 +184,12 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
                         Log.i("success", response.body().toString());
                         _items.setItems(response.body().getItems());
                         _items.correctPrice();
-
-                        ProductListActivity.items.addAll(_items.getItems());
+                        ProductListActivity.producListItems.addAll(_items.getItems());
                         // Переход к активити отображения продуктов
                         openProductList();
 
                     } else {
-                        Log.e("err0", response.toString());
+                        NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                     }
                 }
 

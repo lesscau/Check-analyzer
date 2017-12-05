@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:title="Поиск"
+        yourapp:showAsAction="always|collapseActionView"
+        android:icon="@drawable/ic_search_white_24dp"
+        yourapp:actionViewClass="android.support.v7.widget.SearchView" />
+    <item
+        android:id="@+id/action_edit_user"
+        android:title="Добавить участника"
+        android:icon="@drawable/ic_person_add_white_24dp"
+        yourapp:showAsAction="always" />
+    <item
+        android:id="@+id/action_qr"
+        android:title="Сканировать чек"
+        android:icon="@drawable/ic_center_focus_strong_white_24dp"
+        yourapp:showAsAction="always" />
+</menu>

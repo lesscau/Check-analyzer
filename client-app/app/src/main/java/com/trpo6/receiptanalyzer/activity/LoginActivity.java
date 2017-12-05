@@ -8,12 +8,10 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -21,7 +19,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -32,9 +29,10 @@ import android.widget.Toast;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
-import com.trpo6.receiptanalyzer.model.AuthResponse;
+import com.trpo6.receiptanalyzer.response.AuthResponse;
+import com.trpo6.receiptanalyzer.model.User;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
-import com.trpo6.receiptanalyzer.utils.InternetConnection;
+import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,22 +129,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
             focusView.requestFocus();
         } else {
-            sendTokenRequest(email, password);
+            User user = new User(email,password);
+            sendTokenRequest(user.getName(), user.getPass());
         }
     }
 
     /**
      * Запрос к серверу на получение токена
      */
-    private void sendTokenRequest(final String email, final String password){
+    private void sendTokenRequest(final String name, final String password){
         /**
          * Checking Internet Connection
          */
-        if (InternetConnection.checkConnection(getApplicationContext())) {
+        if (NetworkUtils.checkConnection(getApplicationContext())) {
             ApiService api = RetroClient.getApiService();
 
             String authorizationString = "Basic " + Base64.encodeToString(
-                    (email+":"+password).getBytes(),Base64.NO_WRAP);
+                    (name+":"+password).getBytes(),Base64.NO_WRAP);
 
             Call<AuthResponse> call = api.getToken(authorizationString);
             Log.i("i",call.request().toString());
@@ -165,16 +164,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                         // Сохранение токена
                         String token = "Bearer "+response.body().getToken();
-                        AuthInfo.authSave(getApplicationContext(),token);
+                        AuthInfo.authSave(getApplicationContext(),name,token);
+                        Log.i("token:", token);
 
                         showProgress(false);
                         menuOpen(findViewById(R.id.email_sign_in_button));
 
                     } else {
-                        Log.e("err0", response.toString());
-                        Toast toast = Toast.makeText(getApplicationContext(),
-                                "Error: "+response.message().toString(), Toast.LENGTH_LONG);
-                        toast.show();
+                        NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                         showProgress(false);
                     }
                 }

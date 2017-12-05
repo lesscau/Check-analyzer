@@ -29,8 +29,8 @@
     <ScrollView
 
         android:id="@+id/login_form"
-        android:layout_width="323dp"
-        android:layout_height="125dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="0.68"
         android:focusableInTouchMode="false"
         android:isScrollContainer="false">

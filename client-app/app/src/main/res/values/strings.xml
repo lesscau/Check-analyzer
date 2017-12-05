@@ -27,5 +27,8 @@
     <string name="toMain">На главную</string>
     <string name="history">История</string>
     <string name="logout">Выход</string>
+    <string name="delete">Удалить</string>
+    <string name="create_table_message">Сообщи этот код \nдрузьям, \nчтобы они смогли \nприсоединиться</string>
+    <string name="connect_table_message">Введи код стола,\nчтобы присоединиться</string>
 
 </resources>

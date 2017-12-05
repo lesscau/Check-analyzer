@@ -1,16 +1,15 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
+    <style name="AppTheme" parent="MaterialTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/material_drawer_primary</item>
+        <item name="colorPrimaryDark">@color/material_drawer_primary_dark</item>
+        <item name="colorAccent">@color/material_drawer_accent</item>
+        <item name="android:textColorPrimary">@color/material_drawer_primary_text</item>
         <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
     </style>
 
-    <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Picker" parent="MaterialTheme.Light">
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 H
@@ -26,5 +25,10 @@ H
         <item name="android:maxLines">1</item>
         <item name="android:scrollHorizontally">true</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.DialogWindowTitle</item>
+    </style>
+    <style name="DialogStyle" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowMinWidthMajor">70%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:minHeight">300dp</item>
     </style>
 </resources>

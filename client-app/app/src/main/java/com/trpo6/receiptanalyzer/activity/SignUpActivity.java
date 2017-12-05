@@ -11,9 +11,9 @@ import android.widget.Toast;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
-import com.trpo6.receiptanalyzer.model.RegistrationResponse;
+import com.trpo6.receiptanalyzer.response.RegistrationResponse;
 import com.trpo6.receiptanalyzer.model.SignUpBody;
-import com.trpo6.receiptanalyzer.utils.InternetConnection;
+import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,7 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
         /**
          * Checking Internet Connection
          */
-        if (InternetConnection.checkConnection(getApplicationContext())) {
+        if (NetworkUtils.checkConnection(getApplicationContext())) {
             ApiService api = RetroClient.getApiService();
             //User user  = new User("89112356232","pass");
             //ConfirmSignUpBody body = new ConfirmSignUpBody(_username,_phone,Integer.parseInt(_ftsKey),_password);
@@ -82,10 +82,7 @@ public class SignUpActivity extends AppCompatActivity {
                         // запуск activity
                         startActivity(intent);
                     } else {
-                        Log.e("err0", response.toString());
-                        Toast toast = Toast.makeText(getApplicationContext(),
-                                "Error: "+response.message(), Toast.LENGTH_LONG);
-                        toast.show();
+                        NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                     }
                 }
 

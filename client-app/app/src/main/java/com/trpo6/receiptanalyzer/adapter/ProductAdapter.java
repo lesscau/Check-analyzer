@@ -4,9 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.shawnlin.numberpicker.NumberPicker;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.model.Item;
 
@@ -28,7 +29,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     /**
      * Список продуктов
      */
-    private List<Item> itemListList;
+    private List<Item> itemList;
     /**
      * Тег
      */
@@ -40,7 +41,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
      * @param items Список продуктов
      */
     public ProductAdapter(List<Item> items) {
-        this.itemListList = items;
+        this.itemList = items;
     }
 
     /**
@@ -53,7 +54,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.edit_list_item, parent, false);
         return new ViewHolder(v);
     }
 
@@ -65,7 +66,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
      */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        final Item item = itemListList.get(position);
+        final Item item = itemList.get(position);
         viewHolder.nameView.setText(item.getName());
         viewHolder.countView.setText(formatValue(item.getSelectedCount()));
         viewHolder.priceView.setText(Float.toString(item.getPrice()));
@@ -80,7 +81,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
      */
     @Override
     public int getItemCount() {
-        return itemListList.size();
+        return itemList.size();
+    }
+
+    public void removeItem(int position){
+        itemList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(Item item, int position){
+        itemList.add(position, item);
+        notifyItemInserted(position);
     }
 
     /**
@@ -90,18 +101,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         //int count = item.getSelectedCount()+delta;
         //if(count<0) count=0;
         item.setSelectedCount(count);
-        notifyItemChanged(itemListList.indexOf(item));
-    }
-
-    /**
-     * Обработчик кнопки удаления продукта
-     *
-     * @param item Конкретный элемент из списка продуктов
-     */
-    private void delProduct(Item item) {
-        int pos = itemListList.indexOf(item);
-        itemListList.remove(item);
-        notifyItemRemoved(pos);
+        notifyItemChanged(itemList.indexOf(item));
     }
 
     /**
@@ -117,10 +117,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     /**
      * Шаблон каждой строки из списка продуктов
      */
-    class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         final NumberPicker numberPicker;
         final TextView nameView, countView, priceView;
         final NumberPickerListener numberPickerListener;
+        public RelativeLayout viewBackground, viewForeground;
 
         /**
          * Конструктор паттерна
@@ -134,6 +135,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             nameView = (TextView) view.findViewById(R.id.nameView);
             countView = (TextView) view.findViewById(R.id.priceView);
             priceView = (TextView) view.findViewById(R.id.priceView);
+            viewBackground = view.findViewById(R.id.productList_background);
+            viewForeground = view.findViewById(R.id.productList_foreground);
             numberPickerListener = new NumberPickerListener();
             numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
@@ -187,18 +190,4 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             this.item = item;
         }
     }
-    /**Класс для удаления конкретной позиции в списке продуктов*/
-    private class DeleteButtonListener implements View.OnClickListener {
-        private Item item;
-
-        @Override
-        public void onClick(View view) {
-            delProduct(item);
-        }
-
-        public void setItem(Item item) {
-            this.item = item;
-        }
-    }
 }
-
