@@ -112,7 +112,7 @@ class Table(db.Model):
                 'id': cart.products.id,
                 'name': cart.products.product_name,
                 'quantity': cart.count,
-                'price': int(cart.price * 100)
+                'price': int(cart.products.price * 100)
             } for cart in item.current_products]
         } for item in self.users]
         return result
@@ -143,7 +143,7 @@ class UserTable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, unique=True, index=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable=False, index=True)
-    price = db.Column(db.Float)
+    closed = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', backref=db.backref('user_tables', cascade="all, delete-orphan"))
     table = db.relationship('Table', backref=db.backref('user_tables', cascade="all, delete-orphan"))
@@ -153,7 +153,6 @@ class UserTableArchive(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable=False, index=True)
-    price = db.Column(db.Float)
 
 
 class UserProduct(db.Model):
@@ -162,8 +161,7 @@ class UserProduct(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey(Products.id), nullable=False, index=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), index=True)
     count = db.Column(db.Integer)
-    price = db.Column(db.Float)
 
     user = db.relationship('User')
     table = db.relationship('Table')
-    products = db.relationship('Products') 
+    products = db.relationship('Products')
