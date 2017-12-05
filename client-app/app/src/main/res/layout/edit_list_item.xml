@@ -8,10 +8,10 @@
         android:id="@+id/productList_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:background="@color/material_drawer_primary_dark">
 
         <ImageView
@@ -38,10 +38,10 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/productList_foreground"
         android:background="@color/material_drawer_dark_header_selection_text"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="2dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
 
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -72,18 +72,17 @@
         <com.shawnlin.numberpicker.NumberPicker
             android:id="@+id/numberPicker"
             android:layout_width="40dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            app:np_textSize="14sp"
             app:np_dividerColor="@color/material_drawer_primary_dark"
             app:np_min="0"
             app:np_selectedTextColor="@color/material_drawer_primary_dark"
             app:np_selectedTextSize="18sp"
             app:np_textColor="@color/material_drawer_primary"
-            app:np_value="0"
-            app:np_width="60dp" />
+            app:np_textSize="14sp"
+            app:np_value="0"/>
     </RelativeLayout>
 
 

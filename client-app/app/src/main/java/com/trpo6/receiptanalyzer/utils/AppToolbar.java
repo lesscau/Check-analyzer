@@ -85,9 +85,11 @@ public class AppToolbar extends AppCompatActivity {
                             call.enqueue(new Callback<DisconnectFromTableResponse>() {
                                 @Override
                                 public void onResponse(Call<DisconnectFromTableResponse> call, Response<DisconnectFromTableResponse> response) {
-                                    Log.i("table resp",response.toString());
-                                    if((response.code())!=200)
+                                    if (!response.isSuccessful()){
+                                        NetworkUtils.showErrorResponseBody(app,response);
                                         return;
+                                    }
+                                    Log.i("table resp",response.toString());
                                     AuthInfo.keyTableClear(app);
                                     Intent intent = new Intent(app,MainActivity.class);
                                     app.startActivity(intent);

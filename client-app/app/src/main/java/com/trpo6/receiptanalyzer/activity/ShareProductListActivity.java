@@ -40,7 +40,7 @@ public class ShareProductListActivity extends AppCompatActivity {
                 ((NumberPicker) subItem.findViewById(R.id.user_number_picker)).setMaxValue(productListItem.getQuantity());
                 ((TextView) subItem.findViewById(R.id.sub_title)).setText(ProductListActivity.tempUsers.get(i));
             }
-            item.setIndicatorColorRes(R.color.material_drawer_primary_dark);
+            item.setIndicatorColorRes(R.color.material_drawer_primary);
             item.setIndicatorIcon(getResources().getDrawable(R.drawable.ic_expand_more_white_24dp));
 
         }
