@@ -184,8 +184,7 @@ public class QRscanner extends AppCompatActivity implements ZXingScannerView.Res
                         Log.i("success", response.body().toString());
                         _items.setItems(response.body().getItems());
                         _items.correctPrice();
-
-                        ProductListActivity.items.addAll(_items.getItems());
+                        ProductListActivity.producListItems.addAll(_items.getItems());
                         // Переход к активити отображения продуктов
                         openProductList();
 

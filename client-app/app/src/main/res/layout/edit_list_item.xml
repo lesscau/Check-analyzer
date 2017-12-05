@@ -8,6 +8,10 @@
         android:id="@+id/productList_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:background="@color/material_drawer_primary_dark">
 
         <ImageView
@@ -31,8 +35,14 @@
             android:id="@+id/textView" />
     </RelativeLayout>
     <RelativeLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/productList_foreground"
         android:background="@color/material_drawer_dark_header_selection_text"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -47,26 +57,33 @@
             android:layout_weight="1.31"
             android:gravity="center_vertical"
             android:textAlignment="center"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/priceView"
-            android:layout_width="60dp"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/numberPicker"
             android:gravity="center_vertical|center_horizontal"
-            android:textSize="18sp" />
+            android:textSize="16sp"
+            android:textColor="@color/material_drawer_primary_dark"/>
 
-        <NumberPicker
+        <com.shawnlin.numberpicker.NumberPicker
             android:id="@+id/numberPicker"
             android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:orientation="vertical"
-            android:theme="@style/AppTheme.Picker" />
+            app:np_textSize="14sp"
+            app:np_dividerColor="@color/material_drawer_primary_dark"
+            app:np_min="0"
+            app:np_selectedTextColor="@color/material_drawer_primary_dark"
+            app:np_selectedTextSize="18sp"
+            app:np_textColor="@color/material_drawer_primary"
+            app:np_value="0"
+            app:np_width="60dp" />
     </RelativeLayout>
 
 

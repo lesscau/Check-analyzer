@@ -46,7 +46,8 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /** Список временных пользователей */
     public static ArrayList<String> tempUsers = new ArrayList();
     {
-        tempUsers.add(AuthInfo.getName());
+        if (!tempUsers.contains(AuthInfo.getName()))
+            tempUsers.add(AuthInfo.getName());
     }
 
     /** Адаптер списка пользователей */
@@ -55,7 +56,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /**Адаптер списка продуктов*/
     ProductAdapter productAdapter;
     /**Список продуктов*/
-    static ArrayList<Item> items = new ArrayList();
+    public static ArrayList<Item> producListItems = new ArrayList();
     /**View для работы со списком продуктов*/
     RecyclerView productListView;
 
@@ -64,13 +65,12 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_product_list);
-
         Toolbar toolbar = AppToolbar.setToolbar(this, AuthInfo.getTableKey());
         Drawer drawer = AppToolbar.setMenu(this);
         mActivityView = getLayoutInflater().inflate(R.layout.activity_edit_product_list, null);
 
         productListView = (RecyclerView) findViewById(R.id.productList);
-        productAdapter = new ProductAdapter(items);
+        productAdapter = new ProductAdapter(producListItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
 
@@ -126,11 +126,11 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         float price = Float.parseFloat(strPrice);
 
         /** Добавление продукта в список*/
-        items.add(new Item(product,count,price));
+        producListItems.add(new Item(product,count,price));
         productEditText.setText("");
         countEditText.setText("");
         priceEditText.setText("");
-        productAdapter.notifyItemInserted(items.size()-1);
+        productAdapter.notifyItemInserted(producListItems.size()-1);
 
     }
 
@@ -239,10 +239,10 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if(viewHolder instanceof ProductAdapter.ViewHolder) {
             // get the removed item name to display it in snack bar
-            Item item = items.get(viewHolder.getAdapterPosition());
+            Item item = producListItems.get(viewHolder.getAdapterPosition());
 
             // backup of removed item for undo purpose
-            final Item deletedItem = items.get(viewHolder.getAdapterPosition());
+            final Item deletedItem = producListItems.get(viewHolder.getAdapterPosition());
             final int deletedIndex = viewHolder.getAdapterPosition();
             // remove the item from recycler view
             productAdapter.removeItem(viewHolder.getAdapterPosition());
@@ -288,6 +288,12 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
         }
+    }
+
+    /** Переход к разделению прдуктов*/
+    public void toShareProductList(View view){
+        Intent intent = new Intent(this, ShareProductListActivity.class);
+        startActivity(intent);
     }
 
     @Override

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/dialog_theme"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/material_drawer_background">
 
 
     <LinearLayout
@@ -23,7 +24,7 @@
             android:inputType="text"
             android:layout_gravity="bottom"
             android:layout_marginEnd="16dp"
-            android:textColor="@color/colorAccent" />
+            android:textColor="@color/material_drawer_primary_dark" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/del_user_button"
