@@ -3,6 +3,7 @@ from flask_restplus import Namespace, Resource, fields, abort
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from app import db
+from app.ReceiptPartition import ReceiptPartition
 from app.models import User, Table, UserTable
 from app.rest.Auth import Auth
 from app.RandomPhrases import randomPhrase
@@ -52,6 +53,28 @@ user_table_list_response_fields = api.model('UserTable list request',
     'users': fields.List(fields.Nested(tables_users_item_fields)),
 })
 
+
+# UserItems response JSON template
+user_items_fields = api.model('User items response',
+{
+    'name': fields.String(description='Item name'),
+    'quantity': fields.Integer(description='Item quantity'),
+    'price': fields.Integer(description='Item price')
+})
+# UserProducts response JSON template
+user_products_response_fields = api.model('User Products response',
+{
+    'id': fields.Integer(description='User id', required=True),
+    'username': fields.String(description='Username', required=True),
+    'total': fields.Integer(description='Total sum'),
+    'items': fields.List(fields.Nested(user_items_fields))
+})
+
+# UsersSum list response JSON template
+users_sum_response_fields = api.model('UsersSum list response',
+{
+    'users': fields.List(fields.Nested(user_products_response_fields)),
+})
 
 @api.route('', endpoint='tables')
 class Tables(Resource):
@@ -269,5 +292,36 @@ class TablesInfo(Resource):
 
         try:
             return user.current_table[0]
+        except IndexError:
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
+
+@api.route('/checkout', endpoint='tables_checkout')
+class TablesCheckout(Resource):
+    """
+    Information about total sum of users
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
+    """
+    method_decorators = [Auth.multi_auth.login_required]
+
+    @api.marshal_with(users_sum_response_fields)
+    @api.doc(responses={
+        401: 'Unauthorized access',
+        404: 'Username does not connected to any table'
+    })
+    def get(self):
+        """
+        Get users products and total sum
+
+        :return: List of table users with total sum
+        :rtype:  dict/json
+        """
+
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+
+        try:
+            return ReceiptPartition(user.current_table[0].id)
         except IndexError:
             abort(404, message="Username '{}' does not connected to any table".format(user.username))
