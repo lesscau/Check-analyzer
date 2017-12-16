@@ -1,11 +1,11 @@
 from app.models import Table
 
-def ReceiptPartition(tableKey):
-    table = Table.query.filter_by(table_key=tableKey).first()
+def ReceiptPartition(tableID):
+    table = Table.query.filter_by(id=tableID).first()
     userProducts = table.getUserProducts()
     products = table.getProducts()
-    result = {}
-    result['userSums'] = []
+    result = userProducts
+    userNum = 0
     for users in userProducts['users']:
         subSum = 0
         for items in users['items']:
@@ -14,16 +14,14 @@ def ReceiptPartition(tableKey):
                 if products['items'][index]['id'] == items['id']:
                     products['items'][index].update({'quantity': products['items'][index]['quantity'] - items['quantity']})
                     break
-        result['userSums'].append({
-            'id': users['id'],
-            'username': users['username'],
+        result['users'][userNum].update({
             'total': subSum
         })
+        userNum += 1
 
     freeSum = 0
     for items in products['items']:
         freeSum += items['quantity'] * items['price']
-    for userSums in result['userSums']:
-        userSums.update({'total': userSums['total'] + freeSum//len(userProducts['users'])})
+    for users in result['users']:
+        users.update({'total': users['total'] + freeSum//len(userProducts['users'])})
     return result
-
