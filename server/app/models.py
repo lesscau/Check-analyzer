@@ -117,6 +117,24 @@ class Table(db.Model):
         } for item in self.users]
         return result
 
+    def getFreeProducts(self):
+        """
+        Get dict of products no chosen by anyone
+
+        :return: Dict of products with count of free pie
+        :rtype:  dict/json
+        """
+        userProducts = self.getUserProducts()
+        result = self.getProducts()
+        for users in userProducts['users']:
+            for items in users['items']:
+                for index in range(len(result['items'])):
+                    if result['items'][index]['id'] == items['id']:
+                        result['items'][index].update(
+                            {'quantity': result['items'][index]['quantity'] - items['quantity']})
+                        break
+        return result
+
     def __repr__(self):
         return '<Table %r>' % (self.table_key)
 
