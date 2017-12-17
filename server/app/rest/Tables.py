@@ -57,6 +57,7 @@ user_table_list_response_fields = api.model('UserTable list request',
 # UserItems response JSON template
 user_items_fields = api.model('User items response',
 {
+    'id': fields.Integer(description='Item id'),
     'name': fields.String(description='Item name'),
     'quantity': fields.Integer(description='Item quantity'),
     'price': fields.Integer(description='Item price')
@@ -74,6 +75,12 @@ user_products_response_fields = api.model('User Products response',
 users_sum_response_fields = api.model('UsersSum list response',
 {
     'users': fields.List(fields.Nested(user_products_response_fields)),
+})
+
+# FreeItems list response JSON template
+free_items_response_fields = api.model('FreeItems list response',
+{
+    'items': fields.List(fields.Nested(user_items_fields)),
 })
 
 @api.route('', endpoint='tables')
@@ -323,5 +330,38 @@ class TablesCheckout(Resource):
 
         try:
             return ReceiptPartition(user.current_table[0].id)
+        except IndexError:
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
+
+@api.route('/ack', endpoint='tables_ack')
+class TablesAck(Resource):
+    """
+    Information about count of free items
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
+    """
+    method_decorators = [Auth.multi_auth.login_required]
+
+    @api.marshal_with(free_items_response_fields)
+    @api.doc(responses={
+        401: 'Unauthorized access',
+        404: 'Username does not connected to any table'
+    })
+    def get(self):
+        """
+        Get products free count
+
+        :return: List of products with free count
+        :rtype:  dict/json
+        """
+
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+
+        table = Table.query.filter_by(id=user.current_table[0].id).first()
+
+        try:
+            return table.getFreeProducts()
         except IndexError:
             abort(404, message="Username '{}' does not connected to any table".format(user.username))

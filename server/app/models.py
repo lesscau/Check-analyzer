@@ -130,8 +130,7 @@ class Table(db.Model):
             for items in users['items']:
                 for index in range(len(result['items'])):
                     if result['items'][index]['id'] == items['id']:
-                        result['items'][index].update(
-                            {'quantity': result['items'][index]['quantity'] - items['quantity']})
+                        result['items'][index].update({'quantity': result['items'][index]['quantity'] - items['quantity']})
                         break
         return result
 
