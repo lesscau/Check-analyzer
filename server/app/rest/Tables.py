@@ -181,6 +181,9 @@ class TablesUsers(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
+        if args['table_key'] is None:
+            abort(400, message="Input payload validation failed")
+
         table = Table.query.filter_by(table_key=args['table_key']).first()
 
         if table is None:
