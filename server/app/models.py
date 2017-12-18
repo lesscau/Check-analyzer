@@ -175,6 +175,7 @@ class UserTableArchive(db.Model):
 class UserProduct(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
+    temp_username = db.Column(db.String(64), index=True)
     product_id = db.Column(db.Integer, db.ForeignKey(Products.id), nullable=False, index=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), index=True)
     count = db.Column(db.Integer)
