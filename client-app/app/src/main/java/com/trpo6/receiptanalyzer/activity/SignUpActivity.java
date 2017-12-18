@@ -1,10 +1,13 @@
 package com.trpo6.receiptanalyzer.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -30,6 +33,50 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reg);
+
+        // Пользовательское соглашение
+        String title = "Пользовательское соглашение";
+        WebView webView = new WebView(this);
+        webView.loadUrl("file:///android_asset/agreement.html");
+        String button1String = "Принять";
+        String button2String = "Отклонить";
+        AlertDialog.Builder ad;
+        ad = new AlertDialog.Builder(this);
+        ad.setTitle(title);  // заголовок
+        ad.setView(webView);
+        ad.setPositiveButton(button1String, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+
+            }
+        });
+        ad.setNegativeButton(button2String, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+                startActivity(new Intent(getApplicationContext(),FirstActivity.class));
+            }
+        });
+        ad.show();
+
+        // Политика конфиденциальности
+        title = "Политика конфиденциальности";
+        webView = new WebView(this);
+        webView.loadUrl("file:///android_asset/confidence.html");
+        button1String = "Принять";
+        button2String = "Отклонить";
+
+        ad = new AlertDialog.Builder(this);
+        ad.setTitle(title);  // заголовок
+        ad.setView(webView);
+        ad.setPositiveButton(button1String, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+
+            }
+        });
+        ad.setNegativeButton(button2String, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+                startActivity(new Intent(getApplicationContext(),FirstActivity.class));
+            }
+        });
+        ad.show();
 
         username = (EditText) findViewById(R.id.usernameTextEdit);
         phone = (EditText) findViewById(R.id.phoneTextEdit);

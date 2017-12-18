@@ -12,23 +12,5 @@
     <style name="AppTheme.Picker" parent="MaterialTheme.Light">
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>
-H
-    <style name="dialog_theme" parent="@android:style/Theme.Holo.Light.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowTitleStyle">@style/DialogWindowTitle_Holo</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
-        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
-    </style>
 
-    <style name="DialogWindowTitle_Holo">
-        <item name="android:maxLines">1</item>
-        <item name="android:scrollHorizontally">true</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Holo.DialogWindowTitle</item>
-    </style>
-    <style name="DialogStyle" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowMinWidthMajor">70%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
-        <item name="android:minHeight">300dp</item>
-    </style>
 </resources>
