@@ -63,17 +63,18 @@ user_items_fields = api.model('User items response',
     'quantity': fields.Integer(description='Item quantity'),
     'price': fields.Integer(description='Item price')
 })
-# UserTotal response JSON template
-user_total_fields = api.model('User total response',
+# UsersTotal response JSON template
+users_total_fields = api.model('Users total response',
 {
-    'temp_username_total': fields.Integer(description='Temp User Total'),
+    'temp_username': fields.String(description='Users temp_username'),
+    'total': fields.Integer(description='User Total')
 })
 # UserProducts response JSON template
 user_products_response_fields = api.model('User Products response',
 {
     'id': fields.Integer(description='User id', required=True),
     'username': fields.String(description='Username', required=True),
-    'total': fields.List(fields.Nested(user_total_fields)),
+    'total': fields.List(fields.Nested(users_total_fields)),
     'items': fields.List(fields.Nested(user_items_fields))
 })
 
