@@ -366,9 +366,8 @@ class TablesAck(Resource):
         # Login of authorized user stores in Flask g object
         user = User.query.filter_by(username=g.user.username).first()
 
-        table = Table.query.filter_by(id=user.current_table[0].id).first()
-
         try:
+            table = Table.query.filter_by(id=user.current_table[0].id).first()
             return table.getFreeProducts()
         except IndexError:
             abort(404, message="Username '{}' does not connected to any table".format(user.username))
