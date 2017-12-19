@@ -111,11 +111,30 @@ class Table(db.Model):
             'items': [{
                 'id': cart.products.id,
                 'name': cart.products.product_name,
-                'temp_username': cart.temp_username,
                 'quantity': cart.count,
                 'price': int(cart.products.price * 100)
-            } for cart in item.current_products]
+            } for cart in item.current_products if cart.temp_username is None]
         } for item in self.users]
+
+        tempUsers = []
+        for item in self.user_products:
+            if item.temp_username is not None:
+                temp = []
+                tempUsers.append(item.temp_username)
+        # Only unique users
+        tempUsers = list(set(tempUsers))
+
+        for item in tempUsers:
+            result['users'].append({
+                'username': item,
+                'items': [{
+                    'id': cart.products.id,
+                    'name': cart.products.product_name,
+                    'quantity': cart.count,
+                    'price': int(cart.products.price * 100)
+                } for cart in self.user_products if cart.temp_username == item]
+            })
+
         return result
 
     def getFreeProducts(self):
