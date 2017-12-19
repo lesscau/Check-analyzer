@@ -111,6 +111,7 @@ class Table(db.Model):
             'items': [{
                 'id': cart.products.id,
                 'name': cart.products.product_name,
+                'temp_username': cart.temp_username,
                 'quantity': cart.count,
                 'price': int(cart.products.price * 100)
             } for cart in item.current_products]
