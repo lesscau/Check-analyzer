@@ -117,22 +117,28 @@ class Table(db.Model):
         } for item in self.users]
 
         tempUsers = []
+        tempUsersList = []
         for item in self.user_products:
-            if item.temp_username is not None:
-                temp = []
-                tempUsers.append(item.temp_username)
-        # Only unique users
-        tempUsers = list(set(tempUsers))
+            if item.temp_username is not None and item.temp_username not in tempUsersList:
+                temp = {
+                    'temp_username': item.temp_username,
+                    'parent_id': item.user_id,
+                    'parent': item.user.username
+                }
+                tempUsersList.append(item.temp_username)
+                tempUsers.append(temp)
 
         for item in tempUsers:
             result['users'].append({
-                'username': item,
+                'username': item['temp_username'],
+                'parent_id': item['parent_id'],
+                'parent': item['parent'],
                 'items': [{
                     'id': cart.products.id,
                     'name': cart.products.product_name,
                     'quantity': cart.count,
                     'price': int(cart.products.price * 100)
-                } for cart in self.user_products if cart.temp_username == item]
+                } for cart in self.user_products if cart.temp_username == item['temp_username']]
             })
 
         return result
