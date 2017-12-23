@@ -85,10 +85,18 @@ users_sum_response_fields = api.model('UsersSum list response',
     'users': fields.List(fields.Nested(user_products_response_fields)),
 })
 
+# Free UserItems response JSON template
+free_user_items_fields = api.model('Free User items response',
+{
+    'id': fields.Integer(description='Item id'),
+    'name': fields.String(description='Item name'),
+    'quantity': fields.Integer(description='Item quantity'),
+    'price': fields.Integer(description='Item price')
+})
 # FreeItems list response JSON template
 free_items_response_fields = api.model('FreeItems list response',
 {
-    'items': fields.List(fields.Nested(user_items_fields)),
+    'items': fields.List(fields.Nested(free_user_items_fields)),
 })
 '''
 # Items sync request JSON fields (all fields required)
