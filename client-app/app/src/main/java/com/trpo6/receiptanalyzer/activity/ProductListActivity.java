@@ -78,6 +78,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /**View для работы со списком продуктов*/
     RecyclerView productListView;
 
+
     /**Запуск окна продуктов*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +163,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         float price = Float.parseFloat(strPrice);
 
         /** Добавление продукта в список*/
+        addRequest(new Item.addedItem(product,price,count));
         producListItems.add(new Item(product,count,price));
         productEditText.setText("");
         countEditText.setText("");
@@ -283,7 +285,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
             // remove the item from recycler view
             productAdapter.removeItem(viewHolder.getAdapterPosition());
 
-            Item.deletedItem deletedItem = new Item.deletedItem(item.getName(),item.getPrice());
+            final Item.deletedItem deletedItem = new Item.deletedItem(item.getName(),item.getPrice());
             ApiService api = RetroClient.getApiService();
             Call<String> call = null;
 
@@ -309,7 +311,6 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
                 }
             });
 
-
             // showing snack bar with Undo option
             Snackbar snackbar = Snackbar
                     .make(getCurrentFocus(), item.getName() + " удалён!", Snackbar.LENGTH_LONG);
@@ -318,11 +319,13 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
                 public void onClick(View view) {
 
                     // undo is selected, restore the deleted item
+                    addRequest(new Item.addedItem(item.getName(),item.getPrice(),item.getQuantity()));
                     productAdapter.restoreItem(item, deletedIndex);
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
+
 
         }
         if (viewHolder instanceof UserAdapter.ViewHolder) {
@@ -356,10 +359,8 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /** Получение списка продуктов текущего стола */
     private void getTableProducts(){
         ApiService api = RetroClient.getApiService();
-        //User user  = new User("89112356232","pass");
         Log.i("token", AuthInfo.getKey());
         final Items _items = new Items();
-        //fiscal.get(0),fiscal.get(1),fiscal.get(2)
         Call<Items> call = api.getTableProducts(AuthInfo.getKey());
         Log.i("i",call.request().toString());
         if (!NetworkUtils.checkConnection(getApplicationContext())) {
@@ -373,11 +374,6 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
             @Override
             public void onResponse(Call<Items> call, Response<Items> response) {
                 if (response.isSuccessful()) {
-                    /**
-                     * Got Successfully
-                     */
-                    //String ans = response.body().toString();
-
                     _items.setItems(response.body().getItems());
                     _items.correctPrice();
                     ProductListActivity.producListItems.addAll(_items.getItems());
@@ -395,6 +391,29 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
 
     }
 
+    public void addRequest(final Item.addedItem addedItem){
+        ApiService api = RetroClient.getApiService();
+        Call<String> call = api.addProductToTable(AuthInfo.getKey(),addedItem);
+        Log.i("i",call.request().toString());
+        if (!NetworkUtils.checkConnection(getApplicationContext())) {
+            Log.e("error", "can not connect");
+            return;
+        }
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Log.i("Added item: ",addedItem.toString());
+                }
+                else NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
 
     /** Переход к разделению прдуктов*/
     public void toShareProductList(View view){

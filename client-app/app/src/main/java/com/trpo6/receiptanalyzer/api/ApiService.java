@@ -10,7 +10,6 @@ import com.trpo6.receiptanalyzer.model.ConfirmSignUpBody;
 import com.trpo6.receiptanalyzer.response.DisconnectFromTableResponse;
 import com.trpo6.receiptanalyzer.response.RegistrationResponse;
 
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -19,6 +18,7 @@ import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+
 
 /**
  * Интерфейс для реализации запросов
@@ -126,4 +126,13 @@ public interface ApiService {
      */
     @HTTP(method = "DELETE", path = APIv1 + "/products", hasBody = true)
     Call<String> deleteProductFromTable(@Header("Authorization") String auth, @Body Item.deletedItem deletedItem);
+
+    /**
+     * Добавление нового продукта
+     * @param auth
+     * @param addedItem
+     * @return
+     */
+    @POST(APIv1 + "/products")
+    Call<String> addProductToTable(@Header("Authorization") String auth, @Body Item.addedItem addedItem);
 }
