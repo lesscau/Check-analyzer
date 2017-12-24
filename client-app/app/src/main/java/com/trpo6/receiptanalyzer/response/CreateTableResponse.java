@@ -18,6 +18,5 @@ public class CreateTableResponse {
 
     @SerializedName("table_key")
     @Expose
-
     private String tableKey;
 }

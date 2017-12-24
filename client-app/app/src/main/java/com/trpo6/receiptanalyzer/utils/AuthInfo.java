@@ -69,6 +69,7 @@ public class AuthInfo{
         key = sp.getString("token","");
         name=sp.getString("name","");
         password=sp.getString("password","");
+        Log.i("Auth info: ",key+" "+" "+name+" "+password);
         if (key.isEmpty() || name.isEmpty() || password.isEmpty())
             return false;
         return true;
@@ -94,7 +95,7 @@ public class AuthInfo{
         SharedPreferences.Editor e = sp.edit();
         e.putString("token", token);
         e.putString("name",name);
-        e.putString("password",password);
+        e.putString("password",pass);
         setKey(token);
         setName(name);
         setPassword(pass);

@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             call.enqueue(new Callback<AuthResponse>(){
                 @Override
                 public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                    showProgress(true);
+                    //showProgress(true);
                     if (response.isSuccessful()) {
                         /**
                          * Token Got Successfully - Open main menu
@@ -167,7 +167,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         AuthInfo.authSave(getApplicationContext(),name,password,token);
                         Log.i("token:", token);
 
-                        showProgress(false);
+                        //showProgress(false);
                         menuOpen(findViewById(R.id.email_sign_in_button));
 
                     } else {

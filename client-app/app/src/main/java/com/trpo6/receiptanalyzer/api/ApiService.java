@@ -1,13 +1,14 @@
 package com.trpo6.receiptanalyzer.api;
 
-import com.trpo6.receiptanalyzer.model.ConnectTableRequest;
+import com.trpo6.receiptanalyzer.model.ItemsSync;
+import com.trpo6.receiptanalyzer.model.SignUpBody;
 import com.trpo6.receiptanalyzer.response.AuthResponse;
 import com.trpo6.receiptanalyzer.response.CreateTableResponse;
 import com.trpo6.receiptanalyzer.model.Items;
 import com.trpo6.receiptanalyzer.model.ConfirmSignUpBody;
 import com.trpo6.receiptanalyzer.response.DisconnectFromTableResponse;
 import com.trpo6.receiptanalyzer.response.RegistrationResponse;
-import com.trpo6.receiptanalyzer.model.SignUpBody;
+
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -81,6 +82,9 @@ public interface ApiService {
      */
     @DELETE(APIv1+"/tables/users")
     Call<DisconnectFromTableResponse> disconnectFromTable(@Header("Authorization") String auth);
+
+    @POST(APIv1 + "/tables/sync")
+    Call<String> syncData(@Header("Authorization") String auth, @Body ItemsSync itemsSync);
 
     /**
      * Список продуктов из чека
