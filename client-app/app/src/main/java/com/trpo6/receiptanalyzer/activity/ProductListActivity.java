@@ -40,6 +40,8 @@ import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -96,7 +98,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         productListView.setItemAnimator(itemAnimator);
 
         // Получаем список продуктов стола
-        getTableProducts();
+        if(producListItems.isEmpty()) getTableProducts();
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -273,13 +275,40 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if(viewHolder instanceof ProductAdapter.ViewHolder) {
             // get the removed item name to display it in snack bar
-            Item item = producListItems.get(viewHolder.getAdapterPosition());
+            final Item item = producListItems.get(viewHolder.getAdapterPosition());
 
             // backup of removed item for undo purpose
-            final Item deletedItem = producListItems.get(viewHolder.getAdapterPosition());
+            //final Item deletedItem = producListItems.get(viewHolder.getAdapterPosition());
             final int deletedIndex = viewHolder.getAdapterPosition();
             // remove the item from recycler view
             productAdapter.removeItem(viewHolder.getAdapterPosition());
+
+            Item.deletedItem deletedItem = new Item.deletedItem(item.getName(),item.getPrice());
+            ApiService api = RetroClient.getApiService();
+            Call<String> call = null;
+
+                call = api.deleteProductFromTable(AuthInfo.getKey(), //URLEncoder.encode(deletedItem.getName(),"UTF-8"),deletedItem.getPrice());
+                        deletedItem);
+            if (!NetworkUtils.checkConnection(getApplicationContext())) {
+                Log.e("error", "can not connect");
+                return;
+            }
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    if (!response.isSuccessful()) {
+                        NetworkUtils.showErrorResponseBody(getApplicationContext(), response);
+                        return;
+                    }
+                    Log.i("Sync: ","success");
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.e("err1", t.toString());
+                }
+            });
+
 
             // showing snack bar with Undo option
             Snackbar snackbar = Snackbar
@@ -289,7 +318,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
                 public void onClick(View view) {
 
                     // undo is selected, restore the deleted item
-                    productAdapter.restoreItem(deletedItem, deletedIndex);
+                    productAdapter.restoreItem(item, deletedIndex);
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
@@ -348,11 +377,11 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
                      * Got Successfully
                      */
                     //String ans = response.body().toString();
-                    Log.i("success", response.body().toString());
+
                     _items.setItems(response.body().getItems());
                     _items.correctPrice();
                     ProductListActivity.producListItems.addAll(_items.getItems());
-
+                    Log.i("success", ""+_items.getItems().size()+ProductListActivity.producListItems.toString());
                 } else {
                     NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                 }

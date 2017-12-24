@@ -46,7 +46,7 @@ public class ShareProductListActivity extends AppCompatActivity {
         ArrayList<ItemsSync.ItemSync> itemSyncs = new ArrayList<>();
         for(int i = 0; i < ProductListActivity.producListItems.size(); ++i){
             Item item = ProductListActivity.producListItems.get(i);
-            ItemsSync.ItemSync itemSync = new ItemsSync.ItemSync(item.getName(),i,item.getQuantity());
+            ItemsSync.ItemSync itemSync = new ItemsSync.ItemSync(item.getName(),i);
             itemSyncs.add(itemSync);
         }
 
@@ -76,8 +76,12 @@ public class ShareProductListActivity extends AppCompatActivity {
                         String name = tw.getText().toString();
 
                         itemsSync.setItemsByUser(name,productListItem.getName(),newVal);
+
                         //according to server api
                         if(name.equals(AuthInfo.getName())) name = "null";
+
+
+                        Log.i("Items sync: ",itemsSync.toString());
 
                         Call<String> call = api.syncData(AuthInfo.getKey(), itemsSync);
                         if (!NetworkUtils.checkConnection(getApplicationContext())) {

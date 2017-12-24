@@ -1,7 +1,10 @@
 package com.trpo6.receiptanalyzer.model;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.trpo6.receiptanalyzer.utils.AuthInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +37,25 @@ public class ItemsSync {
 
         public void setItemsByUser(String username, String productname, Integer newcount){
             for (SyncUserItems items : syncData)
-                if(items.getTempUsername().equals(username))
-                    for(ItemSync itemsSync : items.getItems())
-                        if(itemsSync.getName().equals(productname))
+                if(items.getTempUsername().equals(username) || username.equals(AuthInfo.getName())) {
+                    for (ItemSync itemsSync : items.getItems())
+                        if (itemsSync.getName().equals(productname)) {
                             itemsSync.setCount(newcount);
+                            break;
+                        }
+                    break;
+                }
         }
 
-        static public class SyncUserItems {
+
+    @Override
+    public String toString() {
+        return "ItemsSync{" +
+                "syncData=" + syncData.toString() +
+                '}';
+    }
+
+    static public class SyncUserItems {
 
             @SerializedName("temp_username")
             @Expose
@@ -50,7 +65,10 @@ public class ItemsSync {
             private List<ItemSync> items = null;
 
             public SyncUserItems(String tempUsername, List<ItemSync> items) {
-                this.tempUsername = tempUsername;
+                if (tempUsername.equals(AuthInfo.getName()))
+                    this.tempUsername = "null";
+                else
+                    this.tempUsername = tempUsername;
                 this.items = items;
             }
 
@@ -68,6 +86,15 @@ public class ItemsSync {
 
             public void setItems(List<ItemSync> items) {
                 this.items = items;
+            }
+
+
+            @Override
+            public String toString() {
+                return "SyncUserItems{" +
+                        "tempUsername='" + tempUsername + '\'' +
+                        ", items=" + items.toString() +
+                        '}';
             }
         }
 
@@ -88,18 +115,28 @@ public class ItemsSync {
             @Expose
             private Integer count;
 
-            public ItemSync(String name, Integer product_id, Integer count) {
+            public ItemSync(String name, Integer product_id) {
                 this.name = name;
                 this.product_id = product_id;
-                this.count = count;
+                this.count = 0;
             }
 
             public void setCount(Integer count) {
+                Log.i("Set count ", ""+count);
                 this.count = count;
             }
 
             public String getName() {
                 return name;
+            }
+
+            @Override
+            public String toString() {
+                return "ItemSync{" +
+                        "name='" + name + '\'' +
+                        ", product_id=" + product_id +
+                        ", count=" + count +
+                        '}';
             }
         }
 }
