@@ -74,9 +74,9 @@ users_total_fields = api.model('Users total response',
 user_products_response_fields = api.model('User Products response',
 {
     'id': fields.Integer(description='User id', required=True),
-    'username': fields.String(description='Username', required=True),
+    #'username': fields.String(description='Username', required=True),
     'total': fields.List(fields.Nested(users_total_fields)),
-    'items': fields.List(fields.Nested(user_items_fields))
+    #'items': fields.List(fields.Nested(user_items_fields))
 })
 
 # UsersSum list response JSON template
