@@ -292,7 +292,7 @@ class TablesUsers(Resource):
 
         try:
             db.session.delete(user_table)
-            for item in user.current_products:
+            for item in user.current_products():
                 db.session.delete(item)
         except UnmappedInstanceError:
             db.session.rollback()

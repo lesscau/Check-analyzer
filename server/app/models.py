@@ -11,7 +11,6 @@ class User(db.Model):
     fts_key = db.Column(db.Integer, default=0)
 
     current_table = db.relationship('Table', secondary='user_table')
-    current_products = db.relationship('UserProduct')
 
     def hash_password(self, password):
         """
@@ -44,6 +43,14 @@ class User(db.Model):
         s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
         # Insert id in token
         return s.dumps({'id': self.id})
+
+    def current_products(self):
+        """
+        Get current products of self:
+        products selected by current user from existing NOT ARCHIVE table
+        """
+
+        return UserProduct.query.filter_by(user_id=self.id, table_id=self.current_table)
 
     @staticmethod
     def verify_auth_token(token):
@@ -114,7 +121,7 @@ class Table(db.Model):
                 'temp_username': cart.temp_username,
                 'quantity': cart.count,
                 'price': int(cart.products.price * 100)
-            } for cart in item.current_products]
+            } for cart in item.current_products()]
         } for item in self.users]
         return result
 
