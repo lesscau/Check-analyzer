@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from app import db
 from app.ReceiptPartition import ReceiptPartition
-from app.models import User, Table, UserTable, UserProduct
+from app.models import User, Table, UserTable, UserProduct, Products
 from app.rest.Auth import Auth
 from app.RandomPhrases import randomPhrase
 from datetime import datetime
@@ -19,7 +19,7 @@ table_request = api.parser()
 table_request.add_argument('table_key', type=str, required=True,
     help='No table_key provided', location='json')
 table_sync_request = api.parser()
-table_sync_request.add_argument('sync_data', type=list, required=True, help='List of users pick', location='json')
+table_sync_request.add_argument('sync_data', type=dict, required=True, help='Users pick', location='json')
 # JSON Models #
 
 # Creating new table response JSON fields
@@ -105,20 +105,21 @@ items_sync_request_fields = api.model('TablesSync request',
     'product_id': fields.Integer(description='Product id', required=True),
     'count': fields.Integer(description='Count of product', required=True)
 })
-
-# Temp Users sync request JSON fields
+'''
+# Temp Users sync request JSON fields (all fields required)
 users_sync_request_fields = api.model('UsersSync request',
 {
-    'temp_username': fields.String(description='Users temp_username', required=True),
-    'items': fields.List(fields.Nested(items_sync_request_fields)),
+    'temp_username': fields.String(description='Users temp_username', required=True, nullable=True),
+    'product_name': fields.String(description='Users product_name', required=True),
+    'count': fields.Integer(description='Count of product', required=True)
 })
 
 # Find table sync request JSON fields
 find_table_sync_request_fields = api.model('TablesSync request',
 {
-    'sync_data': fields.List(fields.Nested(users_sync_request_fields)),
+    'sync_data': fields.Nested(users_sync_request_fields),
 })
-'''
+
 
 @api.route('', endpoint='tables')
 class Tables(Resource):
@@ -412,12 +413,12 @@ class TablesSync(Resource):
     """
     method_decorators = [Auth.multi_auth.login_required]
 
-    # @api.expect(find_table_sync_request_fields)
+    @api.expect(find_table_sync_request_fields)
     @api.doc(responses={
         400: 'Nothing to synchronize data',
         401: 'Unauthorized access',
         404: 'Username does not connected to any table',
-        407: 'Problems with database transactions',
+        406: 'Problems with database transactions',
     })
     def post(self):
         """
@@ -437,29 +438,28 @@ class TablesSync(Resource):
 
         try:
             table = Table.query.filter_by(id=user.current_table[0].id).first()
-            for users in args['sync_data']:
-                for items in users['items']:
-                    user_product = UserProduct.query.filter(UserProduct.table_id == user.current_table[0].id, UserProduct.user_id == user.id,
-                                                            UserProduct.temp_username == users['temp_username'],
-                                                            UserProduct.product_id == items['product_id']).first()
-                    if items['count'] == 0:
-                        if user_product is not None:
-                            db.session.delete(user_product)
-                    elif user_product is None:
-                        user_product = UserProduct(
-                            user_id=user.id,
-                            temp_username=users['temp_username'],
-                            product_id=items['product_id'],
-                            table_id=user.current_table[0].id,
-                            count=items['count']
-                        )
-                        db.session.add(user_product)
-                    else:
-                        user_product.count = items['count']
+            product_id = Products.query.filter_by(table_id=user.current_table[0].id, product_name=args['sync_data']['product_name']).first().id
+            user_product = UserProduct.query.filter(UserProduct.table_id == user.current_table[0].id, UserProduct.user_id == user.id,
+                                                    UserProduct.temp_username == args['sync_data']['temp_username'],
+                                                    UserProduct.product_id == product_id).first()
+            if args['sync_data']['count'] == 0:
+                if user_product is not None:
+                    db.session.delete(user_product)
+            elif user_product is None:
+                user_product = UserProduct(
+                    user_id=user.id,
+                    temp_username=args['sync_data']['temp_username'],
+                    product_id=product_id,
+                    table_id=user.current_table[0].id,
+                    count=args['sync_data']['count']
+                )
+                db.session.add(user_product)
+            else:
+                user_product.count = args['sync_data']['count']
             db.session.commit()
             return 201
         except (IntegrityError, UnmappedInstanceError, AttributeError):
             db.session.rollback()
-            abort(407, message="Problems with database transactions")
+            abort(406, message="Problems with database transactions")
         except IndexError:
             abort(404, message="Username '{}' does not connected to any table".format(user.username))
