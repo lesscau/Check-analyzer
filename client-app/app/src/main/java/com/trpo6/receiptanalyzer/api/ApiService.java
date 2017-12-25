@@ -3,6 +3,7 @@ package com.trpo6.receiptanalyzer.api;
 import com.trpo6.receiptanalyzer.model.Item;
 import com.trpo6.receiptanalyzer.model.ItemsSync;
 import com.trpo6.receiptanalyzer.model.SignUpBody;
+import com.trpo6.receiptanalyzer.model.TotalUserPrice;
 import com.trpo6.receiptanalyzer.response.AuthResponse;
 import com.trpo6.receiptanalyzer.response.CreateTableResponse;
 import com.trpo6.receiptanalyzer.model.Items;
@@ -99,8 +100,16 @@ public interface ApiService {
      * @param auth
      * @return
      */
-    @GET(APIv1 + "tables/ack")
+    @GET(APIv1 + "/tables/ack")
     Call<Items> ackData(@Header("Authorization") String auth);
+
+    /**
+     * Список пользователей с суммой их долга
+     * @param auth
+     * @return
+     */
+    @GET(APIv1 + "/tables/checkout")
+    Call<TotalUserPrice> getTotalComputation(@Header("Authorization") String auth);
 
     /**
      * Список продуктов из чека

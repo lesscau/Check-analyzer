@@ -1,5 +1,6 @@
 package com.trpo6.receiptanalyzer.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -43,18 +44,6 @@ public class ShareProductListActivity extends AppCompatActivity {
 
         //final Map<String,ArrayList<ItemsSync>> userProducts = new HashMap<>();
 
-        ArrayList<ItemsSync.ItemSync> itemSyncs = new ArrayList<>();
-        for(int i = 0; i < ProductListActivity.producListItems.size(); ++i){
-            Item item = ProductListActivity.producListItems.get(i);
-            ItemsSync.ItemSync itemSync = new ItemsSync.ItemSync(item.getName(),i);
-            itemSyncs.add(itemSync);
-        }
-
-        final ItemsSync itemsSync = new ItemsSync();
-        for(String user: ProductListActivity.tempUsers){
-            Log.i("SyncUserItems",user+" "+itemsSync.toString());
-            itemsSync.addSyncData(new ItemsSync.SyncUserItems(user, itemSyncs));
-        }
 
         // заполнение списка продуктов
         for (final Item productListItem : ProductListActivity.producListItems) {
@@ -75,11 +64,9 @@ public class ShareProductListActivity extends AppCompatActivity {
                     public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                         String name = tw.getText().toString();
 
-                        itemsSync.setItemsByUser(name,productListItem.getName(),newVal);
 
-                        //according to server api
-                        if(name.equals(AuthInfo.getName())) name = "null";
-
+                        ItemsSync.SyncUserItem syncUserItem = new ItemsSync.SyncUserItem(newVal, name,productListItem.getName());
+                        ItemsSync itemsSync = new ItemsSync(syncUserItem);
 
                         Log.i("Items sync: ",itemsSync.toString());
 
@@ -111,5 +98,10 @@ public class ShareProductListActivity extends AppCompatActivity {
             item.setIndicatorIcon(getResources().getDrawable(R.drawable.ic_expand_more_white_24dp));
         }
 
+    }
+
+    public void openTotal(View view){
+        Intent intent = new Intent(this,TotalActivity.class);
+        startActivity(intent);
     }
 }

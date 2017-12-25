@@ -111,10 +111,12 @@ public class MainActivity extends AppCompatActivity {
     private void connectToTable(){
         // проверяем, подключен ли пользователь к столу
         // если подключен - открываем список стола
+        /*
         if(AuthInfo.isConnectedToTable(this)){
             Intent intent = new Intent("productlist");
             startActivity(intent);
         }
+        */
         if (!NetworkUtils.checkConnection(getApplicationContext())) {
             Log.e("error", "can not connect");
             return;
@@ -125,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<CreateTableResponse> call, Response<CreateTableResponse> response) {
                 Log.i("table resp",response.toString()+response.body());
                 if(!response.isSuccessful()) {
+                    if(response.code()==401)
+                        startActivity(new Intent("firstActivity"));
                     NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                     return;
                 }
