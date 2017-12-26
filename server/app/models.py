@@ -116,7 +116,7 @@ class Table(db.Model):
                 'temp_username': cart.temp_username,
                 'quantity': cart.count,
                 'price': int(cart.products.price * 100)
-            } for cart in item.current_products]
+            } for cart in item.current_products()]
         } for item in self.users]
         return result
 
