@@ -1,9 +1,12 @@
 package com.trpo6.receiptanalyzer.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -58,33 +61,62 @@ public class TotalActivity extends AppCompatActivity {
     }
 
     void fillTableLayout(TableLayout tableLayout, TotalUserPrice totalUserPrice){
-        for(TotalUserPrice.TotalUser totalUser : totalUserPrice.getUsers())
-            for (TotalUserPrice.Total total : totalUser.getTotal()){
-                TableRow tableRow = new TableRow(this);
-                TableRow.LayoutParams  params1=new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT,1.0f);
-                TableRow.LayoutParams params2=new TableRow.LayoutParams(TableLayout.LayoutParams.FILL_PARENT,TableLayout.LayoutParams.WRAP_CONTENT);
+        for(TotalUserPrice.TotalUser totalUser : totalUserPrice.getUsers()){
+            if(!totalUser.getUsername().equals(AuthInfo.getName()))
+                continue;
+                for (TotalUserPrice.Total total : totalUser.getTotal()) {
+                    TableRow tableRow = new TableRow(this);
+                    TableRow.LayoutParams params1 = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+                    TableRow.LayoutParams params2 = new TableRow.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+                    tableRow.setDividerDrawable(getResources().getDrawable(R.drawable.list_item_shape));
+                    tableRow.setGravity(Gravity.CENTER);
 
-                // set user text view
-                TextView user = new TextView(this);
-                user.setTextSize(28);
-                user.setTextColor(getResources().getColor(R.color.material_drawer_primary));
-                user.setLayoutParams(params1);
-                user.setPadding(2,5,50,5);
-                user.setText((total.getTempUsername().equals(""))?AuthInfo.getName() : total.getTempUsername());
+                    // set user text view
+                    TextView user = new TextView(this);
+                    user.setTextSize(28);
+                    user.setGravity(Gravity.CENTER);
+                    user.setTextColor(getResources().getColor(R.color.material_drawer_primary));
+                    user.setLayoutParams(params1);
+                    user.setPadding(2, 5, 50, 5);
+                    user.setText((total.getTempUsername().equals("")) ? AuthInfo.getName() : total.getTempUsername());
 
-                // set price text view
-                TextView price = new TextView(this);
-                price.setTextSize(28);
-                price.setTextColor(getResources().getColor(R.color.material_drawer_primary_dark));
-                price.setLayoutParams(params1);
-                price.setPadding(0,5,2,5);
-                price.setText(Float.toString((float)total.getTotal()/100));
+                    // set price text view
+                    TextView price = new TextView(this);
+                    price.setTextSize(28);
+                    price.setGravity(Gravity.CENTER);
+                    price.setTextColor(getResources().getColor(R.color.material_drawer_primary_dark));
+                    price.setLayoutParams(params1);
+                    price.setPadding(0, 5, 2, 5);
+                    price.setText(Float.toString((float) total.getTotal() / 100));
 
-                //add text views to the table
-                tableRow.addView(user,0);
-                tableRow.addView(price,1);
-                tableRow.setLayoutParams(params2);
-                tableLayout.addView(tableRow);
+                    //add text views to the table
+                    tableRow.addView(user, 0);
+                    tableRow.addView(price, 1);
+                    tableRow.setLayoutParams(params2);
+                    tableLayout.addView(tableRow);
+                }
             }
+    }
+
+    public void closeTable(View view){
+        ApiService api = RetroClient.getApiService();
+        Call<String> call = api.closeTable(AuthInfo.getKey(),1);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if(!response.isSuccessful()) {
+                    Log.i("Total ","code "+response.code()+" "+response.body());
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+                    return;
+                }
+                Log.i("Total: ","table closed");
+                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("err1", t.toString());
+            }
+        });
     }
 }
