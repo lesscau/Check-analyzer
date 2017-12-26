@@ -11,7 +11,9 @@ class User(db.Model):
     fts_key = db.Column(db.Integer, default=0)
 
     current_table = db.relationship('Table', secondary='user_table')
-    current_products = db.relationship('UserProduct')
+
+    def current_products(self):
+        return UserProduct.query.filter_by(user_id=self.id, table_id=self.current_table)
 
     def hash_password(self, password):
         """
