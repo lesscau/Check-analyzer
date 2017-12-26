@@ -134,11 +134,11 @@ public class TotalUserPrice {
         @Expose
         private List<Total> total = null;
 
-        public String getId() {
+        public String getUsername() {
             return username;
         }
 
-        public void setId(String id) {
+        public void setUsername(String id) {
             this.username = username;
         }
 

@@ -64,8 +64,32 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /** Список временных пользователей */
     public static ArrayList<String> tempUsers = new ArrayList();
     {
-        if (!tempUsers.contains(AuthInfo.getName()))
-            tempUsers.add(AuthInfo.getName());
+        tempUsers.clear();
+        tempUsers.add(AuthInfo.getName());
+
+        ApiService api = RetroClient.getApiService();
+        Call<TotalUserPrice> call = api.getTotalComputation(AuthInfo.getKey());
+        call.enqueue(new Callback<TotalUserPrice>() {
+            @Override
+            public void onResponse(Call<TotalUserPrice> call, Response<TotalUserPrice> response) {
+                if(!response.isSuccessful()) {
+                    Log.i("Total ","code "+response.code()+" "+response.body());
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+                    return;
+                }
+                Log.i("Total result: ",response.body().toString());
+                for(TotalUserPrice.TotalUser totalUser : response.body().getUsers())
+                    if (totalUser.getUsername().equals(AuthInfo.getName()))
+                        for (TotalUserPrice.Total total : totalUser.getTotal())
+                            if (!total.getTempUsername().isEmpty())
+                                tempUsers.add(total.getTempUsername());
+            }
+
+            @Override
+            public void onFailure(Call<TotalUserPrice> call, Throwable t) {
+                Log.e("err1", t.toString());
+            }
+        });
     }
 
     /** Адаптер списка пользователей */
