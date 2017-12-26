@@ -104,26 +104,24 @@ class Table(db.Model):
         } for item in self.products]
         return result
 
-    def getUserProducts(self):
+    def getUserProducts(self, user_id):
         """
-        Get dict of products chosen by every user in table
+        Get dict of products chosen by user in table
 
-        :return: Dict of users in table with their products
-        :rtype:  dict/json
+        :return: Array of products selected by users
+        :rtype:  list of
         """
         result = {}
         result['users'] = [{
-            'id': item.id,
-            'username': item.username,
-            'items': [{
-                'id': cart.products.id,
-                'name': cart.products.product_name,
-                'temp_username': cart.temp_username,
-                'quantity': cart.count,
-                'price': int(cart.products.price * 100)
-            } for cart in item.current_products()]
-        } for item in self.users]
-        return result
+            "temp_username": user_product.temp_username,
+            "items": [{
+                    "product_name":user_product.products[0].product_name,
+                    "product_price":int(user_product.products[0].price*100),
+                    "count":user_product.count
+            }]
+        } for user_product in UserProduct.query.filter_by(user_id=user_id, table_id=self.id)] 
+        return result 
+
 
     def getFreeProducts(self):
         """
@@ -178,6 +176,8 @@ class UserTableArchive(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), nullable=False, index=True)
+
+    table = db.relationship('Table')
 
 
 class UserProduct(db.Model):
