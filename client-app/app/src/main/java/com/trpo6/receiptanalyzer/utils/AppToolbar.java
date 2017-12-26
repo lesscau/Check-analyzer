@@ -1,19 +1,26 @@
 package com.trpo6.receiptanalyzer.utils;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.DimenHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.activity.FirstActivity;
+import com.trpo6.receiptanalyzer.activity.HistoryActivity;
 import com.trpo6.receiptanalyzer.activity.MainActivity;
 import com.trpo6.receiptanalyzer.activity.ProductListActivity;
 import com.trpo6.receiptanalyzer.api.ApiService;
@@ -48,20 +55,41 @@ public class AppToolbar extends AppCompatActivity {
     }
 
     public static Drawer setMenu(final AppCompatActivity app){
+        // Create the AccountHeader
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(app)
+                .withHeaderBackground(R.drawable.header)
+                .addProfiles(
+                        new ProfileDrawerItem().withName(AuthInfo.getName())
+                                .withIcon(new IconicsDrawable(app)
+                                        .icon(FontAwesome.Icon.faw_user)
+                                        .color(Color.WHITE)
+                                        .sizeDp(15))
+                )
+                .build();
+
         /**
          * Создание пунктов меню
          */
+
         Drawer drawerResult = new DrawerBuilder()
                 .withActivity(app)
                 .withToolbar(mActionBarToolbar)
                 .withActionBarDrawerToggle(true)
-                .withHeader(R.layout.drawer_header)
+                .withAccountHeader(headerResult)
+                .withSliderBackgroundColorRes(R.color.md_white_1000)
                 .addDrawerItems(
                         // На главную
                         new PrimaryDrawerItem()
                                 .withName(R.string.toMain)
                                 .withIcon(FontAwesome.Icon.faw_home)
                                 .withIdentifier(1),
+
+                        // История
+                        new PrimaryDrawerItem()
+                                .withName("История")
+                                .withIcon(FontAwesome.Icon.faw_history)
+                                .withIdentifier(2),
 
                         //Выход
                         new SecondaryDrawerItem()
@@ -101,6 +129,11 @@ public class AppToolbar extends AppCompatActivity {
                                 }
                             });
                         }
+
+                        if (drawerItem.getIdentifier() == 2){
+                            app.startActivity(new Intent(app, HistoryActivity.class));
+                        }
+
                         if (drawerItem.getIdentifier() == 3) {
                             // стираем старый токен
                             AuthInfo.authClear(app);

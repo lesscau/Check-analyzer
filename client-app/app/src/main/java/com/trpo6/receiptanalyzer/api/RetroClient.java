@@ -12,8 +12,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetroClient {
     /** Base URL */
-    //private static final String ROOT_URL =  "http://10.0.3.2:5000";
-    private static final String ROOT_URL =  "http://trpo6.dan0n.ru:80";
+    private static final String ROOT_URL =  "http://10.0.3.2:80";
+    //private static final String ROOT_URL =  "http://trpo6.dan0n.ru:80";
 
     private static Gson gson = new GsonBuilder()
             .setLenient()

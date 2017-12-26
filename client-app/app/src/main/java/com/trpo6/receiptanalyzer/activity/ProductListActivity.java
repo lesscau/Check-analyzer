@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TableLayout;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -36,10 +37,13 @@ import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.Item;
 import com.trpo6.receiptanalyzer.model.Items;
+import com.trpo6.receiptanalyzer.model.TotalUserPrice;
 import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -60,8 +64,32 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /** Список временных пользователей */
     public static ArrayList<String> tempUsers = new ArrayList();
     {
-        if (!tempUsers.contains(AuthInfo.getName()))
-            tempUsers.add(AuthInfo.getName());
+        tempUsers.clear();
+        tempUsers.add(AuthInfo.getName());
+
+        ApiService api = RetroClient.getApiService();
+        Call<TotalUserPrice> call = api.getTotalComputation(AuthInfo.getKey());
+        call.enqueue(new Callback<TotalUserPrice>() {
+            @Override
+            public void onResponse(Call<TotalUserPrice> call, Response<TotalUserPrice> response) {
+                if(!response.isSuccessful()) {
+                    Log.i("Total ","code "+response.code()+" "+response.body());
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+                    return;
+                }
+                Log.i("Total result: ",response.body().toString());
+                for(TotalUserPrice.TotalUser totalUser : response.body().getUsers())
+                    if (totalUser.getUsername().equals(AuthInfo.getName()))
+                        for (TotalUserPrice.Total total : totalUser.getTotal())
+                            if (!total.getTempUsername().isEmpty())
+                                tempUsers.add(total.getTempUsername());
+            }
+
+            @Override
+            public void onFailure(Call<TotalUserPrice> call, Throwable t) {
+                Log.e("err1", t.toString());
+            }
+        });
     }
 
     /** Адаптер списка пользователей */
@@ -76,6 +104,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /**View для работы со списком продуктов*/
     RecyclerView productListView;
 
+
     /**Запуск окна продуктов*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +116,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         mActivityView = getLayoutInflater().inflate(R.layout.activity_edit_product_list, null);
 
         productListView = (RecyclerView) findViewById(R.id.productList);
+        producListItems.clear();
         productAdapter = new ProductAdapter(producListItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
@@ -96,7 +126,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         productListView.setItemAnimator(itemAnimator);
 
         // Получаем список продуктов стола
-        getTableProducts();
+        if(producListItems.isEmpty()) getTableProducts();
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -160,6 +190,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         float price = Float.parseFloat(strPrice);
 
         /** Добавление продукта в список*/
+        addRequest(new Item.addedItem(product,price,count));
         producListItems.add(new Item(product,count,price));
         productEditText.setText("");
         countEditText.setText("");
@@ -273,13 +304,39 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if(viewHolder instanceof ProductAdapter.ViewHolder) {
             // get the removed item name to display it in snack bar
-            Item item = producListItems.get(viewHolder.getAdapterPosition());
+            final Item item = producListItems.get(viewHolder.getAdapterPosition());
 
             // backup of removed item for undo purpose
-            final Item deletedItem = producListItems.get(viewHolder.getAdapterPosition());
+            //final Item deletedItem = producListItems.get(viewHolder.getAdapterPosition());
             final int deletedIndex = viewHolder.getAdapterPosition();
             // remove the item from recycler view
             productAdapter.removeItem(viewHolder.getAdapterPosition());
+
+            final Item.deletedItem deletedItem = new Item.deletedItem(item.getName(),item.getPrice());
+            ApiService api = RetroClient.getApiService();
+            Call<String> call = null;
+
+                call = api.deleteProductFromTable(AuthInfo.getKey(), //URLEncoder.encode(deletedItem.getName(),"UTF-8"),deletedItem.getPrice());
+                        deletedItem);
+            if (!NetworkUtils.checkConnection(getApplicationContext())) {
+                Log.e("error", "can not connect");
+                return;
+            }
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    if (!response.isSuccessful()) {
+                        NetworkUtils.showErrorResponseBody(getApplicationContext(), response);
+                        return;
+                    }
+                    Log.i("Sync: ","success");
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.e("err1", t.toString());
+                }
+            });
 
             // showing snack bar with Undo option
             Snackbar snackbar = Snackbar
@@ -289,11 +346,13 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
                 public void onClick(View view) {
 
                     // undo is selected, restore the deleted item
-                    productAdapter.restoreItem(deletedItem, deletedIndex);
+                    addRequest(new Item.addedItem(item.getName(),item.getPrice(),item.getQuantity()));
+                    productAdapter.restoreItem(item, deletedIndex);
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
+
 
         }
         if (viewHolder instanceof UserAdapter.ViewHolder) {
@@ -327,10 +386,8 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
     /** Получение списка продуктов текущего стола */
     private void getTableProducts(){
         ApiService api = RetroClient.getApiService();
-        //User user  = new User("89112356232","pass");
         Log.i("token", AuthInfo.getKey());
         final Items _items = new Items();
-        //fiscal.get(0),fiscal.get(1),fiscal.get(2)
         Call<Items> call = api.getTableProducts(AuthInfo.getKey());
         Log.i("i",call.request().toString());
         if (!NetworkUtils.checkConnection(getApplicationContext())) {
@@ -344,15 +401,10 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
             @Override
             public void onResponse(Call<Items> call, Response<Items> response) {
                 if (response.isSuccessful()) {
-                    /**
-                     * Got Successfully
-                     */
-                    //String ans = response.body().toString();
-                    Log.i("success", response.body().toString());
                     _items.setItems(response.body().getItems());
                     _items.correctPrice();
                     ProductListActivity.producListItems.addAll(_items.getItems());
-
+                    Log.i("success", ""+_items.getItems().size()+ProductListActivity.producListItems.toString());
                 } else {
                     NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                 }
@@ -366,6 +418,29 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
 
     }
 
+    public void addRequest(final Item.addedItem addedItem){
+        ApiService api = RetroClient.getApiService();
+        Call<String> call = api.addProductToTable(AuthInfo.getKey(),addedItem);
+        Log.i("i",call.request().toString());
+        if (!NetworkUtils.checkConnection(getApplicationContext())) {
+            Log.e("error", "can not connect");
+            return;
+        }
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Log.i("Added item: ",addedItem.toString());
+                }
+                else NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
 
     /** Переход к разделению прдуктов*/
     public void toShareProductList(View view){

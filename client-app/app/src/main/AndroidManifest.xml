@@ -23,7 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.FirstActivity" />
+        <activity android:name=".activity.FirstActivity">
+            <intent-filter>
+                <action android:name="firstActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.ProductListActivity"
             android:windowSoftInputMode="stateHidden">
@@ -60,8 +66,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ShareProductListActivity">
-        </activity>
+        <activity android:name=".activity.ShareProductListActivity" />
+        <activity android:name=".activity.TotalActivity" />
+        <activity android:name=".activity.HistoryActivity"></activity>
     </application>
 
 </manifest>

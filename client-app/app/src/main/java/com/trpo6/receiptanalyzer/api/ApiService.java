@@ -1,7 +1,10 @@
 package com.trpo6.receiptanalyzer.api;
 
+import com.trpo6.receiptanalyzer.model.Item;
+import com.trpo6.receiptanalyzer.model.ItemsAck;
 import com.trpo6.receiptanalyzer.model.ItemsSync;
 import com.trpo6.receiptanalyzer.model.SignUpBody;
+import com.trpo6.receiptanalyzer.model.TotalUserPrice;
 import com.trpo6.receiptanalyzer.response.AuthResponse;
 import com.trpo6.receiptanalyzer.response.CreateTableResponse;
 import com.trpo6.receiptanalyzer.model.Items;
@@ -9,14 +12,15 @@ import com.trpo6.receiptanalyzer.model.ConfirmSignUpBody;
 import com.trpo6.receiptanalyzer.response.DisconnectFromTableResponse;
 import com.trpo6.receiptanalyzer.response.RegistrationResponse;
 
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+
 
 /**
  * Интерфейс для реализации запросов
@@ -83,8 +87,37 @@ public interface ApiService {
     @DELETE(APIv1+"/tables/users")
     Call<DisconnectFromTableResponse> disconnectFromTable(@Header("Authorization") String auth);
 
+    /**
+     * Выбранное количество кажого товара каждым пользователем
+     * @param auth токен
+     * @param itemsSync
+     * @return
+     */
     @POST(APIv1 + "/tables/sync")
     Call<String> syncData(@Header("Authorization") String auth, @Body ItemsSync itemsSync);
+
+    /**
+     * Количество свободных товаров
+     * @param auth
+     * @return
+     */
+    @GET(APIv1 + "/tables/ack")
+    Call<ItemsAck> ackData(@Header("Authorization") String auth);
+
+    /**
+     * Список пользователей с суммой их долга
+     * @param auth
+     * @return
+     */
+    @GET(APIv1 + "/tables/checkout")
+    Call<TotalUserPrice> getTotalComputation(@Header("Authorization") String auth);
+
+    /**
+     * Закрывает текущий стол
+     * @return
+     */
+    @HTTP(method = "POST", path = APIv1 + "/tables/sync")
+    Call<String> closeTable(@Header("Authorization") String auth,@Query("close") Integer close);
 
     /**
      * Список продуктов из чека
@@ -101,4 +134,22 @@ public interface ApiService {
     /** Список продуктов из текущего стола */
     @GET(APIv1 + "/products")
     Call<Items> getTableProducts(@Header("Authorization") String auth);
+
+    /**
+     * Удаление продукта из списка стола
+     * @param auth
+     * @param deletedItem удаляемый продукт
+     * @return
+     */
+    @HTTP(method = "DELETE", path = APIv1 + "/products", hasBody = true)
+    Call<String> deleteProductFromTable(@Header("Authorization") String auth, @Body Item.deletedItem deletedItem);
+
+    /**
+     * Добавление нового продукта
+     * @param auth
+     * @param addedItem
+     * @return
+     */
+    @POST(APIv1 + "/products")
+    Call<String> addProductToTable(@Header("Authorization") String auth, @Body Item.addedItem addedItem);
 }

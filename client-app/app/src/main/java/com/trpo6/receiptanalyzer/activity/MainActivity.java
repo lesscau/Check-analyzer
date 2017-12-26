@@ -105,16 +105,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void toHistory(View view){
+        startActivity(new Intent(this,HistoryActivity.class));
+    }
+
     /**
-     * Переход к редактрованию стола, если юзер подключен к столу
+     * Переход к редактированию стола, если юзер подключен к столу
      */
     private void connectToTable(){
         // проверяем, подключен ли пользователь к столу
         // если подключен - открываем список стола
-        if(AuthInfo.isConnectedToTable(this)){
-            Intent intent = new Intent("productlist");
-            startActivity(intent);
-        }
         if (!NetworkUtils.checkConnection(getApplicationContext())) {
             Log.e("error", "can not connect");
             return;
@@ -125,7 +125,9 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<CreateTableResponse> call, Response<CreateTableResponse> response) {
                 Log.i("table resp",response.toString()+response.body());
                 if(!response.isSuccessful()) {
-                    NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
+                    if(response.code()==401)
+                        startActivity(new Intent("firstActivity"));
+                    //NetworkUtils.showErrorResponseBody(getApplicationContext(),response);
                     return;
                 }
                 String tableKey = response.body().getTableKey();

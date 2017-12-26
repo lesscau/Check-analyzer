@@ -1,7 +1,10 @@
 package com.trpo6.receiptanalyzer.model;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.trpo6.receiptanalyzer.utils.AuthInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,94 +15,80 @@ import java.util.List;
 
 public class ItemsSync {
 
-        @SerializedName("sync_data")
-        @Expose
-        private List<SyncUserItems> syncData = null;
+    @SerializedName("sync_data")
+    @Expose
+    private SyncUserItem syncData;
 
-    public ItemsSync() {
-        this.syncData = new ArrayList<>();
+    public ItemsSync(SyncUserItem syncData) {
+        this.syncData = syncData;
+        this.syncData.setTempUsername((syncData.getTempUsername().equals(AuthInfo.getName())) ? "" : syncData.getTempUsername());
     }
 
-    public List<SyncUserItems> getSyncData() {
-            return syncData;
+    public SyncUserItem getSyncData() {
+        return syncData;
+    }
+
+    public void setSyncData(SyncUserItem syncData) {
+        this.syncData = syncData;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemsSync{" +
+                "syncData=" + syncData +
+                '}';
+    }
+
+    static public class SyncUserItem {
+
+        @SerializedName("count")
+        @Expose
+        private Integer count;
+        @SerializedName("temp_username")
+        @Expose
+        private String tempUsername;
+        @SerializedName("product_name")
+        @Expose
+        private String productName;
+
+        public SyncUserItem(Integer count, String tempUsername, String productName) {
+            this.count = count;
+            this.tempUsername = tempUsername;
+            this.productName = productName;
         }
 
-        public void addSyncData(SyncUserItems syncUserItems){
-            syncData.add(syncUserItems);
+        public Integer getCount() {
+            return count;
         }
 
-        public void setSyncData(List<SyncUserItems> syncData) {
-            this.syncData = syncData;
+        public void setCount(Integer count) {
+            this.count = count;
         }
 
-        public void setItemsByUser(String username, String productname, Integer newcount){
-            for (SyncUserItems items : syncData)
-                if(items.getTempUsername().equals(username))
-                    for(ItemSync itemsSync : items.getItems())
-                        if(itemsSync.getName().equals(productname))
-                            itemsSync.setCount(newcount);
+        public String getTempUsername() {
+            return tempUsername;
         }
 
-        static public class SyncUserItems {
-
-            @SerializedName("temp_username")
-            @Expose
-            private String tempUsername;
-            @SerializedName("items")
-            @Expose
-            private List<ItemSync> items = null;
-
-            public SyncUserItems(String tempUsername, List<ItemSync> items) {
-                this.tempUsername = tempUsername;
-                this.items = items;
-            }
-
-            public String getTempUsername() {
-                return tempUsername;
-            }
-
-            public void setTempUsername(String tempUsername) {
-                this.tempUsername = tempUsername;
-            }
-
-            public List<ItemSync> getItems() {
-                return items;
-            }
-
-            public void setItems(List<ItemSync> items) {
-                this.items = items;
-            }
+        public void setTempUsername(String tempUsername) {
+            this.tempUsername = tempUsername;
         }
 
-        static public class ItemSync {
-            private transient String name;
-
-            /**
-             * номер продукта
-             */
-            @SerializedName("product_id")
-            @Expose
-            private Integer product_id;
-
-            /**
-             * количество единиц купленного продукта (не реализовано)
-             */
-            @SerializedName("count")
-            @Expose
-            private Integer count;
-
-            public ItemSync(String name, Integer product_id, Integer count) {
-                this.name = name;
-                this.product_id = product_id;
-                this.count = count;
-            }
-
-            public void setCount(Integer count) {
-                this.count = count;
-            }
-
-            public String getName() {
-                return name;
-            }
+        public String getProductName() {
+            return productName;
         }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+        @Override
+        public String toString() {
+            return "SyncUserItems{" +
+                    "count=" + count +
+                    ", tempUsername='" + tempUsername + '\'' +
+                    ", productName='" + productName + '\'' +
+                    '}';
+        }
+    }
+
 }

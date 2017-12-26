@@ -30,6 +30,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_weight="1"
+            android:onClick="toHistory"
             android:text="@string/history"
             android:textColor="@android:color/white" />
 
