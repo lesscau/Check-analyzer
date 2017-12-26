@@ -68,37 +68,18 @@ public class ShareProductListActivity extends AppCompatActivity {
 
                 NumberPicker np = (NumberPicker) subItem.findViewById(R.id.user_number_picker);
                 np.setMaxValue(productListItem.getQuantity());
+                // initialization by 0 request
+                ItemsSync.SyncUserItem syncUserItem = new ItemsSync.SyncUserItem(0, tw.getText().toString(),productListItem.getName());
+                syncRequest(new ItemsSync(syncUserItem));
                 np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                     @Override
                     public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                        String name = tw.getText().toString();
-
-
-                        ItemsSync.SyncUserItem syncUserItem = new ItemsSync.SyncUserItem(newVal, name,productListItem.getName());
+                        ItemsSync.SyncUserItem syncUserItem = new ItemsSync.SyncUserItem(newVal, tw.getText().toString(),productListItem.getName());
                         ItemsSync itemsSync = new ItemsSync(syncUserItem);
 
                         Log.i("Items sync: ",itemsSync.toString());
 
-                        Call<String> call = api.syncData(AuthInfo.getKey(), itemsSync);
-                        if (!NetworkUtils.checkConnection(getApplicationContext())) {
-                            Log.e("error", "can not connect");
-                            return;
-                        }
-                        call.enqueue(new Callback<String>() {
-                            @Override
-                            public void onResponse(Call<String> call, Response<String> response) {
-                                if (!response.isSuccessful()) {
-                                    NetworkUtils.showErrorResponseBody(getApplicationContext(), response);
-                                    return;
-                                }
-                                Log.i("Sync: ","success");
-                            }
-
-                            @Override
-                            public void onFailure(Call<String> call, Throwable t) {
-                                Log.e("err1", t.toString());
-                            }
-                        });
+                        syncRequest(itemsSync);
                     }
                 });
                 numberPickerArrayList.add(np);
@@ -130,17 +111,13 @@ public class ShareProductListActivity extends AppCompatActivity {
                         Log.i("Ack: ",itemsAck.toString());
                         ItemsAck.ItemAck itemAck;
                         Item item;
-                        for(int i = 0; i<itemsAck.getItems().size();++i){
+                        for(int i = 0; i<itemsAck.getItems().size();++i) {
                             itemAck = itemsAck.getItems().get(i);
                             item = sharedProductListItems.get(i);
-                            for (int j = 0; j<ProductListActivity.tempUsers.size(); ++j)
-                                if(itemAck.getQuantity() != countItemMap.get(item).get(j).getMaxValue() &&
-                                    itemAck.getQuantity() > 0)// &&
-                                       //countItemMap.get(item).get(j).getValue() < itemAck.getQuantity() )
-                                    countItemMap.get(item).get(j).setMaxValue(itemAck.getQuantity());
+                            for (int j = 0; j < ProductListActivity.tempUsers.size(); ++j)
+                                countItemMap.get(item).get(j).setMaxValue(countItemMap.get(item).get(j).getValue() + itemAck.getQuantity());
                         }
                     }
-
                     @Override
                     public void onFailure(Call<ItemsAck> call, Throwable t) {
 
@@ -149,7 +126,29 @@ public class ShareProductListActivity extends AppCompatActivity {
             }
         };
         timer.schedule(timerTask, 0, 5000);
+    }
 
+    void syncRequest(ItemsSync itemsSync){
+        Call<String> call = api.syncData(AuthInfo.getKey(), itemsSync);
+        if (!NetworkUtils.checkConnection(getApplicationContext())) {
+            Log.e("error", "can not connect");
+            return;
+        }
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (!response.isSuccessful()) {
+                    NetworkUtils.showErrorResponseBody(getApplicationContext(), response);
+                    return;
+                }
+                Log.i("Sync: ","success");
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("err1", t.toString());
+            }
+        });
     }
 
     public void openTotal(View view){
