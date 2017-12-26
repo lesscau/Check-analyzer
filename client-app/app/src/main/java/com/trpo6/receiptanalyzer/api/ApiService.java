@@ -113,6 +113,13 @@ public interface ApiService {
     Call<TotalUserPrice> getTotalComputation(@Header("Authorization") String auth);
 
     /**
+     * Закрывает текущий стол
+     * @return
+     */
+    @HTTP(method = "POST", path = APIv1 + "/tables/sync")
+    Call<String> closeTable(@Header("Authorization") String auth,@Query("close") Integer close);
+
+    /**
      * Список продуктов из чека
      * @param auth токен
      * @param fn

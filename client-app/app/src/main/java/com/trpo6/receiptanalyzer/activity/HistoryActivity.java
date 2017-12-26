@@ -2,13 +2,17 @@ package com.trpo6.receiptanalyzer.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.diegodobelo.expandingview.ExpandingItem;
 import com.diegodobelo.expandingview.ExpandingList;
+import com.mikepenz.materialdrawer.Drawer;
 import com.trpo6.receiptanalyzer.R;
+import com.trpo6.receiptanalyzer.utils.AppToolbar;
+import com.trpo6.receiptanalyzer.utils.AuthInfo;
 
 import java.util.ArrayList;
 
@@ -18,6 +22,9 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        Toolbar toolbar = AppToolbar.setToolbar(this, "История");
+        Drawer drawer = AppToolbar.setMenu(this);
 
         ExpandingList expandingList = (ExpandingList) findViewById(R.id.history_expanding_list);
 
