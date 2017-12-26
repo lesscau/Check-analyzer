@@ -20,6 +20,7 @@ table_request.add_argument('table_key', type=str, required=True,
     help='No table_key provided', location='json')
 table_sync_request = api.parser()
 table_sync_request.add_argument('sync_data', type=dict, required=True, help='Users pick', location='json')
+table_sync_request.add_argument('close', type=int, location='args')
 # JSON Models #
 
 # Creating new table response JSON fields
@@ -447,6 +448,23 @@ class TablesSync(Resource):
                 db.session.add(user_product)
             else:
                 user_product.count = args['sync_data']['count']
+            if args['close'] is not None and args['close'] == 1:
+                userTables = table.user_tables
+                closed = 0
+                for item in userTables:
+                    if item.closed == True:
+                        closed += 1
+                    if item.user_id == user.id:
+                        item.closed = True
+                        closed += 1
+                if closed == len(userTables):
+                    table.table_key = None
+                    for item in userTables:
+                        userTableArchive = UserTableArchive(
+                            user_id = item.user_id,
+                            table_id = item.table_id)
+                        db.session.add(userTableArchive)
+                        db.session.delete(item)
             db.session.commit()
             return 201
         except (IntegrityError, UnmappedInstanceError, AttributeError):
