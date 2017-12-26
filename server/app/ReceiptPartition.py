@@ -39,7 +39,7 @@ def ReceiptPartition(tableID):
     result2 = {'users': []}
     userNum = 0
     for users in result['users']:
-        result2['users'].append({'id': users['id'], 'total': []})
+        result2['users'].append({'username': users['username'], 'total': []})
         for tempUsername in users['total'].keys():
             users['total'].update({tempUsername: users['total'][tempUsername] + freeSum//(len(userProducts['users']) + countTempUsers)})
             result2['users'][userNum]['total'].append({'temp_username': tempUsername, 'total': users['total'][tempUsername]})
