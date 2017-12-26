@@ -1,6 +1,7 @@
 package com.trpo6.receiptanalyzer.api;
 
 import com.trpo6.receiptanalyzer.model.Item;
+import com.trpo6.receiptanalyzer.model.ItemsAck;
 import com.trpo6.receiptanalyzer.model.ItemsSync;
 import com.trpo6.receiptanalyzer.model.SignUpBody;
 import com.trpo6.receiptanalyzer.model.TotalUserPrice;
@@ -101,7 +102,7 @@ public interface ApiService {
      * @return
      */
     @GET(APIv1 + "/tables/ack")
-    Call<Items> ackData(@Header("Authorization") String auth);
+    Call<ItemsAck> ackData(@Header("Authorization") String auth);
 
     /**
      * Список пользователей с суммой их долга

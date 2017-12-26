@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TableLayout;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -36,6 +37,7 @@ import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.Item;
 import com.trpo6.receiptanalyzer.model.Items;
+import com.trpo6.receiptanalyzer.model.TotalUserPrice;
 import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.NetworkUtils;
@@ -90,6 +92,7 @@ public class ProductListActivity extends AppCompatActivity implements RecyclerUs
         mActivityView = getLayoutInflater().inflate(R.layout.activity_edit_product_list, null);
 
         productListView = (RecyclerView) findViewById(R.id.productList);
+        producListItems.clear();
         productAdapter = new ProductAdapter(producListItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();

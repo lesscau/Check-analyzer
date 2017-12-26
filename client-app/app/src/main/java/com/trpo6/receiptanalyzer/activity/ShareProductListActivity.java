@@ -16,12 +16,18 @@ import com.trpo6.receiptanalyzer.R;
 import com.trpo6.receiptanalyzer.api.ApiService;
 import com.trpo6.receiptanalyzer.api.RetroClient;
 import com.trpo6.receiptanalyzer.model.Item;
+import com.trpo6.receiptanalyzer.model.ItemsAck;
 import com.trpo6.receiptanalyzer.model.ItemsSync;
 import com.trpo6.receiptanalyzer.utils.AppToolbar;
 import com.trpo6.receiptanalyzer.utils.AuthInfo;
 import com.trpo6.receiptanalyzer.utils.NetworkUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +36,10 @@ import retrofit2.Response;
 public class ShareProductListActivity extends AppCompatActivity {
 
     ApiService api;
+    /**Список продуктов*/
+    private final static ArrayList<Item> sharedProductListItems = ProductListActivity.producListItems;
+    private static Map<Item,ArrayList<NumberPicker>> countItemMap = new LinkedHashMap<>();
+    Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +50,13 @@ public class ShareProductListActivity extends AppCompatActivity {
         Toolbar toolbar = AppToolbar.setToolbar(this, AuthInfo.getTableKey());
         Drawer drawer = AppToolbar.setMenu(this);
 
-        ExpandingList expandingList = (ExpandingList) findViewById(R.id.expanding_list_main);
-
-        //final Map<String,ArrayList<ItemsSync>> userProducts = new HashMap<>();
+        final ExpandingList expandingList = (ExpandingList) findViewById(R.id.expanding_list_main);
 
 
         // заполнение списка продуктов
-        for (final Item productListItem : ProductListActivity.producListItems) {
+        for (final Item productListItem : sharedProductListItems) {
             final ExpandingItem item = expandingList.createNewItem(R.layout.expanding_layout);
+            ArrayList<NumberPicker> numberPickerArrayList = new ArrayList<>();
             TextView list_item = (TextView) item.findViewById(R.id.list_item_title);
             list_item.setText(productListItem.getName());
             item.createSubItems(ProductListActivity.tempUsers.size());
@@ -92,16 +101,65 @@ public class ShareProductListActivity extends AppCompatActivity {
                         });
                     }
                 });
-
+                numberPickerArrayList.add(np);
             }
+            countItemMap.put(productListItem,numberPickerArrayList);
             item.setIndicatorColorRes(R.color.material_drawer_primary);
             item.setIndicatorIcon(getResources().getDrawable(R.drawable.ic_expand_more_white_24dp));
         }
+
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                Call<ItemsAck> call = api.ackData(AuthInfo.getKey());
+                if (!NetworkUtils.checkConnection(getApplicationContext())) {
+                    Log.e("error", "can not connect");
+                    return;
+                }
+                call.enqueue(new Callback<ItemsAck>() {
+                    @Override
+                    public void onResponse(Call<ItemsAck> call, Response<ItemsAck> response) {
+                        if (!response.isSuccessful()) {
+                            NetworkUtils.showErrorResponseBody(getApplicationContext(), response);
+                            return;
+                        }
+                        ItemsAck itemsAck = response.body();
+                        Log.i("Ack: ",itemsAck.toString());
+                        ItemsAck.ItemAck itemAck;
+                        Item item;
+                        for(int i = 0; i<itemsAck.getItems().size();++i){
+                            itemAck = itemsAck.getItems().get(i);
+                            item = sharedProductListItems.get(i);
+                            for (int j = 0; j<ProductListActivity.tempUsers.size(); ++j)
+                                if(itemAck.getQuantity() != countItemMap.get(item).get(j).getMaxValue() &&
+                                    itemAck.getQuantity() > 0)// &&
+                                       //countItemMap.get(item).get(j).getValue() < itemAck.getQuantity() )
+                                    countItemMap.get(item).get(j).setMaxValue(itemAck.getQuantity());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ItemsAck> call, Throwable t) {
+
+                    }
+                });
+            }
+        };
+        timer.schedule(timerTask, 0, 5000);
 
     }
 
     public void openTotal(View view){
         Intent intent = new Intent(this,TotalActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        timer.cancel();
+        super.onBackPressed();
     }
 }

@@ -127,19 +127,19 @@ public class TotalUserPrice {
 
     public static class TotalUser {
 
-        @SerializedName("id")
+        @SerializedName("username")
         @Expose
-        private Integer id;
+        private String username;
         @SerializedName("total")
         @Expose
         private List<Total> total = null;
 
-        public Integer getId() {
-            return id;
+        public String getId() {
+            return username;
         }
 
-        public void setId(Integer id) {
-            this.id = id;
+        public void setId(String id) {
+            this.username = username;
         }
 
         public List<Total> getTotal() {
@@ -153,7 +153,7 @@ public class TotalUserPrice {
         @Override
         public String toString() {
             return "TotalUser{" +
-                    "id=" + id +
+                    "id=" + username +
                     ", total=" + total +
                     '}';
         }

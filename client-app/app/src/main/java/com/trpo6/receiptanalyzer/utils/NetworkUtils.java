@@ -41,10 +41,10 @@ public class NetworkUtils {
                 getToken(context,AuthInfo.getName(),AuthInfo.getPassword());
                 return;
             }
-
             JSONObject jObjError = new JSONObject(response.errorBody().string());
-            Toast.makeText(context, jObjError.getString("message"), Toast.LENGTH_LONG).show();
             Log.i("Failure responce:", response.toString()+jObjError.getString("message"));
+            Toast.makeText(context, jObjError.getString("message"), Toast.LENGTH_LONG).show();
+
         } catch (Exception e) {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
