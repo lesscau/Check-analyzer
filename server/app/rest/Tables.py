@@ -74,9 +74,7 @@ users_total_fields = api.model('Users total response',
 user_products_response_fields = api.model('User Products response',
 {
     'id': fields.Integer(description='User id', required=True),
-    #'username': fields.String(description='Username', required=True),
     'total': fields.List(fields.Nested(users_total_fields)),
-    #'items': fields.List(fields.Nested(user_items_fields))
 })
 
 # UsersSum list response JSON template
@@ -98,14 +96,7 @@ free_items_response_fields = api.model('FreeItems list response',
 {
     'items': fields.List(fields.Nested(free_user_items_fields)),
 })
-'''
-# Items sync request JSON fields (all fields required)
-items_sync_request_fields = api.model('TablesSync request',
-{
-    'product_id': fields.Integer(description='Product id', required=True),
-    'count': fields.Integer(description='Count of product', required=True)
-})
-'''
+
 # Temp Users sync request JSON fields (all fields required)
 users_sync_request_fields = api.model('UsersSync request',
 {
