@@ -111,10 +111,28 @@ class Table(db.Model):
             'items': [{
                 'id': cart.products.id,
                 'name': cart.products.product_name,
+                'temp_username': cart.temp_username,
                 'quantity': cart.count,
                 'price': int(cart.products.price * 100)
             } for cart in item.current_products]
         } for item in self.users]
+        return result
+
+    def getFreeProducts(self):
+        """
+        Get dict of products no chosen by anyone
+
+        :return: Dict of products with count of free pie
+        :rtype:  dict/json
+        """
+        userProducts = self.getUserProducts()
+        result = self.getProducts()
+        for users in userProducts['users']:
+            for items in users['items']:
+                for index in range(len(result['items'])):
+                    if result['items'][index]['id'] == items['id']:
+                        result['items'][index].update({'quantity': result['items'][index]['quantity'] - items['quantity']})
+                        break
         return result
 
     def __repr__(self):
@@ -158,6 +176,7 @@ class UserTableArchive(db.Model):
 class UserProduct(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False, index=True)
+    temp_username = db.Column(db.String(64), index=True)
     product_id = db.Column(db.Integer, db.ForeignKey(Products.id), nullable=False, index=True)
     table_id = db.Column(db.Integer, db.ForeignKey(Table.id), index=True)
     count = db.Column(db.Integer)
