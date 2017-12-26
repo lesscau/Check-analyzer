@@ -282,9 +282,9 @@ class TablesUsers(Resource):
         user_table = UserTable.query.filter_by(user_id=user.id).first()
 
         try:
-            db.session.delete(user_table)
             for item in user.current_products():
                 db.session.delete(item)
+            db.session.delete(user_table)
         except UnmappedInstanceError:
             db.session.rollback()
             abort(404, message="Username '{}' does not connected to any table".format(user.username))
