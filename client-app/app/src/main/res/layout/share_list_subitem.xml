@@ -8,8 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/number_picker"
-        android:layout_toStartOf="@+id/number_picker"
+        android:layout_toLeftOf="@+id/user_number_picker"
+        android:layout_toStartOf="@+id/user_number_picker"
         android:gravity="center_vertical|left"
         android:textSize="20sp"
         android:textColor="@color/material_drawer_primary_dark"/>

@@ -66,8 +66,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ShareProductListActivity"></activity>
-        <activity android:name=".activity.TotalActivity"></activity>
+        <activity android:name=".activity.ShareProductListActivity" />
+        <activity android:name=".activity.TotalActivity" />
+        <activity android:name=".activity.HistoryActivity"></activity>
     </application>
 
 </manifest>

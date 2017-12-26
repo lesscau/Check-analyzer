@@ -52,11 +52,11 @@ public class ShareProductListActivity extends AppCompatActivity {
 
         final ExpandingList expandingList = (ExpandingList) findViewById(R.id.expanding_list_main);
 
-
         // заполнение списка продуктов
         for (final Item productListItem : sharedProductListItems) {
-            final ExpandingItem item = expandingList.createNewItem(R.layout.expanding_layout);
             ArrayList<NumberPicker> numberPickerArrayList = new ArrayList<>();
+
+            final ExpandingItem item = expandingList.createNewItem(R.layout.expanding_layout);
             TextView list_item = (TextView) item.findViewById(R.id.list_item_title);
             list_item.setText(productListItem.getName());
             item.createSubItems(ProductListActivity.tempUsers.size());
@@ -125,10 +125,10 @@ public class ShareProductListActivity extends AppCompatActivity {
                 });
             }
         };
-        timer.schedule(timerTask, 0, 5000);
+        timer.schedule(timerTask, 0, 3000);
     }
 
-    void syncRequest(ItemsSync itemsSync){
+    void syncRequest(final ItemsSync itemsSync){
         Call<String> call = api.syncData(AuthInfo.getKey(), itemsSync);
         if (!NetworkUtils.checkConnection(getApplicationContext())) {
             Log.e("error", "can not connect");
@@ -141,7 +141,7 @@ public class ShareProductListActivity extends AppCompatActivity {
                     NetworkUtils.showErrorResponseBody(getApplicationContext(), response);
                     return;
                 }
-                Log.i("Sync: ","success");
+                Log.i("Items sync2: ", itemsSync.toString());
             }
 
             @Override

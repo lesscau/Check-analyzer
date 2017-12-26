@@ -72,6 +72,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         viewHolder.priceView.setText(Float.toString(item.getPrice()));
         viewHolder.numberPicker.setMinValue(0);
         viewHolder.numberPicker.setMaxValue(item.getQuantity());
+        viewHolder.numberPicker.setValue(item.getQuantity());
     }
 
     /**
