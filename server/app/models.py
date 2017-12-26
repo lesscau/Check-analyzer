@@ -13,7 +13,7 @@ class User(db.Model):
     current_table = db.relationship('Table', secondary='user_table')
 
     def current_products(self):
-        return UserProduct.query.filter_by(user_id=self.id, table_id=self.current_table)
+        return UserProduct.query.filter_by(user_id=self.id, table_id=self.current_table[0].id)
 
     def hash_password(self, password):
         """
