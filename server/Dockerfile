@@ -1,7 +1,11 @@
 FROM dan0n/flask-alpine
 
-# Copy application
-COPY . /app
+# Copy python requirements
+COPY requirements.txt /tmp
+
+# Upgrade pip and install required python packages
+RUN pip install -U pip \
+    && pip install -r /tmp/requirements.txt
 
 # Set secret key for application
 ARG FLASK_APP_SECRET_KEY
@@ -12,8 +16,8 @@ ARG DATABASE_URL
 ENV FLASK_APP_SECRET_KEY=${FLASK_APP_SECRET_KEY:-} \
     DATABASE_URL=${DATABASE_URL:-}
 
-# Upgrade pip and install required python packages
-RUN pip install -U pip \
-    && pip install -r requirements.txt \
+# Copy application
+COPY . /app
+
 # Upgrade database
-    && python db.py upgrade
+RUN python db.py upgrade
