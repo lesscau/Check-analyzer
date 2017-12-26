@@ -120,6 +120,12 @@ find_table_sync_request_fields = api.model('TablesSync request',
     'sync_data': fields.Nested(users_sync_request_fields),
 })
 
+# Close table response JSON fields
+close_table_response_fields = api.model('TablesClose response',
+{
+    'table_id': fields.Integer(description='Table_id'),
+})
+
 
 @api.route('', endpoint='tables')
 class Tables(Resource):
@@ -458,6 +464,59 @@ class TablesSync(Resource):
                 user_product.count = args['sync_data']['count']
             db.session.commit()
             return 201
+        except (IntegrityError, UnmappedInstanceError, AttributeError):
+            db.session.rollback()
+            abort(406, message="Problems with database transactions")
+        except IndexError:
+            abort(404, message="Username '{}' does not connected to any table".format(user.username))
+
+@api.route('/close', endpoint='tables_close')
+class TablesClose(Resource):
+    """
+    Control replace of the table to archive
+
+    :var     method_decorators: Decorators applied to methods
+    :vartype method_decorators: list
+    """
+    method_decorators = [Auth.multi_auth.login_required]
+
+    @api.marshal_with(close_table_response_fields)
+    @api.doc(responses={
+        404: 'Username does not connected to any table',
+        406: 'Problems with database transactions',
+    })
+    def put(self):
+        """
+        Send close request and replace to archive for a last user
+
+        :return: table_id
+        :rtype:  Integer
+        """
+
+        # Login of authorized user stores in Flask g object
+        user = User.query.filter_by(username=g.user.username).first()
+
+        try:
+            table = Table.query.filter_by(id=user.current_table[0].id).first()
+
+            userTables = table.user_tables
+            closed = 0
+            for item in userTables:
+                if item.closed == True:
+                    closed += 1
+                if item.user_id == user.id:
+                    item.closed = True
+                    closed += 1
+            if closed == len(userTables):
+                table.table_key = None
+                for item in userTables:
+                    userTableArchive = UserTableArchive(
+                        user_id = item.user_id,
+                        table_id = item.table_id)
+                    db.session.add(userTableArchive)
+                    db.session.delete(item)
+            db.session.commit()
+            return table.id
         except (IntegrityError, UnmappedInstanceError, AttributeError):
             db.session.rollback()
             abort(406, message="Problems with database transactions")
