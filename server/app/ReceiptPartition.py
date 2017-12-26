@@ -17,7 +17,7 @@ def ReceiptPartition(tableID):
                 if products['items'][index]['id'] == items['id']:
                     products['items'][index].update({'quantity': products['items'][index]['quantity'] - items['quantity']})
                     break
-            if items['temp_username'] is None:
+            if items['temp_username'] is None or items['temp_username'] == '':
                 subSum += items['quantity'] * items['price']
             elif result['users'][userNum]['total'].get(items['temp_username']) is None:
                 result['users'][userNum]['total'].update({
